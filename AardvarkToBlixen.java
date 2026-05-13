@@ -1,6 +1,10 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -29,19 +33,20 @@ public class AardvarkToBlixen {
 
         // Left text area (source for >, destination for <)
         leftArea.setText("Hello aardvark!");
+        leftArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 24));
         leftArea.setLineWrap(true);
         leftArea.setWrapStyleWord(true);
+        leftArea.setPreferredSize(new Dimension(300, 200));
 
         // Right text area (destination for >, source for <)
         rightArea.setText("");
+        rightArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 24));
         rightArea.setLineWrap(true);
         rightArea.setWrapStyleWord(true);
+        rightArea.setPreferredSize(new Dimension(300, 200));
 
         // Center panel with two text areas side by side
         JPanel centerPanel = new JPanel(new BorderLayout());
-
-        JScrollPane leftScroll  = new JScrollPane(leftArea);
-        JScrollPane rightScroll = new JScrollPane(rightArea);
 
         JPanel leftPanel  = new JPanel(new BorderLayout());
         leftPanel.add(new JScrollPane(leftArea), BorderLayout.CENTER);
@@ -62,18 +67,27 @@ public class AardvarkToBlixen {
         buttonPanel.add(moveLeftButton);
         buttonPanel.add(moveRightButton);
 
-        // Assemble the center panel
-        JPanel sideBySide = new JPanel(new BorderLayout());
-        sideBySide.add(leftPanel,  BorderLayout.WEST);
-        sideBySide.add(buttonPanel, BorderLayout.CENTER);
-        sideBySide.add(rightPanel, BorderLayout.EAST);
+        // Assemble the center panel — GridBagLayout for proportional widths (46% / 8% / 46%)
+        JPanel topRow = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.fill = GridBagConstraints.BOTH;
 
-        centerPanel.add(sideBySide, BorderLayout.CENTER);
+        gbc.weightx = 0.46; gbc.weighty = 1.0;
+        topRow.add(leftPanel, gbc);
+
+        gbc.weightx = 0.08;
+        topRow.add(buttonPanel, gbc);
+
+        gbc.weightx = 0.46;
+        topRow.add(rightPanel, gbc);
+
+        centerPanel.add(topRow, BorderLayout.CENTER);
         frame.add(centerPanel, BorderLayout.CENTER);
 
         // Size the window and center on screen
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setSize(Math.min(800, screenSize.width / 2), Math.min(600, screenSize.height / 2));
+        frame.setSize(screenSize.width / 2, screenSize.height / 2);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
@@ -83,6 +97,7 @@ public class AardvarkToBlixen {
         String source = leftArea.getText();
         String transformed = source.replace(AARDVARK, BLIXEN);
         rightArea.setText(transformed);
+        leftArea.setText("");
     }
 
     /** Move text from right to left, replacing "blixen" → "aardvark". */
@@ -90,5 +105,6 @@ public class AardvarkToBlixen {
         String source = rightArea.getText();
         String transformed = source.replace(BLIXEN, AARDVARK);
         leftArea.setText(transformed);
+        rightArea.setText("");
     }
 }
