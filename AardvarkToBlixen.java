@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import org.json.JSONObject;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,6 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+//compile with javac -cp json-20250107.jar AardvarkToBlixen.java
+//run with java -cp json-20250107.jar:. AardvarkToBlixen
 public class AardvarkToBlixen {
 
     private static final String AARDVARK = "aardvark";
@@ -34,7 +37,8 @@ public class AardvarkToBlixen {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Left text area (source for >, destination for <)
-        leftArea.setText("Hello aardvark!");
+        JSONObject jsonObject = new JSONObject("{\"key\": \"Hello aardvark!\"}");
+        leftArea.setText(jsonObject.toString());
         leftArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 24));
         leftArea.setLineWrap(true);
         leftArea.setWrapStyleWord(true);
