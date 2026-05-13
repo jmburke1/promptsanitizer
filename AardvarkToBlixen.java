@@ -20,6 +20,7 @@ import javax.swing.JTextArea;
 
 //compile with javac -cp json-20250107.jar AardvarkToBlixen.java
 //run with java -cp json-20250107.jar:. AardvarkToBlixen
+//json-20250107.jar comes from https://repo1.maven.org/maven2/org/json/json/20250107/
 public class AardvarkToBlixen {
 
     private static final String AARDVARK = "aardvark";
