@@ -8,6 +8,8 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -56,16 +58,29 @@ public class AardvarkToBlixen {
         rightPanel.add(new JScrollPane(rightArea), BorderLayout.CENTER);
         rightPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Right"));
 
-        // Button panel with > and < buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        // Button panel with > and < buttons side by side, ~ underneath
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+
+        JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton moveRightButton = new JButton(">");
         JButton moveLeftButton  = new JButton("<");
 
         moveRightButton.addActionListener(e -> moveTextLeftToRight());
         moveLeftButton.addActionListener(e -> moveTextRightToLeft());
 
-        buttonPanel.add(moveLeftButton);
-        buttonPanel.add(moveRightButton);
+        topButtons.add(moveLeftButton);
+        topButtons.add(moveRightButton);
+
+        JButton tildeButton = new JButton("~");
+        tildeButton.addActionListener(e -> {});
+
+        buttonPanel.add(topButtons);
+        buttonPanel.add(Box.createVerticalStrut(4));
+        JPanel tildeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        tildeRow.add(tildeButton);
+        buttonPanel.add(tildeRow);
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
         // Assemble the center panel — GridBagLayout for proportional widths (46% / 8% / 46%)
         JPanel topRow = new JPanel(new GridBagLayout());
@@ -73,13 +88,13 @@ public class AardvarkToBlixen {
         gbc.insets = new Insets(2, 2, 2, 2);
         gbc.fill = GridBagConstraints.BOTH;
 
-        gbc.weightx = 0.46; gbc.weighty = 1.0;
+        gbc.weightx = 0.46; gbc.weighty = 1.0; gbc.fill = GridBagConstraints.BOTH;
         topRow.add(leftPanel, gbc);
 
-        gbc.weightx = 0.08;
+        gbc.weightx = 0.08; gbc.fill = GridBagConstraints.NONE;
         topRow.add(buttonPanel, gbc);
 
-        gbc.weightx = 0.46;
+        gbc.weightx = 0.46; gbc.fill = GridBagConstraints.BOTH;
         topRow.add(rightPanel, gbc);
 
         centerPanel.add(topRow, BorderLayout.CENTER);
@@ -95,16 +110,20 @@ public class AardvarkToBlixen {
     /** Move text from left to right, replacing "aardvark" → "blixen". */
     private void moveTextLeftToRight() {
         String source = leftArea.getText();
-        String transformed = source.replace(AARDVARK, BLIXEN);
-        rightArea.setText(transformed);
-        leftArea.setText("");
+        if(source != null && !source.isEmpty()) {
+            String transformed = source.replace(AARDVARK, BLIXEN);
+            rightArea.setText(transformed);
+            leftArea.setText("");
+        }
     }
 
     /** Move text from right to left, replacing "blixen" → "aardvark". */
     private void moveTextRightToLeft() {
         String source = rightArea.getText();
-        String transformed = source.replace(BLIXEN, AARDVARK);
-        leftArea.setText(transformed);
-        rightArea.setText("");
+        if(source != null && !source.isEmpty()) {
+            String transformed = source.replace(BLIXEN, AARDVARK);
+            leftArea.setText(transformed);
+            rightArea.setText("");
+        }
     }
 }
