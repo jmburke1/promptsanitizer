@@ -66,8 +66,8 @@ public class AardvarkToBlixen {
         JButton moveRightButton = new JButton(">");
         JButton moveLeftButton  = new JButton("<");
 
-        moveRightButton.addActionListener(e -> moveTextLeftToRight());
-        moveLeftButton.addActionListener(e -> moveTextRightToLeft());
+        moveRightButton.addActionListener(e -> moveText(leftArea, rightArea, AARDVARK, BLIXEN));
+        moveLeftButton.addActionListener(e -> moveText(rightArea, leftArea, BLIXEN, AARDVARK));
 
         topButtons.add(moveLeftButton);
         topButtons.add(moveRightButton);
@@ -107,23 +107,13 @@ public class AardvarkToBlixen {
         frame.setVisible(true);
     }
 
-    /** Move text from left to right, replacing "aardvark" → "blixen". */
-    private void moveTextLeftToRight() {
-        String source = leftArea.getText();
+    /** Move text from one area to another, replacing occurrences of {@code replaceThis} with {@code withThis}. */
+    private void moveText(JTextArea fromArea, JTextArea toArea, String replaceThis, String withThis) {
+        String source = fromArea.getText();
         if(source != null && !source.isEmpty()) {
-            String transformed = source.replace(AARDVARK, BLIXEN);
-            rightArea.setText(transformed);
-            leftArea.setText("");
-        }
-    }
-
-    /** Move text from right to left, replacing "blixen" → "aardvark". */
-    private void moveTextRightToLeft() {
-        String source = rightArea.getText();
-        if(source != null && !source.isEmpty()) {
-            String transformed = source.replace(BLIXEN, AARDVARK);
-            leftArea.setText(transformed);
-            rightArea.setText("");
+            String transformed = source.replace(replaceThis, withThis);
+            toArea.setText(transformed);
+            fromArea.setText("");
         }
     }
 }
