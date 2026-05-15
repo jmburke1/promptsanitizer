@@ -37,9 +37,8 @@ public class DictionaryEditor {
 
     /** Lightweight model backed by a Map<Integer, String>. */
     private static class DictionaryModel extends javax.swing.table.AbstractTableModel {
-        private Map<Integer, String> keys   = new HashMap<>();
-        private Map<Integer, String> values = new HashMap<>();
-        private int nextId = 0;
+        private final List<String> keys   = new ArrayList<>();
+        private final List<String> values = new ArrayList<>();
 
         @Override public int getRowCount()              { return keys.size(); }
         @Override public int getColumnCount()           { return 2; }
@@ -53,8 +52,8 @@ public class DictionaryEditor {
 
         @Override public void setValueAt(Object v, int r, int c) {
             String s = (v == null) ? "" : v.toString();
-            if (c == 0) keys.put(r, s);
-            else        values.put(r, s);
+            if (c == 0) keys.set(r, s);
+            else        values.set(r, s);
             fireTableCellUpdated(r, c);
         }
 
@@ -62,50 +61,36 @@ public class DictionaryEditor {
 
         /** Add a blank row and return its row index. */
         public int addRow() {
-            int id = nextId++;
-            keys.put(id, "");
-            values.put(id, "");
+            keys.add("");
+            values.add("");
             fireTableRowsInserted(keys.size() - 1, keys.size() - 1);
             return keys.size() - 1;
         }
 
         /** Remove the given row index (shifts subsequent entries). */
         public void removeRow(int r) {
-            Map<Integer, String> newKeys   = new HashMap<>();
-            Map<Integer, String> newValues = new HashMap<>();
-            for (java.util.Map.Entry<Integer, String> e : keys.entrySet()) {
-                if (e.getKey() < r) {
-                    newKeys.put(e.getKey(), e.getValue());
-                    newValues.put(e.getKey(), values.get(e.getKey()));
-                } else if (e.getKey() > r) {
-                    newKeys.put(e.getKey() - 1, e.getValue());
-                    newValues.put(e.getKey() - 1, values.get(e.getKey()));
-                }
-            }
-
-            keys = newKeys;
-            values = newValues;
-            nextId--;
+            keys.remove(r);
+            values.remove(r);
 
             fireTableDataChanged();
         }
 
         /** Move row up one position. Returns false if already at top. */
         public boolean moveRowUp(int r) {
-            if (r <= 0) return false;
-            swap(r - 1);
+            /*if (r <= 0) return false;
+            swap(r - 1);*/
             return true;
         }
 
         /** Move row down one position. Returns false if already at bottom. */
         public boolean moveRowDown(int r) {
-            if (r >= getRowCount() - 1) return false;
-            swap(r);
+            /*if (r >= getRowCount() - 1) return false;
+            swap(r);*/
             return true;
         }
 
         private void swap(int a) {
-            int b = a + 1;
+            /*int b = a + 1;
 
             String kA   = keys.remove(a);
             String kB   = keys.remove(b);
@@ -117,18 +102,16 @@ public class DictionaryEditor {
             values.put(a, vB);
             values.put(b, vA);
 
-            fireTableRowsUpdated(Math.min(a, b), Math.max(a, b));
+            fireTableRowsUpdated(Math.min(a, b), Math.max(a, b));*/
         }
 
         /** Load all entries from the JSON file into this model. */
         public void load(JSONObject json) {
             keys.clear();
             values.clear();
-            nextId = 0;
             for (String k : json.keySet()) {
-                int id = nextId++;
-                keys.put(id, k);
-                values.put(id, json.getString(k));
+                keys.add(k);
+                values.add(json.getString(k));
             }
             fireTableDataChanged();
         }
@@ -136,15 +119,17 @@ public class DictionaryEditor {
         /** Serialize this model back into a JSONObject. */
         public JSONObject toJSON() {
             JSONObject result = new JSONObject();
-            for (Integer id : keys.keySet()) {
-                String k = keys.get(id);
-                String v = values.get(id);
+            for (int i = 0; i < keys.size() ; i++) {
+                String k = keys.get(i);
+                String v = values.get(i);
                 if (k.isEmpty() && v.isEmpty()) continue; // skip blank rows
                 result.put(k, v);
             }
             return result;
         }
     }
+
+    private static final Font BUTTON_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 
     private final DictionaryModel model = new DictionaryModel();
     private final JTable    table   = new JTable(model);
@@ -162,9 +147,10 @@ public class DictionaryEditor {
         JFrame frame = new JFrame("Dictionary Editor");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Table with compact cells
-        table.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
-        table.setRowHeight(28);
+        // Table with bigger font and headers
+        table.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+        table.setRowHeight(32);
+        table.getTableHeader().setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
         TableColumnModel tcm = table.getColumnModel();
         if (tcm.getColumnCount() > 0) {
@@ -179,6 +165,12 @@ public class DictionaryEditor {
         JPanel buttonBar = new JPanel();
         buttonBar.setLayout(new BoxLayout(buttonBar, BoxLayout.X_AXIS));
         buttonBar.setAlignmentX(0.0f);
+
+        addBtn.setFont(BUTTON_FONT);
+        rmBtn.setFont(BUTTON_FONT);
+        upBtn.setFont(BUTTON_FONT);
+        dnBtn.setFont(BUTTON_FONT);
+        saveBtn.setFont(BUTTON_FONT);
 
         addBtn.setMaximumSize(addBtn.getPreferredSize());
         rmBtn.setMaximumSize(rmBtn.getPreferredSize());
