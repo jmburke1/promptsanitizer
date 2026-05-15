@@ -22,6 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -158,7 +160,29 @@ public class DictionaryEditor {
             tcm.getColumn(1).setPreferredWidth(320);
         }
 
+        // Single-click to start editing a cell
+        table.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1 && table.getSelectedRow() >= 0) {
+                    int col = table.columnAtPoint(e.getPoint());
+                    int row = table.rowAtPoint(e.getPoint());
+                    if (col >= 0 && row >= 0) {
+                        table.editCellAt(row, col);
+                    }
+                }
+            }
+        });
+
+        // Clicking on empty space in the scroll pane cancels editing and deselects the row.
+
         JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.addMouseListener(new MouseAdapter() {
+            @Override public void mousePressed(MouseEvent e) {
+                if (table.isEditing()) {
+                    table.getCellEditor().stopCellEditing();
+                }
+            }
+        });
         frame.add(scrollPane, BorderLayout.CENTER);
 
         // Button bar at the bottom
