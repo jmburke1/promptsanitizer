@@ -1,4 +1,4 @@
-package sanitizer;
+package promptsanitizer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
