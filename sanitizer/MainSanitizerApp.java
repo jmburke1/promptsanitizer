@@ -1,3 +1,5 @@
+package sanitizer;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -17,11 +19,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.border.TitledBorder;
+import java.awt.Color;
 
-//compile with javac -cp json-20250107.jar AardvarkToBlixen.java
-//run with java -cp json-20250107.jar:. AardvarkToBlixen
+//compile with javac -cp json-20250107.jar MainSanitizerApp.java
+//run with java -cp json-20250107.jar:. MainSanitizerApp
 //json-20250107.jar comes from https://repo1.maven.org/maven2/org/json/json/20250107/
-public class AardvarkToBlixen {
+public class MainSanitizerApp {
 
     private static final String AARDVARK = "aardvark";
     private static final String BLIXEN = "blixen";
@@ -30,7 +34,7 @@ public class AardvarkToBlixen {
     private final JTextArea rightArea = new JTextArea();
 
     public static void main(String[] args) {
-        new AardvarkToBlixen().createUI();
+        new MainSanitizerApp().createUI();
     }
 
     private void createUI() {
@@ -46,8 +50,9 @@ public class AardvarkToBlixen {
         leftArea.setPreferredSize(new Dimension(300, 200));
 
         // Right text area (destination for >, source for <)
+        Font font = new Font(Font.MONOSPACED, Font.PLAIN, 24);
         rightArea.setText("");
-        rightArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 24));
+        rightArea.setFont(font);
         rightArea.setLineWrap(true);
         rightArea.setWrapStyleWord(true);
         rightArea.setPreferredSize(new Dimension(300, 200));
@@ -57,11 +62,11 @@ public class AardvarkToBlixen {
 
         JPanel leftPanel  = new JPanel(new BorderLayout());
         leftPanel.add(new JScrollPane(leftArea), BorderLayout.CENTER);
-        leftPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Left"));
+        leftPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Left", TitledBorder.LEFT, TitledBorder.TOP, font, Color.BLACK));
 
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(new JScrollPane(rightArea), BorderLayout.CENTER);
-        rightPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Right"));
+        rightPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Right", TitledBorder.LEFT, TitledBorder.TOP, font, Color.BLACK));
 
         // Button panel with > and < buttons side by side, ~ underneath
         JPanel buttonPanel = new JPanel();
