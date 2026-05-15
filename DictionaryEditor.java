@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
@@ -24,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JTextField;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +39,23 @@ public class DictionaryEditor {
     private static final String FILE_NAME = "personal_dictionary.json";
     private static final String[] COLUMN_NAMES = {"Key", "Value"};
 
+    /** Cell editor that centers its text field vertically in the cell. */
+    private static class CenteredCellEditor extends javax.swing.DefaultCellEditor {
+        public CenteredCellEditor(JTextField tf) {
+            super(tf);
+        }
+
+        @Override
+        public java.awt.Component getTableCellEditorComponent(
+                javax.swing.JTable table, Object value, boolean isSelected, int row, int col) {
+            java.awt.Component c = super.getTableCellEditorComponent(table, value, isSelected, row, col);
+            if (c instanceof javax.swing.JTextField tf) {
+                tf.setMargin(new Insets(5, 10, 5, 10));
+            }
+            return c;
+        }
+    }
+
     /** Lightweight model backed by a Map<Integer, String>. */
     private static class DictionaryModel extends javax.swing.table.AbstractTableModel {
         private final List<String> keys   = new ArrayList<>();
@@ -45,6 +64,10 @@ public class DictionaryEditor {
         @Override public int getRowCount()              { return keys.size(); }
         @Override public int getColumnCount()           { return 2; }
         @Override public String getColumnName(int c)    { return COLUMN_NAMES[c]; }
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return String.class;
+        }
 
         @Override public Object getValueAt(int r, int c) {
             if (c == 0) return keys.get(r);
@@ -149,7 +172,8 @@ public class DictionaryEditor {
         JFrame frame = new JFrame("Dictionary Editor");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Table with bigger font and headers
+        // Center the editor vertically so the cursor is visible
+        table.setDefaultEditor(String.class, new CenteredCellEditor(new JTextField()));
         table.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 18));
         table.setRowHeight(32);
         table.getTableHeader().setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
