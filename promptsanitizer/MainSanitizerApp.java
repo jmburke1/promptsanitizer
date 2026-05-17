@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -42,7 +43,6 @@ public class MainSanitizerApp {
     private void loadDictionary() {
         File f = new File("personal_dictionary.json");
         if (!f.exists()) {
-            dictionary = Map.of();
             return;
         }
         try {
@@ -153,7 +153,17 @@ public class MainSanitizerApp {
 
     /** Move text from one area to another, applying the dictionary replacements in the appropriate direction. */
     private void moveText(JTextArea fromArea, JTextArea toArea, boolean isReverseDirection) {
-        if (dictionary == null) loadDictionary();
+        if (dictionary == null) {
+            loadDictionary();
+            if (dictionary == null || dictionary.isEmpty()) {
+                JOptionPane.showMessageDialog(null, 
+                    "You either haven't configured a personal dictionary yet or it has no data in it.\nClick the ~ button to set one up.", 
+                    "No Dictionary Configured", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                dictionary = null;
+                return;
+            }
+        }
         String text = fromArea.getText();
         if(!text.isEmpty()) {
             toArea.setText(applyDictionary(text, isReverseDirection));
