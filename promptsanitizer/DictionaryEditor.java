@@ -148,13 +148,14 @@ public class DictionaryEditor {
     private final JButton   sortBySensitiveBtn   = new JButton("Sort By Sensitive Words/Phrases");
     private final JButton   sortBySafeBtn   = new JButton("Sort By Safe Words/Phrases");
     private final JButton   saveBtn = new JButton("Save to File");
+    private JFrame          frame;
 
     public static void main(String[] args) {
         new DictionaryEditor().createUI();
     }
 
-    private void createUI() {
-        JFrame frame = new JFrame("Edit Your Personal Dictionary of Sensitive Snippets");
+    public void createUI() {
+        frame = new JFrame("Edit Your Personal Dictionary of Sensitive Snippets");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Center the editor vertically so the cursor is visible
@@ -280,6 +281,7 @@ public class DictionaryEditor {
         try {
             JSONObject json = model.toJSON();
             Files.writeString(p, json.toString(2));   // pretty-print with 2-space indent
+            frame.dispose();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null,
                 "Could not save to " + FILE_NAME + ":\n" + ex.getMessage(),
