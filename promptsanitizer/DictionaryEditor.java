@@ -49,10 +49,6 @@ public class DictionaryEditor {
     private final JButton   saveBtn = new JButton("Save to File");
     private JFrame          frame;
 
-    public static void main(String[] args) {
-        new DictionaryEditor().createUI();
-    }
-
     public void createUI() {
         frame = new JFrame("Edit Your Personal Dictionary of Sensitive Snippets");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

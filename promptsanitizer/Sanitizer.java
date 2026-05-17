@@ -26,18 +26,11 @@ import java.awt.Color;
 import java.util.Map;
 import java.util.HashMap;
 
-//compile with javac -cp json-20250107.jar MainSanitizerApp.java
-//run with java -cp json-20250107.jar:. MainSanitizerApp
-//json-20250107.jar comes from https://repo1.maven.org/maven2/org/json/json/20250107/
-public class MainSanitizerApp {
+class Sanitizer {
 
     private final JTextArea leftArea  = new JTextArea();
     private final JTextArea rightArea = new JTextArea();
     private Map<String, String> dictionary;
-
-    public static void main(String[] args) {
-        new MainSanitizerApp().createUI();
-    }
 
     /** Load the personal dictionary from disk. Returns an empty map if the file doesn't exist. */
     private void loadDictionary() {
@@ -68,7 +61,7 @@ public class MainSanitizerApp {
         return text;
     }
 
-    private void createUI() {
+    void createUI() {
         JFrame frame = new JFrame("Replace Sensitive Strings in Your Prompts to an LLM.  Back replace the answer from the LLM.");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
