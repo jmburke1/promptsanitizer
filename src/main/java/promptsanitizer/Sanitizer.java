@@ -27,19 +27,23 @@ import java.util.Map;
 import java.util.HashMap;
 
 class Sanitizer {
+    public Sanitizer(String fileName) {
+        this.fileName = fileName;
+    }
 
+    private final String fileName;
     private final JTextArea leftArea  = new JTextArea();
     private final JTextArea rightArea = new JTextArea();
     private Map<String, String> dictionary;
 
     /** Load the personal dictionary from disk. Returns an empty map if the file doesn't exist. */
     private void loadDictionary() {
-        File f = new File("personal_dictionary.json");
+        File f = new File(fileName);
         if (!f.exists()) {
             return;
         }
         try {
-            JSONObject json = new JSONObject(Files.readString(Path.of("personal_dictionary.json")));
+            JSONObject json = new JSONObject(Files.readString(Path.of(fileName)));
             dictionary = new HashMap<>();
             for (String k : json.keySet()) {
                 dictionary.put(k, json.getString(k));
@@ -109,7 +113,7 @@ class Sanitizer {
         JButton tildeButton = new JButton("~");
         tildeButton.addActionListener(e -> {
             dictionary = null;
-            new DictionaryEditor().createUI();
+            new DictionaryEditor(fileName).createUI();
         });
 
         buttonPanel.add(topButtons);

@@ -35,8 +35,11 @@ import java.util.Collections;
 // compile with: javac -cp json-20250107.jar DictionaryEditor.java
 // run with:    java -cp json-20250107.jar:. DictionaryEditor
 public class DictionaryEditor {
+    public DictionaryEditor(String fileName) {
+        this.fileName = fileName;
+    }
 
-    private static final String FILE_NAME = "personal_dictionary.json";
+    private final String fileName;
 
     private static final Font BUTTON_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 
@@ -142,28 +145,28 @@ public class DictionaryEditor {
 
     /** Read the JSON file and populate the table. */
     private void loadFromFile() {
-        File f = new File(FILE_NAME);
+        File f = new File(fileName);
         if (!f.exists()) return;
         try {
-            JSONObject json = new JSONObject(Files.readString(Path.of(FILE_NAME)));
+            JSONObject json = new JSONObject(Files.readString(Path.of(fileName)));
             model.load(json);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(null,
-                "Could not read " + FILE_NAME + ":\n" + ex.getMessage(),
+                "Could not read " + fileName + ":\n" + ex.getMessage(),
                 "Load Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /** Serialize the table back to JSON and write it to disk. */
     private void saveToFile() {
-        Path p = Path.of(FILE_NAME);
+        Path p = Path.of(fileName);
         try {
             JSONObject json = model.toJSON();
             Files.writeString(p, json.toString(2));   // pretty-print with 2-space indent
             frame.dispose();
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null,
-                "Could not save to " + FILE_NAME + ":\n" + ex.getMessage(),
+                "Could not save to " + fileName + ":\n" + ex.getMessage(),
                 "Save Error", JOptionPane.ERROR_MESSAGE);
         }
     }
