@@ -33,13 +33,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.json.JSONObject;
+import java.util.Collections;
 
 // compile with: javac -cp json-20250107.jar DictionaryEditor.java
 // run with:    java -cp json-20250107.jar:. DictionaryEditor
 public class DictionaryEditor {
 
     private static final String FILE_NAME = "personal_dictionary.json";
-    private static final String[] COLUMN_NAMES = {"Key", "Value"};
+    private static final String[] COLUMN_NAMES = {"Sensitive", "Safe"};
 
     /** Cell editor that centers its text field vertically in the cell. */
     private static class CenteredCellEditor extends javax.swing.DefaultCellEditor {
@@ -60,10 +61,9 @@ public class DictionaryEditor {
 
     /** Lightweight model backed by a Map<Integer, String>. */
     private static class DictionaryModel extends javax.swing.table.AbstractTableModel {
-        private final List<String> keys   = new ArrayList<>();
-        private final List<String> values = new ArrayList<>();
+        private final List<SensitiveSafeRecord> sensitiveSafes   = new ArrayList<>();
 
-        @Override public int getRowCount()              { return keys.size(); }
+        @Override public int getRowCount()              { return sensitiveSafes.size(); }
         @Override public int getColumnCount()           { return 2; }
         @Override public String getColumnName(int c)    { return COLUMN_NAMES[c]; }
         @Override
@@ -72,15 +72,20 @@ public class DictionaryEditor {
         }
 
         @Override public Object getValueAt(int r, int c) {
-            if (c == 0) return keys.get(r);
-            if (c == 1) return values.get(r);
+            if (c == 0) return sensitiveSafes.get(r).sensitive();
+            if (c == 1) return sensitiveSafes.get(r).safe();
             return null;
         }
 
         @Override public void setValueAt(Object v, int r, int c) {
             String s = (v == null) ? "" : v.toString();
-            if (c == 0) keys.set(r, s);
-            else        values.set(r, s);
+            SensitiveSafeRecord senSafRec;
+            if (c == 0) {
+                senSafRec = new SensitiveSafeRecord(s, sensitiveSafes.get(r).safe());
+            } else {
+                senSafRec = new SensitiveSafeRecord(sensitiveSafes.get(r).sensitive(), s);
+            }
+            sensitiveSafes.set(r, senSafRec);
             fireTableCellUpdated(r, c);
         }
 
@@ -88,57 +93,35 @@ public class DictionaryEditor {
 
         /** Add a blank row and return its row index. */
         public int addRow() {
-            keys.add("");
-            values.add("");
-            fireTableRowsInserted(keys.size() - 1, keys.size() - 1);
-            return keys.size() - 1;
+            sensitiveSafes.add(new SensitiveSafeRecord("", ""));
+            fireTableRowsInserted(sensitiveSafes.size() - 1, sensitiveSafes.size() - 1);
+            return sensitiveSafes.size() - 1;
         }
 
         /** Remove the given row index (shifts subsequent entries). */
         public void removeRow(int r) {
-            keys.remove(r);
-            values.remove(r);
+            sensitiveSafes.remove(r);
 
             fireTableDataChanged();
         }
 
-        /** Move row up one position. Returns false if already at top. */
-        public boolean moveRowUp(int r) {
-            /*if (r <= 0) return false;
-            swap(r - 1);*/
-            return true;
+        /** Sort the JTable by sensitive values. */
+        public void sortBySensitive() {
+            Collections.sort(sensitiveSafes, (ss1, ss2) -> ss1.sensitive().compareTo(ss2.sensitive()));
+            fireTableDataChanged();
         }
 
-        /** Move row down one position. Returns false if already at bottom. */
-        public boolean moveRowDown(int r) {
-            /*if (r >= getRowCount() - 1) return false;
-            swap(r);*/
-            return true;
-        }
-
-        private void swap(int a) {
-            /*int b = a + 1;
-
-            String kA   = keys.remove(a);
-            String kB   = keys.remove(b);
-            String vA   = values.remove(a);
-            String vB   = values.remove(b);
-
-            keys.put(a, kB);
-            keys.put(b, kA);
-            values.put(a, vB);
-            values.put(b, vA);
-
-            fireTableRowsUpdated(Math.min(a, b), Math.max(a, b));*/
+        /** Sort the JTable by safe values. */
+        public void sortBySafe() {
+            Collections.sort(sensitiveSafes, (ss1, ss2) -> ss1.safe().compareTo(ss2.safe()));
+            fireTableDataChanged();
         }
 
         /** Load all entries from the JSON file into this model. */
         public void load(JSONObject json) {
-            keys.clear();
-            values.clear();
+            sensitiveSafes.clear();
             for (String k : json.keySet()) {
-                keys.add(k);
-                values.add(json.getString(k));
+                sensitiveSafes.add(new SensitiveSafeRecord(k, json.getString(k)));
             }
             fireTableDataChanged();
         }
@@ -146,9 +129,9 @@ public class DictionaryEditor {
         /** Serialize this model back into a JSONObject. */
         public JSONObject toJSON() {
             JSONObject result = new JSONObject();
-            for (int i = 0; i < keys.size() ; i++) {
-                String k = keys.get(i);
-                String v = values.get(i);
+            for (int i = 0; i < sensitiveSafes.size() ; i++) {
+                String k = sensitiveSafes.get(i).sensitive();
+                String v = sensitiveSafes.get(i).safe();
                 if (k.isEmpty() && v.isEmpty()) continue; // skip blank rows
                 result.put(k, v);
             }
@@ -162,8 +145,8 @@ public class DictionaryEditor {
     private final JTable    table   = new JTable(model);
     private final JButton   addBtn  = new JButton("Add Row");
     private final JButton   rmBtn   = new JButton("Remove Row");
-    private final JButton   upBtn   = new JButton("▲ Up");
-    private final JButton   dnBtn   = new JButton("▼ Down");
+    private final JButton   sortBySensitiveBtn   = new JButton("Sort By Sensitive Words/Phrases");
+    private final JButton   sortBySafeBtn   = new JButton("Sort By Safe Words/Phrases");
     private final JButton   saveBtn = new JButton("Save to File");
 
     public static void main(String[] args) {
@@ -171,7 +154,7 @@ public class DictionaryEditor {
     }
 
     private void createUI() {
-        JFrame frame = new JFrame("Dictionary Editor");
+        JFrame frame = new JFrame("Edit Your Personal Dictionary of Sensitive Snippets");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Center the editor vertically so the cursor is visible
@@ -218,14 +201,14 @@ public class DictionaryEditor {
 
         addBtn.setFont(BUTTON_FONT);
         rmBtn.setFont(BUTTON_FONT);
-        upBtn.setFont(BUTTON_FONT);
-        dnBtn.setFont(BUTTON_FONT);
+        sortBySensitiveBtn.setFont(BUTTON_FONT);
+        sortBySafeBtn.setFont(BUTTON_FONT);
         saveBtn.setFont(BUTTON_FONT);
 
         addBtn.setMaximumSize(addBtn.getPreferredSize());
         rmBtn.setMaximumSize(rmBtn.getPreferredSize());
-        upBtn.setMaximumSize(upBtn.getPreferredSize());
-        dnBtn.setMaximumSize(dnBtn.getPreferredSize());
+        sortBySensitiveBtn.setMaximumSize(sortBySensitiveBtn.getPreferredSize());
+        sortBySafeBtn.setMaximumSize(sortBySafeBtn.getPreferredSize());
         saveBtn.setMaximumSize(saveBtn.getPreferredSize());
 
         buttonBar.add(Box.createHorizontalStrut(6));
@@ -233,9 +216,9 @@ public class DictionaryEditor {
         buttonBar.add(Box.createHorizontalStrut(4));
         buttonBar.add(rmBtn);
         buttonBar.add(Box.createHorizontalStrut(4));
-        buttonBar.add(upBtn);
+        buttonBar.add(sortBySensitiveBtn);
         buttonBar.add(Box.createHorizontalStrut(4));
-        buttonBar.add(dnBtn);
+        buttonBar.add(sortBySafeBtn);
         buttonBar.add(Box.createHorizontalGlue());
         buttonBar.add(saveBtn);
         buttonBar.add(Box.createHorizontalStrut(6));
@@ -255,18 +238,14 @@ public class DictionaryEditor {
             model.removeRow(r);
         });
 
-        upBtn.addActionListener(e -> {
-            int r = table.getSelectedRow();
-            if (r > 0 && model.moveRowUp(r)) {
-                table.setRowSelectionInterval(r - 1, r - 1);
-            }
+        sortBySensitiveBtn.addActionListener(e -> {
+            model.sortBySensitive();
+            table.clearSelection();
         });
 
-        dnBtn.addActionListener(e -> {
-            int r = table.getSelectedRow();
-            if (r >= 0 && r < model.getRowCount() - 1 && model.moveRowDown(r)) {
-                table.setRowSelectionInterval(r + 1, r + 1);
-            }
+        sortBySafeBtn.addActionListener(e -> {
+            model.sortBySafe();
+            table.clearSelection();
         });
 
         saveBtn.addActionListener(e -> saveToFile());
