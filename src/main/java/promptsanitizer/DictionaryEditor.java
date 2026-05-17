@@ -1,4 +1,4 @@
-package promptsanitizer;
+package promptsanitizer; //Adding a test comment to prove that the github token works.
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
