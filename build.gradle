@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group = 'promptsanitizer'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = '21'
+targetCompatibility = '21'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.json:json:20250107'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.+'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}
