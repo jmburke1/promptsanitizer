@@ -2,7 +2,6 @@ package promptsanitizer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
@@ -13,8 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -40,104 +37,6 @@ import java.util.Collections;
 public class DictionaryEditor {
 
     private static final String FILE_NAME = "personal_dictionary.json";
-    private static final String[] COLUMN_NAMES = {"Sensitive", "Safe"};
-
-    /** Cell editor that centers its text field vertically in the cell. */
-    private static class CenteredCellEditor extends javax.swing.DefaultCellEditor {
-        public CenteredCellEditor(JTextField tf) {
-            super(tf);
-        }
-
-        @Override
-        public java.awt.Component getTableCellEditorComponent(
-                javax.swing.JTable table, Object value, boolean isSelected, int row, int col) {
-            java.awt.Component c = super.getTableCellEditorComponent(table, value, isSelected, row, col);
-            if (c instanceof javax.swing.JTextField tf) {
-                tf.setMargin(new Insets(5, 10, 5, 10));
-            }
-            return c;
-        }
-    }
-
-    /** Lightweight model backed by a Map<Integer, String>. */
-    private static class DictionaryModel extends javax.swing.table.AbstractTableModel {
-        private final List<SensitiveSafeRecord> sensitiveSafes   = new ArrayList<>();
-
-        @Override public int getRowCount()              { return sensitiveSafes.size(); }
-        @Override public int getColumnCount()           { return 2; }
-        @Override public String getColumnName(int c)    { return COLUMN_NAMES[c]; }
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            return String.class;
-        }
-
-        @Override public Object getValueAt(int r, int c) {
-            if (c == 0) return sensitiveSafes.get(r).sensitive();
-            if (c == 1) return sensitiveSafes.get(r).safe();
-            return null;
-        }
-
-        @Override public void setValueAt(Object v, int r, int c) {
-            String s = (v == null) ? "" : v.toString();
-            SensitiveSafeRecord senSafRec;
-            if (c == 0) {
-                senSafRec = new SensitiveSafeRecord(s, sensitiveSafes.get(r).safe());
-            } else {
-                senSafRec = new SensitiveSafeRecord(sensitiveSafes.get(r).sensitive(), s);
-            }
-            sensitiveSafes.set(r, senSafRec);
-            fireTableCellUpdated(r, c);
-        }
-
-        @Override public boolean isCellEditable(int r, int c) { return true; }
-
-        /** Add a blank row and return its row index. */
-        public int addRow() {
-            sensitiveSafes.add(new SensitiveSafeRecord("", ""));
-            fireTableRowsInserted(sensitiveSafes.size() - 1, sensitiveSafes.size() - 1);
-            return sensitiveSafes.size() - 1;
-        }
-
-        /** Remove the given row index (shifts subsequent entries). */
-        public void removeRow(int r) {
-            sensitiveSafes.remove(r);
-
-            fireTableDataChanged();
-        }
-
-        /** Sort the JTable by sensitive values. */
-        public void sortBySensitive() {
-            Collections.sort(sensitiveSafes, (ss1, ss2) -> ss1.sensitive().compareTo(ss2.sensitive()));
-            fireTableDataChanged();
-        }
-
-        /** Sort the JTable by safe values. */
-        public void sortBySafe() {
-            Collections.sort(sensitiveSafes, (ss1, ss2) -> ss1.safe().compareTo(ss2.safe()));
-            fireTableDataChanged();
-        }
-
-        /** Load all entries from the JSON file into this model. */
-        public void load(JSONObject json) {
-            sensitiveSafes.clear();
-            for (String k : json.keySet()) {
-                sensitiveSafes.add(new SensitiveSafeRecord(k, json.getString(k)));
-            }
-            fireTableDataChanged();
-        }
-
-        /** Serialize this model back into a JSONObject. */
-        public JSONObject toJSON() {
-            JSONObject result = new JSONObject();
-            for (int i = 0; i < sensitiveSafes.size() ; i++) {
-                String k = sensitiveSafes.get(i).sensitive();
-                String v = sensitiveSafes.get(i).safe();
-                if (k.isEmpty() && v.isEmpty()) continue; // skip blank rows
-                result.put(k, v);
-            }
-            return result;
-        }
-    }
 
     private static final Font BUTTON_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 
@@ -171,28 +70,12 @@ public class DictionaryEditor {
         }
 
         // Single-click to start editing a cell
-        table.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1 && table.getSelectedRow() >= 0) {
-                    int col = table.columnAtPoint(e.getPoint());
-                    int row = table.rowAtPoint(e.getPoint());
-                    if (col >= 0 && row >= 0) {
-                        table.editCellAt(row, col);
-                    }
-                }
-            }
-        });
+        table.addMouseListener(new TableMouseAdapter(table));
 
         // Clicking on empty space in the scroll pane cancels editing and deselects the row.
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.addMouseListener(new MouseAdapter() {
-            @Override public void mousePressed(MouseEvent e) {
-                if (table.isEditing()) {
-                    table.getCellEditor().stopCellEditing();
-                }
-            }
-        });
+        scrollPane.addMouseListener(new ScrollPaneMouseAdapter(table));
         frame.add(scrollPane, BorderLayout.CENTER);
 
         // Button bar at the bottom
