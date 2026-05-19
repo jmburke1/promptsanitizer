@@ -3,6 +3,9 @@ package promptsanitizer;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
+import promptsanitizer.controller.SanitizerController;
+import promptsanitizer.model.SanitizerModel;
+import promptsanitizer.view.SanitizerView;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,11 +13,13 @@ class MainAppTest {
     @Test
     void testMain() {
         try(
-                MockedConstruction<Sanitizer> sanitizerMC = Mockito.mockConstruction(
-                        Sanitizer.class,
+                MockedConstruction<SanitizerView> sanitizerMC = Mockito.mockConstruction(
+                        SanitizerView.class,
                         (mock, context) -> {
-                            assertEquals(1, context.arguments().size());
-                            assertTrue(((String)context.arguments().getFirst()).contains("personal_dictionary.json"));
+                            assertEquals(3, context.arguments().size());
+                            assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
+                            assertInstanceOf(SanitizerController.class, context.arguments().get(1));
+                            assertInstanceOf(SanitizerModel.class, context.arguments().get(2));
                         }
                 )
         ) {
