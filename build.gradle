@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'promptsanitizer'
+group = 'myapplication'
 version = '1.0-SNAPSHOT'
 
 java {
@@ -18,6 +18,8 @@ dependencies {
     implementation 'org.json:json:20250107'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.+'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
 }
 
 test {

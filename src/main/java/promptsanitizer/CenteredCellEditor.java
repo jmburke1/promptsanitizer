@@ -13,11 +13,11 @@ class CenteredCellEditor extends DefaultCellEditor {
     @Override
     public Component getTableCellEditorComponent(
         JTable table, Object value, boolean isSelected, int row, int col) {
-        Component c = super.getTableCellEditorComponent(table, value, isSelected, row, col);
-        if (c instanceof JTextField tf) {
-            tf.setMargin(new Insets(5, 10, 5, 10));
-        }
-        return c;
+        JTextField tf = (JTextField)super.getTableCellEditorComponent(table, value, isSelected, row, col);
+
+        tf.setMargin(new Insets(5, 10, 5, 10));
+
+        return tf;
     }
 }
 
