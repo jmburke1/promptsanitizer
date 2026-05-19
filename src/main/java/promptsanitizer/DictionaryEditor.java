@@ -4,14 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -22,15 +16,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.JTextField;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.json.JSONObject;
-import java.util.Collections;
+import promptsanitizer.component.CenteredCellEditor;
+import promptsanitizer.controller.TableMouseAdapter;
 
 // compile with: javac -cp json-20250107.jar DictionaryEditor.java
 // run with:    java -cp json-20250107.jar:. DictionaryEditor

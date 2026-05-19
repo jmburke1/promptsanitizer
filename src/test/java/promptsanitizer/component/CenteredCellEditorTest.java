@@ -1,10 +1,13 @@
-package promptsanitizer;
+package promptsanitizer.component;
 
 import org.junit.jupiter.api.Test;
-import javax.swing.*;
-import java.awt.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import java.awt.Component;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class CenteredCellEditorTest {
 

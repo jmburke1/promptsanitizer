@@ -1,12 +1,12 @@
-package promptsanitizer;
+package promptsanitizer.component;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.DefaultCellEditor;
 import java.awt.Component;
 import java.awt.Insets;
 
-class CenteredCellEditor extends DefaultCellEditor {
-    CenteredCellEditor(JTextField tf) {
+public class CenteredCellEditor extends DefaultCellEditor {
+    public CenteredCellEditor(JTextField tf) {
         super(tf);
     }
 

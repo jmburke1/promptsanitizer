@@ -1,13 +1,13 @@
-package promptsanitizer;
+package promptsanitizer.controller;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTable;
 
-class TableMouseAdapter extends MouseAdapter {
+public class TableMouseAdapter extends MouseAdapter {
     private final JTable table;
 
-    TableMouseAdapter(JTable table) {
+    public TableMouseAdapter(JTable table) {
         this.table = table;
     }
 
