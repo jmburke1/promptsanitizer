@@ -7,6 +7,8 @@ import org.mockito.Mockito;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockitoSession;
@@ -28,8 +30,11 @@ class TableMouseAdapterTest {
     @Test
     void shouldEditCellAtRowAndColumnWhenClickCount1AndSelectedRowNotLessThanZero() {
         JTable jTable = Mockito.mock(JTable.class);
+        JButton jButton = Mockito.mock(JButton.class);
+        java.util.List<JButton> list = new ArrayList<>();
+        list.add(jButton);
         Point point = Mockito.mock(Point.class);
-        TableMouseAdapter sut = new TableMouseAdapter(jTable);
+        TableMouseAdapter sut = new TableMouseAdapter(jTable, list);
         MouseEvent mouseEvent = Mockito.mock(MouseEvent.class);
         Mockito.when(mouseEvent.getPoint()).thenReturn(point);
         Mockito.when(mouseEvent.getClickCount()).thenReturn(1);
@@ -40,13 +45,14 @@ class TableMouseAdapterTest {
         sut.mouseClicked(mouseEvent);
 
         Mockito.verify(jTable).editCellAt(3, 5);
+        Mockito.verify(jButton).setEnabled(false);
     }
 
     @Test
     void shouldNotEditCellAtRowAndColumnWhenRowNegative() {
         JTable jTable = Mockito.mock(JTable.class);
         Point point = Mockito.mock(Point.class);
-        TableMouseAdapter sut = new TableMouseAdapter(jTable);
+        TableMouseAdapter sut = new TableMouseAdapter(jTable, null);
         MouseEvent mouseEvent = Mockito.mock(MouseEvent.class);
         Mockito.when(mouseEvent.getPoint()).thenReturn(point);
         Mockito.when(mouseEvent.getClickCount()).thenReturn(1);
@@ -63,7 +69,7 @@ class TableMouseAdapterTest {
     void shouldNotEditCellAtRowAndColumnWhenColumnNegative() {
         JTable jTable = Mockito.mock(JTable.class);
         Point point = Mockito.mock(Point.class);
-        TableMouseAdapter sut = new TableMouseAdapter(jTable);
+        TableMouseAdapter sut = new TableMouseAdapter(jTable, null);
         MouseEvent mouseEvent = Mockito.mock(MouseEvent.class);
         Mockito.when(mouseEvent.getPoint()).thenReturn(point);
         Mockito.when(mouseEvent.getClickCount()).thenReturn(1);
@@ -79,7 +85,7 @@ class TableMouseAdapterTest {
     @Test
     void shouldNotEditCellAtRowAndColumnWhenClickCountWrong() {
         JTable jTable = Mockito.mock(JTable.class);
-        TableMouseAdapter sut = new TableMouseAdapter(jTable);
+        TableMouseAdapter sut = new TableMouseAdapter(jTable, null);
         MouseEvent mouseEvent = Mockito.mock(MouseEvent.class);
         Mockito.when(mouseEvent.getClickCount()).thenReturn(5);
 
@@ -90,7 +96,7 @@ class TableMouseAdapterTest {
     @Test
     void shouldNotEditCellAtRowAndColumnWhenClickCount1ButSelectedRowLessThanZero() {
         JTable jTable = Mockito.mock(JTable.class);
-        TableMouseAdapter sut = new TableMouseAdapter(jTable);
+        TableMouseAdapter sut = new TableMouseAdapter(jTable, null);
         MouseEvent mouseEvent = Mockito.mock(MouseEvent.class);
         Mockito.when(mouseEvent.getClickCount()).thenReturn(1);
         Mockito.when(jTable.getSelectedRow()).thenReturn(-3);

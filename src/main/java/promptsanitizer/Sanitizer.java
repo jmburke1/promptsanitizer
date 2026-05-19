@@ -14,6 +14,9 @@ import java.nio.file.Path;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import org.json.JSONObject;
+import promptsanitizer.controller.DictionaryEditorController;
+import promptsanitizer.model.DictionaryModel;
+import promptsanitizer.view.DictionaryEditorView;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -113,7 +116,7 @@ class Sanitizer {
         JButton tildeButton = new JButton("~");
         tildeButton.addActionListener(e -> {
             dictionary = null;
-            new DictionaryEditor(fileName).createUI();
+            new DictionaryEditorView(fileName, new DictionaryEditorController(), new DictionaryModel()).createUI();
         });
 
         buttonPanel.add(topButtons);

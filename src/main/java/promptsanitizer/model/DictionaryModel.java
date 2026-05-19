@@ -1,13 +1,13 @@
-package promptsanitizer;
+package promptsanitizer.model;
 
-import javax.swing.table.AbstractTableModel;
 import org.json.JSONObject;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
 /** Lightweight model backed by a Map<Integer, String>. */
-class DictionaryModel extends javax.swing.table.AbstractTableModel {
+public class DictionaryModel extends javax.swing.table.AbstractTableModel {
     private final List<SensitiveSafeRecord> sensitiveSafes   = new ArrayList<>();
     private static final String[] COLUMN_NAMES = {"Sensitive", "Safe"};
 
@@ -48,9 +48,8 @@ class DictionaryModel extends javax.swing.table.AbstractTableModel {
 
     /** Remove the given row index (shifts subsequent entries). */
     public void removeRow(int r) {
+        fireTableRowsDeleted(r, r);
         sensitiveSafes.remove(r);
-
-        fireTableDataChanged();
     }
 
     /** Sort the JTable by sensitive values. */
