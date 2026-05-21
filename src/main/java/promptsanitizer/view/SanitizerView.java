@@ -26,13 +26,15 @@ public class SanitizerView {
         this.fileName = fileName;
         this.controller = controller;
         this.model = model;
+        leftArea = new JTextArea();
+        rightArea = new JTextArea();
     }
 
     private final SanitizerController controller;
     private final SanitizerModel model;
     private final String fileName;
-    private final JTextArea leftArea  = new JTextArea();
-    private final JTextArea rightArea = new JTextArea();
+    private final JTextArea leftArea;
+    private final JTextArea rightArea;
 
     public void createUI() {
         model.init(fileName);
@@ -97,7 +99,7 @@ public class SanitizerView {
         gbc.insets = new Insets(2, 2, 2, 2);
         gbc.fill = GridBagConstraints.BOTH;
 
-        gbc.weightx = 0.46; gbc.weighty = 1.0; gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 0.46; gbc.weighty = 1.0;
         topRow.add(leftPanel, gbc);
 
         gbc.weightx = 0.08; gbc.fill = GridBagConstraints.NONE;

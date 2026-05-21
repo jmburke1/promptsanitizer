@@ -1,4 +1,4 @@
-package promptsanitizer.component;
+package promptsanitizer.controller;
 
 import org.junit.jupiter.api.Test;
 

@@ -2,7 +2,7 @@ package promptsanitizer.view;
 
 import promptsanitizer.controller.DictionaryEditorController;
 import promptsanitizer.controller.ScrollPaneMouseAdapter;
-import promptsanitizer.component.CenteredCellEditor;
+import promptsanitizer.controller.CenteredCellEditor;
 import promptsanitizer.controller.TableMouseAdapter;
 import promptsanitizer.model.DictionaryModel;
 
@@ -16,26 +16,32 @@ public class DictionaryEditorView {
         this.fileName = fileName;
         this.controller = controller;
         this.model = model;
+        addBtn = new JButton("Add Row");
+        rmBtn = new JButton("Remove Row");
+        sortBySensitiveBtn = new JButton("Sort By Sensitive Words/Phrases");
+        sortBySafeBtn = new JButton("Sort By Safe Words/Phrases");
+        saveBtn = new JButton("Save to File");
+        cancelBtn = new JButton("Cancel");
+        table = new JTable(model);
+        frame = new JFrame("Edit Your Personal Dictionary of Sensitive Snippets");
     }
 
     private final String fileName;
 
     private static final Font BUTTON_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 
-    private DictionaryModel model;
-    private JTable table;
-    private final JButton   addBtn  = new JButton("Add Row");
-    private final JButton   rmBtn   = new JButton("Remove Row");
-    private final JButton   sortBySensitiveBtn   = new JButton("Sort By Sensitive Words/Phrases");
-    private final JButton   sortBySafeBtn   = new JButton("Sort By Safe Words/Phrases");
-    private final JButton   saveBtn = new JButton("Save to File");
-    private final JButton   cancelBtn = new JButton("Cancel");
-    private JFrame          frame;
-    private DictionaryEditorController controller;
+    private final DictionaryModel model;
+    private final JTable table;
+    private final JButton addBtn;
+    private final JButton rmBtn;
+    private final JButton sortBySensitiveBtn;
+    private final JButton sortBySafeBtn;
+    private final JButton saveBtn;
+    private final JButton cancelBtn;
+    private final JFrame frame;
+    private final DictionaryEditorController controller;
 
     public void createUI() {
-        table = new JTable(model);
-        frame = new JFrame("Edit Your Personal Dictionary of Sensitive Snippets");
         controller.init(fileName, model, table, frame);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
