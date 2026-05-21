@@ -15,8 +15,6 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.Disabled;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DictionaryEditorControllerTest {
