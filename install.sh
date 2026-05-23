@@ -33,6 +33,31 @@ if (( java_major < JAVA_MIN || javac_major < JAVA_MIN )); then
 fi
 
 info "Java version OK (java=${java_major}, javac=${javac_major})."
+info "Checking that it's the full java rather than headless"
+
+cat >/tmp/TestGui.java <<'EOF'
+import java.awt.Frame;
+
+public class TestGui {
+    public static void main(String[] args) {
+        Frame f = new Frame();
+        f.dispose();
+        System.out.println("GUI_OK");
+    }
+}
+EOF
+
+javac /tmp/TestGui.java >/dev/null
+
+if ! java -cp /tmp TestGui >/tmp/gui_test.out 2>&1; then
+    die "Java GUI support unavailable.  The promptsanitizer requires the Java AWT and Java Swing."
+fi
+
+if ! grep -q GUI_OK /tmp/gui_test.out; then
+    die "Java GUI support unavailable.  The promptsanitizer requires the Java AWT and Java Swing."
+fi
+
+rm /tmp/TestGui.java
 
 # ── Step 1: Create install directory ──────────────────────────────────
 if [ -d "$INSTALL_DIR" ]; then
@@ -119,9 +144,4 @@ echo ""
 echo "═══════════════════════════════════════════════════"
 echo "  Installation complete!"
 echo "  Run '${APP_NAME}' from anywhere to start."
-echo "  ONE IMPORTANT NOTE!  This install script currently"
-echo "  has no way to check if you have the full JDK or"
-echo "  only the headless one.  If you get a headless"
-echo "  If you get a headless exception, simply install the"
-echo "  full JDK."
 echo "═══════════════════════════════════════════════════"
