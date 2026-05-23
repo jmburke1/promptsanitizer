@@ -46,7 +46,7 @@ info "Created ${INSTALL_DIR}." # mkdir -p implicitly creates the INSTALL_DIR in 
 # ── Step 2: Download the repo as a zip (no git required) ──────────
 
 info "Downloading repository from ${REPO_URL} ..."
-if ! curl -H "Authorization: Bearer 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" -fsSL "${REPO_URL}" -o "downloaded.zip"; then
+if ! curl -fsSL "${REPO_URL}" -o "downloaded.zip"; then
     die "Failed to download ${REPO_URL}. Is the URL correct?"
 fi
 sudo mv downloaded.zip ${INSTALL_DIR}
