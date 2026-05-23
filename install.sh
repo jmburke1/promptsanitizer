@@ -46,11 +46,11 @@ info "Created ${INSTALL_DIR}." # mkdir -p implicitly creates the INSTALL_DIR in 
 # ── Step 2: Download the repo as a zip (no git required) ──────────
 
 info "Downloading repository from ${REPO_URL} ..."
-if ! curl -fsSL "${REPO_URL}" -o "downloaded.zip"; then
+if ! curl -H "Authorization: Bearer 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" -fsSL "${REPO_URL}" -o "downloaded.zip"; then
     die "Failed to download ${REPO_URL}. Is the URL correct?"
 fi
 sudo mv downloaded.zip ${INSTALL_DIR}
-cd ${INSTALL_DIR}
+pushd ${INSTALL_DIR}
 sudo unzip downloaded.zip
 sudo rm downloaded.zip
 
@@ -65,11 +65,11 @@ fi
 
 # ── Step 4: Compile MainApp and all main classes ─────────────────────
 info "Compiling Java sources ..."
-cd promptsanitizer-main
+pushd promptsanitizer-main
 sudo mv * ../
 sudo mv .gitignore ../
 sudo mv .gitattributes ../
-cd ..
+popd
 sudo rmdir promptsanitizer-main
 
 # Collect all .java files under src/main/java
@@ -86,19 +86,21 @@ sudo javac -d build -sourcepath src/main/java \
 info "Compilation successful."
 
 # ── Step 6: Create the application runner script ──────────────────────
-RUNNER="${INSTALL_DIR}/run-${APP_NAME}"
+popd
+RUNNER="run-${APP_NAME}"
 
-sudo cat > "$RUNNER" <<'RUNNER_EOF'
+cat > "$RUNNER" <<'RUNNER_EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="/opt/promptsanitizer/"
 CLASS_PATH="${SCRIPT_DIR}/build:$(find "${SCRIPT_DIR}/lib" -name '*.jar' | tr '\n' ':')"
 
 exec java -cp "$CLASS_PATH" promptsanitizer.MainApp "$@"
 RUNNER_EOF
 
-sudo chmod +x "$RUNNER"
+sudo mv ${RUNNER} ${INSTALL_DIR}
+sudo chmod +x "${INSTALL_DIR}/${RUNNER}"
 info "Created runner script at ${RUNNER}."
 
 # ── Step 7: Create symbolic link in /usr/local/bin ────────────────────
@@ -109,12 +111,17 @@ if [ -L "$LINK_TARGET" ] || [ -e "$LINK_TARGET" ]; then
     sudo rm -f "$LINK_TARGET"
 fi
 
-sudo ln -sf "$RUNNER" "$LINK_TARGET"
-info "Created symlink: ${LINK_TARGET} -> ${RUNNER}"
+sudo ln -sf "${INSTALL_DIR}/${RUNNER}" "$LINK_TARGET"
+info "Created symlink: ${LINK_TARGET} -> ${INSTALL_DIR}/${RUNNER}"
 
 # ── Done ──────────────────────────────────────────────────────────────
 echo ""
 echo "═══════════════════════════════════════════════════"
 echo "  Installation complete!"
 echo "  Run '${APP_NAME}' from anywhere to start."
+echo "  ONE IMPORTANT NOTE!  This install script currently"
+echo "  has no way to check if you have the full JDK or"
+echo "  only the headless one.  If you get a headless"
+echo "  If you get a headless exception, simply install the"
+echo "  full JDK."
 echo "═══════════════════════════════════════════════════"
