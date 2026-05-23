@@ -1,3 +1,7 @@
+/*
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2026 Jason Burke
+ */
 package promptsanitizer.controller;
 import javax.swing.JTable;
 import javax.swing.JTextField;
