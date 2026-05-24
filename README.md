@@ -132,6 +132,14 @@ java -cp build/classes/java/main:lib/json-20250107.jar promptsanitizer.MainApp
 
 ---
 
+## Batch Job Interface
+
+This is for a local AI running inside a docker container (for example, openmonoagent.ai), which will probably only have access to a headless java.
+
+It only takes a single command line argument for the direction.  And the values are expected to be either "forward" or "reverse".  If the direction is forward, it will write to a file called "sanitized_content.txt" with the contents of the "unsanitized_content.txt" replaced with their corresponding safe values from your personal dictionary.  If the direction is specified as reverse, everything is done in reverse.  It will write to the file "unsanitized_content.txt" with the contents of the "sanitized_content.txt" after making the dictionary replacements.
+
+Finally, before it does any of this, it checks for a file called upserts.json in the directory that the application is running from.  In it, if it finds json strings of the form `{"key": "value"}` then it will update your personal dictionary so that the indicated key/value pair is there (either overwriting it or creating it as a new key/value pair).  And, if the upserts.json contains `{"key": null}` then that is taken as an instruction to delete "key" out of your personal dictionary altogether.
+
 ## License
 
 MIT - do whatever you want with your downloaded copy of it.

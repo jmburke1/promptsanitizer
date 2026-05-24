@@ -33,31 +33,6 @@ if (( java_major < JAVA_MIN || javac_major < JAVA_MIN )); then
 fi
 
 info "Java version OK (java=${java_major}, javac=${javac_major})."
-info "Checking that it's the full java rather than headless"
-
-cat >/tmp/TestGui.java <<'EOF'
-import java.awt.Frame;
-
-public class TestGui {
-    public static void main(String[] args) {
-        Frame f = new Frame();
-        f.dispose();
-        System.out.println("GUI_OK");
-    }
-}
-EOF
-
-javac /tmp/TestGui.java >/dev/null
-
-if ! java -cp /tmp TestGui >/tmp/gui_test.out 2>&1; then
-    die "Java GUI support unavailable.  The promptsanitizer requires the Java AWT and Java Swing."
-fi
-
-if ! grep -q GUI_OK /tmp/gui_test.out; then
-    die "Java GUI support unavailable.  The promptsanitizer requires the Java AWT and Java Swing."
-fi
-
-rm /tmp/TestGui.java
 
 # ── Step 1: Create install directory ──────────────────────────────────
 if [ -d "$INSTALL_DIR" ]; then
@@ -124,20 +99,45 @@ CLASS_PATH="${SCRIPT_DIR}/build:$(find "${SCRIPT_DIR}/lib" -name '*.jar' | tr '\
 exec java -cp "$CLASS_PATH" promptsanitizer.MainApp "$@"
 RUNNER_EOF
 
+RUNNER_BATCH="run-${APP_NAME}-batch"
+
+cat > "$RUNNER_BATCH" <<'RUNNER_BATCH_EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="/opt/promptsanitizer/"
+CLASS_PATH="${SCRIPT_DIR}/build:$(find "${SCRIPT_DIR}/lib" -name '*.jar' | tr '\n' ':')"
+
+exec java -cp "$CLASS_PATH" promptsanitizer.batchjob.MainBatchJobApp "$@"
+RUNNER_BATCH_EOF
+
 sudo mv ${RUNNER} ${INSTALL_DIR}
 sudo chmod +x "${INSTALL_DIR}/${RUNNER}"
 info "Created runner script at ${RUNNER}."
 
+sudo mv ${RUNNER_BATCH} ${INSTALL_DIR}
+sudo chmod +x "${INSTALL_DIR}/${RUNNER_BATCH}"
+info "Created runner script at ${RUNNER_BATCH}."
+
 # ── Step 7: Create symbolic link in /usr/local/bin ────────────────────
 LINK_TARGET="/usr/local/bin/${APP_NAME}"
+LINK_TARGET_BATCH="/usr/local/bin/${APP_NAME}batch"
 
 if [ -L "$LINK_TARGET" ] || [ -e "$LINK_TARGET" ]; then
     info "Removing existing ${LINK_TARGET} ..."
     sudo rm -f "$LINK_TARGET"
 fi
 
+if [ -L "$LINK_TARGET_BATCH" ] || [ -e "$LINK_TARGET_BATCH" ]; then
+    info "Removing existing ${LINK_TARGET_BATCH} ..."
+    sudo rm -f "$LINK_TARGET_BATCH"
+fi
+
 sudo ln -sf "${INSTALL_DIR}/${RUNNER}" "$LINK_TARGET"
 info "Created symlink: ${LINK_TARGET} -> ${INSTALL_DIR}/${RUNNER}"
+
+sudo ln -sf "${INSTALL_DIR}/${RUNNER_BATCH}" "$LINK_TARGET_BATCH"
+info "Created symlink: ${LINK_TARGET_BATCH} -> ${INSTALL_DIR}/${RUNNER_BATCH}"
 
 # ── Done ──────────────────────────────────────────────────────────────
 echo ""
