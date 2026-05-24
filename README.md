@@ -132,6 +132,10 @@ java -cp build/classes/java/main:lib/json-20250107.jar promptsanitizer.MainApp
 
 ---
 
+## Batch Job Interface
+
+This is for a local AI running inside a docker container (for example, openmonoagent.ai), which will probably only have access to a headless java.
+
 ## License
 
 MIT - do whatever you want with your downloaded copy of it.
