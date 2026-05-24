@@ -136,7 +136,9 @@ java -cp build/classes/java/main:lib/json-20250107.jar promptsanitizer.MainApp
 
 This is for a local AI running inside a docker container (for example, openmonoagent.ai), which will probably only have access to a headless java.
 
-The names of the command line arguments are "direction" (where you specify forward or reverse), "sensitive-file-loc" and "safe-file-loc".
+The names of the command line arguments are "direction" (where you specify forward or reverse), "sensitive-file-loc" and "safe-file-loc".  If the direction is forward, it will write to the safe file location with the contents of the file in the sensitive file location replaced with their corresponding safe values from your personal dictionary.  If the direction is specified as reverse, everything is done in reverse.  It will write to the file specified in the sensitive file location with the contents of the file in the safe file location after making the dictionary replacements.
+
+Finally, before it does any of this, it checks for a file called upserts.json in the directory that the application is running from.  In it, if it finds json strings of the form `{"key": {"upsertType": "UPSERT", "value": "newValue"}}` then it will update your personal dictionary so that the indicated key/value pair is there (either overwriting it or creating it as a new key/value pair).  And, if the upserts.json contains `{"key": {"upsertType": "DELETE"}}` then that is taken as an instruction to delete "key" out of your personal dictionary altogether.
 
 ## License
 
