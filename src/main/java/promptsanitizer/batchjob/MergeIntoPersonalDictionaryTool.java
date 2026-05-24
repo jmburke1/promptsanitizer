@@ -29,14 +29,10 @@ public class MergeIntoPersonalDictionaryTool {
         }
         JSONObject thingToMergeIntoPersonalDictionary = new JSONObject(Files.readString(Path.of(updateFileLocation)));
         for (String k : thingToMergeIntoPersonalDictionary.keySet()) {
-            JSONObject currentObject = thingToMergeIntoPersonalDictionary.getJSONObject(k);
-            String upsertType = currentObject.getString("upsertType");
-            if("UPSERT".equals(upsertType)) {
-                currentPersonalDictionary.put(k, currentObject.getString("value"));
-            } else if("DELETE".equals(upsertType)) {
+            if(thingToMergeIntoPersonalDictionary.isNull(k)) {
                 currentPersonalDictionary.remove(k);
             } else {
-                throw new IllegalArgumentException("upsertType should be either UPSERT or DELETE");
+                currentPersonalDictionary.put(k, thingToMergeIntoPersonalDictionary.getString(k));
             }
         }
         Files.writeString(writeToThisWhenDone, currentPersonalDictionary.toString(2));   // pretty-print with 2-space indent

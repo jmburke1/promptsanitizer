@@ -1,15 +1,13 @@
 package promptsanitizer.batchjob;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class MainBatchJobApp {
     public static void main(String[] args) throws IOException {
-        Map<String, String> parsed = ArgsParse.parseArgs(args);
         boolean reverseDirection;
-        if("forward".equals(parsed.get("direction"))) {
+        if("forward".equals(args[0])) {
             reverseDirection = false;
-        } else if("reverse".equals(parsed.get("direction"))) {
+        } else if("reverse".equals(args[0])) {
             reverseDirection = true;
         } else {
             throw new IllegalArgumentException("Must specify forward or reverse");
@@ -20,9 +18,9 @@ public class MainBatchJobApp {
                 "personal_dictionary.json";
         (new MergeIntoPersonalDictionaryTool(personalDictionaryFileLocation, "upserts.json")).updatePersonalDictionary();
         if(reverseDirection) {
-            (new PersonalDictionaryApplicator(personalDictionaryFileLocation, parsed.get("safe-file-loc"), parsed.get("sensitive-file-loc"), true)).executeUpdate();
+            (new PersonalDictionaryApplicator(personalDictionaryFileLocation, "sanitized_content.txt", "unsanitized_content.txt", true)).executeUpdate();
         } else {
-            (new PersonalDictionaryApplicator(personalDictionaryFileLocation, parsed.get("sensitive-file-loc"), parsed.get("safe-file-loc"), false)).executeUpdate();
+            (new PersonalDictionaryApplicator(personalDictionaryFileLocation, "unsanitized_content.txt", "sanitized_content.txt", false)).executeUpdate();
         }
     }
 }

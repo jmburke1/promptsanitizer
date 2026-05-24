@@ -29,13 +29,13 @@ class MainBatchJobAppTest {
                         (mock, context) -> {
                             assertEquals(4, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
-                            assertEquals("ContainsSecrets.md", context.arguments().get(1));
-                            assertEquals("Safe.md", context.arguments().get(2));
+                            assertEquals("unsanitized_content.txt", context.arguments().get(1));
+                            assertEquals("sanitized_content.txt", context.arguments().get(2));
                             assertFalse((boolean)context.arguments().get(3));
                         }
                 )
         ) {
-            String[] testArgs = {"--sensitive-file-loc", "ContainsSecrets.md", "--safe-file-loc", "Safe.md", "--direction", "forward"};
+            String[] testArgs = {"forward"};
             MainBatchJobApp.main(testArgs);
             Mockito.verify(mgIntoPDectToolMC.constructed().getFirst()).updatePersonalDictionary();
             Mockito.verify(personalDictApplMC.constructed().getFirst()).executeUpdate();
@@ -58,13 +58,13 @@ class MainBatchJobAppTest {
                         (mock, context) -> {
                             assertEquals(4, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
-                            assertEquals("LLMAnswer.md", context.arguments().get(1));
-                            assertEquals("WhatWeKnowItMeans.md", context.arguments().get(2));
+                            assertEquals("sanitized_content.txt", context.arguments().get(1));
+                            assertEquals("unsanitized_content.txt", context.arguments().get(2));
                             assertTrue((boolean)context.arguments().get(3));
                         }
                 )
         ) {
-            String[] testArgs = {"--sensitive-file-loc", "WhatWeKnowItMeans.md", "--safe-file-loc", "LLMAnswer.md", "--direction", "reverse"};
+            String[] testArgs = {"reverse"};
             MainBatchJobApp.main(testArgs);
             Mockito.verify(mgIntoPDectToolMC.constructed().getFirst()).updatePersonalDictionary();
             Mockito.verify(personalDictApplMC.constructed().getFirst()).executeUpdate();
@@ -73,7 +73,7 @@ class MainBatchJobAppTest {
     @Test
     void testMainForOtherDirection() throws IOException {
         boolean caught = false;
-        String[] testArgs = {"--sensitive-file-loc", "someMD.md", "--safe-file-loc", "someOtherMD.md", "--direction", "somethingelse"};
+        String[] testArgs = {"somethingelse"};
         try {
             MainBatchJobApp.main(testArgs);
         } catch(IllegalArgumentException iae) {
