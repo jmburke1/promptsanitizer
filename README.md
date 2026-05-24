@@ -136,6 +136,8 @@ java -cp build/classes/java/main:lib/json-20250107.jar promptsanitizer.MainApp
 
 This is for a local AI running inside a docker container (for example, openmonoagent.ai), which will probably only have access to a headless java.
 
+The names of the command line arguments are "direction" (where you specify forward or reverse), "sensitive-file-loc" and "safe-file-loc".
+
 ## License
 
 MIT - do whatever you want with your downloaded copy of it.
