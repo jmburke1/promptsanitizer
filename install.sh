@@ -66,13 +66,13 @@ fi
 
 # ── Step 4: Compile MainApp and all main classes ─────────────────────
 info "Compiling Java sources ..."
-pushd promptsanitizer-v1.0.0
+pushd promptsanitizer-1.0.0
 #Change back to pushd promptsanitizer-main when done cutting the release tag
 sudo mv * ../
 sudo mv .gitignore ../
 sudo mv .gitattributes ../
 popd
-sudo rmdir promptsanitizer-v1.0.0
+sudo rmdir promptsanitizer-1.0.0
 #Change back to rmdir promptsanitizer-main when done cutting the release tag
 
 # Collect all .java files under src/main/java
