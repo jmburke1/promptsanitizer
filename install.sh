@@ -5,8 +5,8 @@ set -euo pipefail
 INSTALL_DIR="/opt/promptsanitizer"
 LIB_DIR="${INSTALL_DIR}/lib"
 APP_NAME="promptsanitizer"
-REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/tags/v1.0.0.zip"
-#Change back to REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/main.zip" when done cutting release tag
+REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/main.zip"
+#This was changed to REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/tags/v1.0.0.zip" when cutting release tag
 JSON_VERSION="20250107"
 JSON_COORD="org.json:json:${JSON_VERSION}"
 JAVA_MIN=21
@@ -66,14 +66,14 @@ fi
 
 # ── Step 4: Compile MainApp and all main classes ─────────────────────
 info "Compiling Java sources ..."
-pushd promptsanitizer-1.0.0
-#Change back to pushd promptsanitizer-main when done cutting the release tag
+pushd promptsanitizer-main
+#This was changed to pushd promptsanitizer-1.0.0 when cutting the release tag
 sudo mv * ../
 sudo mv .gitignore ../
 sudo mv .gitattributes ../
 popd
-sudo rmdir promptsanitizer-1.0.0
-#Change back to rmdir promptsanitizer-main when done cutting the release tag
+sudo rmdir promptsanitizer-main
+#This was changed to sudo rmdir promptsanitizer-1.0.0 when cutting the release tag
 
 # Collect all .java files under src/main/java
 sudo javac -d build -sourcepath src/main/java \
