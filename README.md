@@ -151,3 +151,7 @@ MIT - do whatever you want with your downloaded copy of it.
 ---
 
 **Built because your prompts shouldn't be anyone else's training data.**
+
+## Screen Captures
+
+This README.md is already long enough.  See the EXAMPLE_WITH_SCREEN_CAPTURES.md for more details.
