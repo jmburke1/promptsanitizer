@@ -73,15 +73,11 @@ popd
 sudo rmdir promptsanitizer-main
 
 # Collect all .java files under src/main/java
-JAVA_FILES=$(find src/main/java -name '*.java' | sort)
-
-if [ -z "$JAVA_FILES" ]; then
-    die "No .java files found under src/main/java."
-fi
-
 sudo javac -d build -sourcepath src/main/java \
     -cp "${INSTALL_DIR}/lib/json-${JSON_VERSION}.jar" \
-    $JAVA_FILES || die "Compilation failed."
+    src/main/java/promptsanitizer/MainApp.java \
+    src/main/java/promptsanitizer/batchjob/MainBatchJobApp.java \
+    || die "Compilation failed."
 
 info "Compilation successful."
 
