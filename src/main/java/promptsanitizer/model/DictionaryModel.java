@@ -6,7 +6,6 @@ package promptsanitizer.model;
 
 import org.json.JSONObject;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -58,13 +57,13 @@ public class DictionaryModel extends javax.swing.table.AbstractTableModel {
 
     /** Sort the JTable by sensitive values. */
     public void sortBySensitive() {
-        Collections.sort(sensitiveSafes, (ss1, ss2) -> ss1.sensitive().compareTo(ss2.sensitive()));
+        sensitiveSafes.sort((ss1, ss2) -> ss1.sensitive().compareTo(ss2.sensitive()));
         fireTableDataChanged();
     }
 
     /** Sort the JTable by safe values. */
     public void sortBySafe() {
-        Collections.sort(sensitiveSafes, (ss1, ss2) -> ss1.safe().compareTo(ss2.safe()));
+        sensitiveSafes.sort((ss1, ss2) -> ss1.safe().compareTo(ss2.safe()));
         fireTableDataChanged();
     }
 
