@@ -24,7 +24,7 @@ public class DictionaryEditorViewTest {
                     Mockito.mock(DictionaryModel.class)
             );
             dictionaryEditorView.createUI();
-            Mockito.verify(jfMC.constructed().get(0)).setVisible(true);
+            Mockito.verify(jfMC.constructed().getFirst()).setVisible(true);
         }
     }
 }
