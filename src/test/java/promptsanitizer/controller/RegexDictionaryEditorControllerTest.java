@@ -39,20 +39,6 @@ class RegexDictionaryEditorControllerTest {
 
     // --- helper: set private fields via reflection to avoid calling init() ---
 
-    private void injectFields(RegexDictionaryEditorController controller, String fileName,
-                              DictionaryModel model, JTable table, JFrame frame) throws Exception {
-        setPrivate(controller, "fileName", fileName);
-        setPrivate(controller, "model", model);
-        setPrivate(controller, "table", table);
-        setPrivate(controller, "frame", frame);
-    }
-
-    private void setPrivate(Object target, String fieldName, Object value) throws Exception {
-        Field f = target.getClass().getDeclaredField(fieldName);
-        f.setAccessible(true);
-        f.set(target, value);
-    }
-
     // --- init / loadFromFile ---
 
     @Test
@@ -190,14 +176,14 @@ class RegexDictionaryEditorControllerTest {
     void saveToFile_shouldSerializeAndWriteToJsonFile() throws Exception {
         Path tmp = Files.createTempFile("save", ".json");
         String fileName = tmp.toString();
+        Files.writeString(tmp, "{}");
         DictionaryModel model = Mockito.mock(DictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         JSONObject expectedJson = new JSONObject().put("hello", "greetings").put("bye", "farewell");
         Mockito.when(model.toJSON()).thenReturn(expectedJson);
         RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
-        // Inject fields directly to avoid loadFromFile reading a real file.
-        injectFields(controller, fileName, model, table, frame);
+        controller.init(fileName, model, table, frame);
 
         controller.saveToFile();
 
@@ -216,9 +202,8 @@ class RegexDictionaryEditorControllerTest {
         JFrame frame = Mockito.mock(JFrame.class);
         Mockito.when(model.toJSON()).thenReturn(new JSONObject());
         RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
-        // Inject fields with an invalid path to force an IOException on write.
         String badPath = "/tmp/nonexistent/directory/file.json";
-        injectFields(controller, badPath, model, table, frame);
+        controller.init(badPath, model, table, frame);
 
         try(MockedStatic<JOptionPane> jOptionPaneMockedStatic = Mockito.mockStatic(JOptionPane.class)) {
             controller.saveToFile();
@@ -238,8 +223,7 @@ class RegexDictionaryEditorControllerTest {
         /*DictionaryModel model = Mockito.mock(DictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);*/
         RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
-        controller.init(frame);
-        //injectFields(controller, "/tmp/nonexistent/file.json", model, table, frame);
+        controller.init(/*"/tmp/nonexistent/file.json", model, table, */frame);
 
         controller.cancel();
 

@@ -8,9 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import promptsanitizer.controller.DictionaryEditorController;
-import promptsanitizer.controller.SanitizerController;
 import promptsanitizer.model.DictionaryModel;
-import promptsanitizer.model.SanitizerModel;
 
 import javax.swing.*;
 
