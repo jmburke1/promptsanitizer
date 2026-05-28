@@ -7,6 +7,7 @@ package promptsanitizer.controller;
 import promptsanitizer.model.DictionaryModel;
 import promptsanitizer.model.SanitizerModel;
 import promptsanitizer.view.DictionaryEditorView;
+import promptsanitizer.view.RegexDictionaryEditorView;
 
 import javax.swing.*;
 
@@ -40,5 +41,8 @@ public class SanitizerController {
     public void handleTilde() {
         model.invalidateDictionary();
         new DictionaryEditorView(fileName, new DictionaryEditorController(), new DictionaryModel()).createUI();
+    }
+    public void handleAsteriskTilde() {
+        new RegexDictionaryEditorView(/*fileName, */new RegexDictionaryEditorController()/*, new DictionaryModel()*/).createUI();
     }
 }
