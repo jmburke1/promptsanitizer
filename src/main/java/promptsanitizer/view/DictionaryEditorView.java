@@ -47,7 +47,7 @@ public class DictionaryEditorView {
 
     public void createUI() {
         controller.init(fileName, model, table, frame);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Center the editor vertically so the cursor is visible
         table.setDefaultEditor(String.class, new CenteredCellEditor(new JTextField()));
