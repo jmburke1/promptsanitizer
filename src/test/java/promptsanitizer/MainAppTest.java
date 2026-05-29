@@ -20,10 +20,11 @@ class MainAppTest {
                 MockedConstruction<SanitizerView> sanitizerMC = Mockito.mockConstruction(
                         SanitizerView.class,
                         (mock, context) -> {
-                            assertEquals(3, context.arguments().size());
+                            assertEquals(4, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
-                            assertInstanceOf(SanitizerController.class, context.arguments().get(1));
-                            assertInstanceOf(SanitizerModel.class, context.arguments().get(2));
+                            assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
+                            assertInstanceOf(SanitizerController.class, context.arguments().get(2));
+                            assertInstanceOf(SanitizerModel.class, context.arguments().get(3));
                         }
                 )
         ) {

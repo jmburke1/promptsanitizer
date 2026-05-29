@@ -17,12 +17,14 @@ class SanitizerModelTest {
     void canApplyDictionaryInForwardDirection() throws Exception {
         SanitizerModel model = new SanitizerModel();
         Path tmpFile = Files.createTempFile("dict", ".json");
+        Path tmpFileRegex = Files.createTempFile("dict_regex", ".json");
         try {
             Files.writeString(tmpFile, "{\"hello\": \"world\", \"foo\": \"bar\"}");
-            model.init(tmpFile.toString());
+            Files.writeString(tmpFileRegex, "{\"graft([0-9]+)\": {\"repl\": \"$1lark\", \"dir\": \">\"}}");
+            model.init(tmpFile.toString(), tmpFileRegex.toString());
             model.loadDictionary();
-            String beforeSubstitutions = "hello foo clay drool foo dust hello graft";
-            String expectedAfterSubstitutions = "world bar clay drool bar dust world graft";
+            String beforeSubstitutions = "hello foo graft1 drool foo dust hello graft2";
+            String expectedAfterSubstitutions = "world bar 1lark drool bar dust world 2lark";
 
             String actualAfterSubstitutions = model.applyDictionary(beforeSubstitutions, false);
 
@@ -32,6 +34,7 @@ class SanitizerModelTest {
         } finally {
             model.invalidateDictionary();
             Files.delete(tmpFile);
+            Files.delete(tmpFileRegex);
         }
         assertFalse(model.isValidDictionary());
         assertFalse(model.isStronglyValidDictionary());
@@ -41,12 +44,14 @@ class SanitizerModelTest {
     void canApplyDictionaryInReverseDirection() throws Exception {
         SanitizerModel model = new SanitizerModel();
         Path tmpFile = Files.createTempFile("dict", ".json");
+        Path tmpFileRegex = Files.createTempFile("dict_regex", ".json");
         try {
             Files.writeString(tmpFile, "{\"hello\": \"world\", \"foo\": \"bar\"}");
-            model.init(tmpFile.toString());
+            Files.writeString(tmpFileRegex, "{\"graft([0-9]+)\": {\"repl\": \"$1lark\", \"dir\": \"<\"}}");
+            model.init(tmpFile.toString(), tmpFileRegex.toString());
             model.loadDictionary();
-            String beforeSubstitutions = "world bar clay drool bar dust world graft";
-            String expectedAfterSubstitutions = "hello foo clay drool foo dust hello graft";
+            String beforeSubstitutions = "world bar graft1 drool bar dust world graft2";
+            String expectedAfterSubstitutions = "hello foo 1lark drool foo dust hello 2lark";
 
             String actualAfterSubstitutions = model.applyDictionary(beforeSubstitutions, true);
 
@@ -56,6 +61,7 @@ class SanitizerModelTest {
         } finally {
             model.invalidateDictionary();
             Files.delete(tmpFile);
+            Files.delete(tmpFileRegex);
         }
         assertFalse(model.isValidDictionary());
         assertFalse(model.isStronglyValidDictionary());
@@ -66,9 +72,11 @@ class SanitizerModelTest {
         SanitizerModel model = new SanitizerModel();
 
         Path tmpFile = Files.createTempFile("dict", ".json");
+        Path tmpFileRegex = Files.createTempFile("dict_regex", ".json");
         try {
             Files.writeString(tmpFile, "{}");
-            model.init(tmpFile.toString());
+            Files.writeString(tmpFileRegex, "{}");
+            model.init(tmpFile.toString(), tmpFileRegex.toString());
 
             model.loadDictionary();
 
@@ -77,6 +85,7 @@ class SanitizerModelTest {
         } finally {
             model.invalidateDictionary();
             Files.delete(tmpFile);
+            Files.delete(tmpFileRegex);
         }
     }
 
@@ -85,7 +94,7 @@ class SanitizerModelTest {
         SanitizerModel model = new SanitizerModel();
 
         try {
-            model.init("/tmp/nonexistent/file.json");
+            model.init("/tmp/nonexistent/file.json", "/tmp/nonexistent/file_regex.json");
 
             model.loadDictionary();
 
@@ -99,9 +108,11 @@ class SanitizerModelTest {
     void loadingDictionaryCausingExceptionResultsInInvalidDictionary() throws Exception {
         SanitizerModel model = new SanitizerModel();
         Path tmpFile = Files.createTempFile("dict", ".json");
+        Path tmpFileRegex = Files.createTempFile("dict_regex", ".json");
         try {
             Files.writeString(tmpFile, "This is not valid JSON syntax.");
-            model.init(tmpFile.toString());
+            Files.writeString(tmpFileRegex, "This is not valid JSON syntax.");
+            model.init(tmpFile.toString(), tmpFileRegex.toString());
 
             model.loadDictionary();
 
@@ -110,6 +121,7 @@ class SanitizerModelTest {
         } finally {
             model.invalidateDictionary();
             Files.delete(tmpFile);
+            Files.delete(tmpFileRegex);
         }
     }
 }
