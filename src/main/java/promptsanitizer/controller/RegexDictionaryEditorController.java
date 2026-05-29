@@ -4,37 +4,41 @@
  */
 package promptsanitizer.controller;
 
-import org.json.JSONObject;
-import promptsanitizer.model.DictionaryModel;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.json.JSONObject;
+import promptsanitizer.model.RegexDictionaryModel;
+
 public class RegexDictionaryEditorController {
     public void init(
-            /*String fileName,
-            DictionaryModel model,
-            JTable table,*/
+            String fileName,
+            RegexDictionaryModel model,
+            JTable table,
             JFrame frame
     ) {
-        /*this.model = model;
+        this.model = model;
         this.table = table;
-        this.fileName = fileName;*/
+        this.fileName = fileName;
         this.frame = frame;
-        //loadFromFile();
+        loadFromFile();
     }
 
-    /*private String fileName;
+    private String fileName;
 
-    private DictionaryModel model;
-    private JTable table;*/
+    private RegexDictionaryModel model;
+    private JTable table;
     private JFrame frame;
 
     /** Read the JSON file and populate the table. */
-    /*private void loadFromFile() {
+    private void loadFromFile() {
         File f = new File(fileName);
         if (!f.exists()) return;
         try {
@@ -58,18 +62,18 @@ public class RegexDictionaryEditorController {
         model.removeRow(r);
     }
 
-    public void sortBySensitive() {
-        model.sortBySensitive();
+    public void sortByRegex() {
+        model.sortByRegexes();
         table.clearSelection();
     }
 
-    public void sortBySafe() {
-        model.sortBySafe();
+    public void sortByReplacement() {
+        model.sortByReplacements();
         table.clearSelection();
-    }*/
+    }
 
     /** Serialize the table back to JSON and write it to disk. */
-    /*public void saveToFile() {
+    public void saveToFile() {
         Path p = Path.of(fileName);
         try {
             JSONObject json = model.toJSON();
@@ -80,7 +84,7 @@ public class RegexDictionaryEditorController {
                 "Could not save to " + fileName + ":\n" + ex.getMessage(),
                 "Save Error", JOptionPane.ERROR_MESSAGE);
         }
-    }*/
+    }
     /** Cancel the operation. */
     public void cancel() {
         frame.dispose();

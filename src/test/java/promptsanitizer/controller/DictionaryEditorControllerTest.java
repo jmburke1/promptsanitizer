@@ -15,7 +15,6 @@ import org.mockito.quality.Strictness;
 import promptsanitizer.model.DictionaryModel;
 
 import javax.swing.*;
-import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
