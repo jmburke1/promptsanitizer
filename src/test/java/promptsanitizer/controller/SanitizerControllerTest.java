@@ -14,6 +14,7 @@ import org.mockito.MockitoSession;
 import org.mockito.quality.Strictness;
 import promptsanitizer.model.SanitizerModel;
 import promptsanitizer.view.DictionaryEditorView;
+import promptsanitizer.view.RegexDictionaryEditorView;
 
 import java.util.List;
 import javax.swing.*;
@@ -42,9 +43,10 @@ class SanitizerControllerTest {
     void init_shouldSetModelAndFileName() throws Exception {
         SanitizerModel model = Mockito.mock(SanitizerModel.class);
         String fileName = "/tmp/dict.json";
+        String regexFileName = "/tmp/regex_dict.json";
         SanitizerController controller = new SanitizerController();
 
-        controller.init(model, fileName);
+        controller.init(model, fileName, regexFileName);
 
         // Verify fields are set via reflection (no getter on the class)
         var f1 = SanitizerController.class.getDeclaredField("model");
@@ -65,7 +67,7 @@ class SanitizerControllerTest {
         JTextArea fromArea = new JTextArea("hello");
         JTextArea toArea = new JTextArea();
         SanitizerController controller = new SanitizerController();
-        controller.init(model, "/tmp/dict.json");
+        controller.init(model, "/tmp/dict.json", "/tmp/regex_dict.json");
 
         controller.moveText(fromArea, toArea, false);
 
@@ -81,7 +83,7 @@ class SanitizerControllerTest {
         JTextArea fromArea = new JTextArea("");
         JTextArea toArea = new JTextArea();
         SanitizerController controller = new SanitizerController();
-        controller.init(model, "/tmp/dict.json");
+        controller.init(model, "/tmp/dict.json", "/tmp/regex_dict.json");
 
         controller.moveText(fromArea, toArea, false);
 
@@ -98,7 +100,7 @@ class SanitizerControllerTest {
         JTextArea fromArea = new JTextArea("test");
         JTextArea toArea = new JTextArea();
         SanitizerController controller = new SanitizerController();
-        controller.init(model, "/tmp/dict.json");
+        controller.init(model, "/tmp/dict.json", "/tmp/regex_dict.json");
 
         controller.moveText(fromArea, toArea, true);
 
@@ -116,7 +118,7 @@ class SanitizerControllerTest {
         JTextArea fromArea = new JTextArea("test");
         JTextArea toArea = new JTextArea();
         SanitizerController controller = new SanitizerController();
-        controller.init(model, "/tmp/dict.json");
+        controller.init(model, "/tmp/dict.json", "/tmp/regex_dict.json");
 
         try (MockedStatic<JOptionPane> jOptionPaneMockedStatic = Mockito.mockStatic(JOptionPane.class)) {
             controller.moveText(fromArea, toArea, false);
@@ -141,7 +143,7 @@ class SanitizerControllerTest {
         JTextArea fromArea = new JTextArea("reversed");
         JTextArea toArea = new JTextArea();
         SanitizerController controller = new SanitizerController();
-        controller.init(model, "/tmp/dict.json");
+        controller.init(model, "/tmp/dict.json", "/tmp/regex_dict.json");
 
         controller.moveText(fromArea, toArea, true);
 
@@ -155,8 +157,9 @@ class SanitizerControllerTest {
     void handleTilde_shouldInvalidateDictionaryAndOpenEditorView() {
         SanitizerModel model = Mockito.mock(SanitizerModel.class);
         String fileName = "/tmp/dict.json";
+        String regexFileName = "/tmp/regex_dict.json";
         SanitizerController controller = new SanitizerController();
-        controller.init(model, fileName);
+        controller.init(model, fileName, regexFileName);
 
         try (MockedConstruction<DictionaryEditorView> viewMockedConstruction = Mockito.mockConstruction(
                 DictionaryEditorView.class)) {
@@ -164,6 +167,27 @@ class SanitizerControllerTest {
 
             Mockito.verify(model).invalidateDictionary();
             List<DictionaryEditorView> editorViews = viewMockedConstruction.constructed();
+            assertEquals(1, editorViews.size());
+            Mockito.verify(editorViews.getFirst()).createUI();
+        }
+    }
+
+    // --- handleAsteriskTilde ---
+
+    @Test
+    void handleAsteriskTilde_shouldInvalidateDictionaryAndOpenEditorView() {
+        SanitizerModel model = Mockito.mock(SanitizerModel.class);
+        String fileName = "/tmp/dict.json";
+        String regexFileName = "/tmp/regex_dict.json";
+        SanitizerController controller = new SanitizerController();
+        controller.init(model, fileName, regexFileName);
+
+        try (MockedConstruction<RegexDictionaryEditorView> viewMockedConstruction = Mockito.mockConstruction(
+                RegexDictionaryEditorView.class)) {
+            controller.handleAsteriskTilde();
+
+            Mockito.verify(model).invalidateDictionary();
+            List<RegexDictionaryEditorView> editorViews = viewMockedConstruction.constructed();
             assertEquals(1, editorViews.size());
             Mockito.verify(editorViews.getFirst()).createUI();
         }

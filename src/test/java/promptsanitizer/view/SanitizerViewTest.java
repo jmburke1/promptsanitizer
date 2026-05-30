@@ -18,6 +18,7 @@ public class SanitizerViewTest {
         try(MockedConstruction<JFrame> jfMC = Mockito.mockConstruction(JFrame.class)) {
             SanitizerView sanitizerView = new SanitizerView(
                     "/path/to/file.json",
+                    "/path/to/file_with_regexes.json",
                     Mockito.mock(SanitizerController.class),
                     Mockito.mock(SanitizerModel.class)
             );

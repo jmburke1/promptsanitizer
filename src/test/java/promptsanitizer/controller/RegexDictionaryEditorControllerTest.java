@@ -12,7 +12,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
 import org.mockito.quality.Strictness;
-import promptsanitizer.model.DictionaryModel;
+import promptsanitizer.model.RegexDictionaryModel;
 
 import javax.swing.*;
 import java.nio.file.Files;
@@ -20,7 +20,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DictionaryEditorControllerTest {
+class RegexDictionaryEditorControllerTest {
 
     private MockitoSession mockito;
 
@@ -40,29 +40,33 @@ class DictionaryEditorControllerTest {
 
     // --- init / loadFromFile ---
 
+    private boolean jsonObjectArgThat(JSONObject jo) {
+        JSONObject t = jo.getJSONObject("key1");
+        return t.getString("repl").equals("value1") && t.getString("dir").equals("<");
+    }
     @Test
     void init_shouldSetFieldsAndCallLoadWhenFileExists() throws Exception {
         Path tmp = Files.createTempFile("dict", ".json");
-        Files.writeString(tmp, "{\"key1\":\"value1\"}");
+        Files.writeString(tmp, "{\"key1\":{\"repl\": \"value1\", \"dir\": \"<\"}}"); //change this?
         String fileName = tmp.toString();
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
 
         controller.init(fileName, model, table, frame);
 
-        Mockito.verify(model).load(Mockito.argThat(jsonObject -> jsonObject.getString("key1").equals("value1")));
+        Mockito.verify(model).load(Mockito.argThat(this::jsonObjectArgThat));
         Files.delete(tmp);
     }
 
     @Test
     void init_shouldDoNothingWhenFileDoesNotExist() {
         String fileName = "/tmp/nonexistent/file.json";
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
 
         controller.init(fileName, model, table, frame);
 
@@ -74,10 +78,10 @@ class DictionaryEditorControllerTest {
         Path tmp = Files.createTempFile("bad", ".json");
         Files.writeString(tmp, "not valid json {{{");
         String fileName = tmp.toString();
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
 
         try(MockedStatic<JOptionPane> jOptionPaneMockedStatic = Mockito.mockStatic(JOptionPane.class)) {
             controller.init(fileName, model, table, frame);
@@ -95,11 +99,11 @@ class DictionaryEditorControllerTest {
 
     @Test
     void addRow_shouldAddRowAndSelectIt() {
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         Mockito.when(model.addRow()).thenReturn(2);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
         controller.addRow();
@@ -113,11 +117,11 @@ class DictionaryEditorControllerTest {
 
     @Test
     void removeRow_shouldRemoveWhenRowSelected() {
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         Mockito.when(table.getSelectedRow()).thenReturn(1);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
         controller.removeRow();
@@ -127,11 +131,11 @@ class DictionaryEditorControllerTest {
 
     @Test
     void removeRow_shouldDoNothingWhenNoSelection() {
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         Mockito.when(table.getSelectedRow()).thenReturn(-1);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
         controller.removeRow();
@@ -142,30 +146,30 @@ class DictionaryEditorControllerTest {
     // --- sortBySensitive / sortBySafe ---
 
     @Test
-    void sortBySensitive_shouldDelegateToModelAndClearSelection() {
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+    void sortByRegex_shouldDelegateToModelAndClearSelection() {
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
-        controller.sortBySensitive();
+        controller.sortByRegex();
 
-        Mockito.verify(model).sortBySensitive();
+        Mockito.verify(model).sortByRegexes();
         Mockito.verify(table).clearSelection();
     }
 
     @Test
     void sortBySafe_shouldDelegateToModelAndClearSelection() {
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
-        controller.sortBySafe();
+        controller.sortByReplacement();
 
-        Mockito.verify(model).sortBySafe();
+        Mockito.verify(model).sortByReplacements();
         Mockito.verify(table).clearSelection();
     }
 
@@ -176,12 +180,12 @@ class DictionaryEditorControllerTest {
         Path tmp = Files.createTempFile("save", ".json");
         String fileName = tmp.toString();
         Files.writeString(tmp, "{}");
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         JSONObject expectedJson = new JSONObject().put("hello", "greetings").put("bye", "farewell");
         Mockito.when(model.toJSON()).thenReturn(expectedJson);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init(fileName, model, table, frame);
 
         controller.saveToFile();
@@ -196,11 +200,11 @@ class DictionaryEditorControllerTest {
 
     @Test
     void saveToFile_shouldShowErrorDialogWhenWriteFails() throws Exception {
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         Mockito.when(model.toJSON()).thenReturn(new JSONObject());
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         String badPath = "/tmp/nonexistent/directory/file.json";
         controller.init(badPath, model, table, frame);
 
@@ -219,9 +223,9 @@ class DictionaryEditorControllerTest {
     @Test
     void cancel_shouldDisposeFrame() throws Exception {
         JFrame frame = Mockito.mock(JFrame.class);
-        DictionaryModel model = Mockito.mock(DictionaryModel.class);
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
-        DictionaryEditorController controller = new DictionaryEditorController();
+        RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
         controller.cancel();

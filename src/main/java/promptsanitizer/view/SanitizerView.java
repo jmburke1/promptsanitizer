@@ -26,8 +26,9 @@ import javax.swing.border.TitledBorder;
 import java.awt.Color;
 
 public class SanitizerView {
-    public SanitizerView(String fileName, SanitizerController controller, SanitizerModel model) {
+    public SanitizerView(String fileName, String regexFileName, SanitizerController controller, SanitizerModel model) {
         this.fileName = fileName;
+        this.regexFileName = regexFileName;
         this.controller = controller;
         this.model = model;
         leftArea = new JTextArea();
@@ -37,12 +38,13 @@ public class SanitizerView {
     private final SanitizerController controller;
     private final SanitizerModel model;
     private final String fileName;
+    private final String regexFileName;
     private final JTextArea leftArea;
     private final JTextArea rightArea;
 
     public void createUI() {
-        model.init(fileName);
-        controller.init(model, fileName);
+        model.init(fileName, regexFileName);
+        controller.init(model, fileName, regexFileName);
         JFrame frame = new JFrame("Replace Sensitive Strings in Your Prompts to an LLM.  Back replace the answer from the LLM.");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -92,12 +94,18 @@ public class SanitizerView {
         JButton tildeButton = new JButton("~");
         tildeButton.setFont(font);
         tildeButton.addActionListener(e -> controller.handleTilde());
+        JButton asteriskTildeButton = new JButton("*~");
+        asteriskTildeButton.setFont(font);
+        asteriskTildeButton.addActionListener(e -> controller.handleAsteriskTilde());
 
         buttonPanel.add(topButtons);
         buttonPanel.add(Box.createVerticalStrut(4));
         JPanel tildeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         tildeRow.add(tildeButton);
+        JPanel asteriskTildeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        asteriskTildeRow.add(asteriskTildeButton);
         buttonPanel.add(tildeRow);
+        buttonPanel.add(asteriskTildeRow);
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
         // Assemble the center panel — GridBagLayout for proportional widths (46% / 8% / 46%)
