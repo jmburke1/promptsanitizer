@@ -91,7 +91,7 @@ Paste a prompt containing `AKIAxxxxxxxxxxxxxx` → get `[AWS_ACCESS_KEY]` → se
 ### Quick install (Linux / macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.0.3/install.sh | bash
 ```
 
 This downloads the source, compiles it with Java 21+, and installs a `promptsanitizer` command to `/usr/local/bin`.
