@@ -14,6 +14,7 @@ import org.mockito.MockitoSession;
 import org.mockito.quality.Strictness;
 import promptsanitizer.model.SanitizerModel;
 import promptsanitizer.view.DictionaryEditorView;
+import promptsanitizer.view.RegexDictionaryEditorView;
 
 import java.util.List;
 import javax.swing.*;
@@ -164,6 +165,26 @@ class SanitizerControllerTest {
 
             Mockito.verify(model).invalidateDictionary();
             List<DictionaryEditorView> editorViews = viewMockedConstruction.constructed();
+            assertEquals(1, editorViews.size());
+            Mockito.verify(editorViews.getFirst()).createUI();
+        }
+    }
+
+    // --- handleAsteriskTilde ---
+
+    @Test
+    void handleAsteriskTilde_shouldInvalidateDictionaryAndOpenEditorView() {
+        SanitizerModel model = Mockito.mock(SanitizerModel.class);
+        String fileName = "/tmp/dict.json";
+        SanitizerController controller = new SanitizerController();
+        controller.init(model, fileName);
+
+        try (MockedConstruction<RegexDictionaryEditorView> viewMockedConstruction = Mockito.mockConstruction(
+                RegexDictionaryEditorView.class)) {
+            controller.handleAsteriskTilde();
+
+            Mockito.verify(model).invalidateDictionary();
+            List<RegexDictionaryEditorView> editorViews = viewMockedConstruction.constructed();
             assertEquals(1, editorViews.size());
             Mockito.verify(editorViews.getFirst()).createUI();
         }

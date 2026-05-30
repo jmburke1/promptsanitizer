@@ -85,6 +85,11 @@ public class SanitizerModel {
 
     /** Apply all replacements from the dictionary, in the appropriate direction, to the given text. */
     public String applyDictionary(String text, boolean isReverseDirection) {
+        if(isReverseDirection && rightToLeftDictionary != null) {
+            for (Map.Entry<String, String> entry : rightToLeftDictionary.entrySet()) {
+                text = text.replaceAll(entry.getKey(), entry.getValue());
+            }
+        }
         if(dictionary != null) {
             for (Map.Entry<String, String> entry : dictionary.entrySet()) {
                 if (isReverseDirection) {
@@ -94,11 +99,7 @@ public class SanitizerModel {
                 }
             }
         }
-        if(isReverseDirection && rightToLeftDictionary != null) {
-            for (Map.Entry<String, String> entry : rightToLeftDictionary.entrySet()) {
-                text = text.replaceAll(entry.getKey(), entry.getValue());
-            }
-        } else if(!isReverseDirection && leftToRightDictionary != null) {
+        if(!isReverseDirection && leftToRightDictionary != null) {
             for (Map.Entry<String, String> entry : leftToRightDictionary.entrySet()) {
                 text = text.replaceAll(entry.getKey(), entry.getValue());
             }

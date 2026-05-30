@@ -4,7 +4,5 @@
  */
 package promptsanitizer.model;
 
-import java.util.Comparator;
-
 record RegexReplaceRecord(String regex, String replacement, String direction) {
 }
