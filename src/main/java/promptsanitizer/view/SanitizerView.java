@@ -78,7 +78,9 @@ public class SanitizerView {
 
         JPanel topButtons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton moveRightButton = new JButton(">");
+        moveRightButton.setFont(font);
         JButton moveLeftButton  = new JButton("<");
+        moveLeftButton.setFont(font);
 
         moveRightButton.addActionListener(e -> controller.moveText(leftArea, rightArea, false));
 
@@ -88,6 +90,7 @@ public class SanitizerView {
         topButtons.add(moveRightButton);
 
         JButton tildeButton = new JButton("~");
+        tildeButton.setFont(font);
         tildeButton.addActionListener(e -> controller.handleTilde());
 
         buttonPanel.add(topButtons);
