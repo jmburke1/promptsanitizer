@@ -15,10 +15,12 @@ import javax.swing.*;
 public class SanitizerController {
     private SanitizerModel model;
     private String fileName;
+    private String regexFileName;
 
-    public void init(SanitizerModel model, String fileName) {
+    public void init(SanitizerModel model, String fileName, String regexFileName) {
         this.model = model;
         this.fileName = fileName;
+        this.regexFileName = regexFileName;
     }
     /** Move text from one area to another, applying the dictionary replacements in the appropriate direction. */
     public void moveText(JTextArea fromArea, JTextArea toArea, boolean isReverseDirection) {
@@ -45,6 +47,6 @@ public class SanitizerController {
     }
     public void handleAsteriskTilde() {
         model.invalidateDictionary();
-        new RegexDictionaryEditorView(fileName, new RegexDictionaryEditorController(), new RegexDictionaryModel()).createUI();
+        new RegexDictionaryEditorView(regexFileName, new RegexDictionaryEditorController(), new RegexDictionaryModel()).createUI();
     }
 }

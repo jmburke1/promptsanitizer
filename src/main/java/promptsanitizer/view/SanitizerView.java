@@ -44,7 +44,7 @@ public class SanitizerView {
 
     public void createUI() {
         model.init(fileName, regexFileName);
-        controller.init(model, fileName);
+        controller.init(model, fileName, regexFileName);
         JFrame frame = new JFrame("Replace Sensitive Strings in Your Prompts to an LLM.  Back replace the answer from the LLM.");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
