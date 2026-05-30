@@ -95,14 +95,17 @@ public class SanitizerView {
         tildeButton.setFont(font);
         tildeButton.addActionListener(e -> controller.handleTilde());
         JButton asteriskTildeButton = new JButton("*~");
+        asteriskTildeButton.setFont(font);
         asteriskTildeButton.addActionListener(e -> controller.handleAsteriskTilde());
 
         buttonPanel.add(topButtons);
         buttonPanel.add(Box.createVerticalStrut(4));
         JPanel tildeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         tildeRow.add(tildeButton);
-        tildeRow.add(asteriskTildeButton);
+        JPanel asteriskTildeRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        asteriskTildeRow.add(asteriskTildeButton);
         buttonPanel.add(tildeRow);
+        buttonPanel.add(asteriskTildeRow);
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
         // Assemble the center panel — GridBagLayout for proportional widths (46% / 8% / 46%)
