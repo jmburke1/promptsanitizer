@@ -23,10 +23,10 @@ public class MainBatchJobApp {
                 personalDictionaryFileLocationPrefix +
                         "personal_regex_dictionary.json";
         (new MergeIntoPersonalDictionaryTool(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "upserts.json")).updatePersonalDictionary();
-        /*if(reverseDirection) {
+        if(reverseDirection) {
             (new PersonalDictionaryApplicator(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "sanitized_content.txt", "unsanitized_content.txt", true)).executeUpdate();
         } else {
             (new PersonalDictionaryApplicator(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "unsanitized_content.txt", "sanitized_content.txt", false)).executeUpdate();
-        }*/
+        }
     }
 }

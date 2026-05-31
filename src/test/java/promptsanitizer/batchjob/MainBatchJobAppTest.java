@@ -5,7 +5,6 @@
 package promptsanitizer.batchjob;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 
@@ -13,7 +12,6 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Disabled
 class MainBatchJobAppTest {
     @Test
     void testMainForForwardDirection() throws IOException {
@@ -21,19 +19,21 @@ class MainBatchJobAppTest {
                 MockedConstruction<MergeIntoPersonalDictionaryTool> mgIntoPDectToolMC = Mockito.mockConstruction(
                         MergeIntoPersonalDictionaryTool.class,
                         (mock, context) -> {
-                            assertEquals(2, context.arguments().size());
+                            assertEquals(3, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
-                            assertEquals("upserts.json", context.arguments().get(1));
+                            assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
+                            assertEquals("upserts.json", context.arguments().get(2));
                         }
                 );
                 MockedConstruction<PersonalDictionaryApplicator> personalDictApplMC = Mockito.mockConstruction(
                         PersonalDictionaryApplicator.class,
                         (mock, context) -> {
-                            assertEquals(4, context.arguments().size());
+                            assertEquals(5, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
-                            assertEquals("unsanitized_content.txt", context.arguments().get(1));
-                            assertEquals("sanitized_content.txt", context.arguments().get(2));
-                            assertFalse((boolean)context.arguments().get(3));
+                            assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
+                            assertEquals("unsanitized_content.txt", context.arguments().get(2));
+                            assertEquals("sanitized_content.txt", context.arguments().get(3));
+                            assertFalse((boolean)context.arguments().get(4));
                         }
                 )
         ) {
@@ -50,19 +50,21 @@ class MainBatchJobAppTest {
                 MockedConstruction<MergeIntoPersonalDictionaryTool> mgIntoPDectToolMC = Mockito.mockConstruction(
                         MergeIntoPersonalDictionaryTool.class,
                         (mock, context) -> {
-                            assertEquals(2, context.arguments().size());
+                            assertEquals(3, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
-                            assertEquals("upserts.json", context.arguments().get(1));
+                            assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
+                            assertEquals("upserts.json", context.arguments().get(2));
                         }
                 );
                 MockedConstruction<PersonalDictionaryApplicator> personalDictApplMC = Mockito.mockConstruction(
                         PersonalDictionaryApplicator.class,
                         (mock, context) -> {
-                            assertEquals(4, context.arguments().size());
+                            assertEquals(5, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
-                            assertEquals("sanitized_content.txt", context.arguments().get(1));
-                            assertEquals("unsanitized_content.txt", context.arguments().get(2));
-                            assertTrue((boolean)context.arguments().get(3));
+                            assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
+                            assertEquals("sanitized_content.txt", context.arguments().get(2));
+                            assertEquals("unsanitized_content.txt", context.arguments().get(3));
+                            assertTrue((boolean)context.arguments().get(4));
                         }
                 )
         ) {
