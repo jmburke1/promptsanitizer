@@ -12,15 +12,21 @@ public class MainBatchJobApp {
         } else {
             throw new IllegalArgumentException("Must specify forward or reverse");
         }
-        String personalDictionaryFileLocation =
+        String personalDictionaryFileLocationPrefix =
                 System.getProperty("user.home") +
                 System.getProperty("file.separator") +
                 "personal_dictionary.json";
-        (new MergeIntoPersonalDictionaryTool(personalDictionaryFileLocation, "upserts.json")).updatePersonalDictionary();
-        if(reverseDirection) {
-            (new PersonalDictionaryApplicator(personalDictionaryFileLocation, "sanitized_content.txt", "unsanitized_content.txt", true)).executeUpdate();
+        String personalDictionaryFileLocation =
+                personalDictionaryFileLocationPrefix +
+                        "personal_dictionary.json";
+        String regexPersonalDictionaryFileLocation =
+                personalDictionaryFileLocationPrefix +
+                        "personal_regex_dictionary.json";
+        (new MergeIntoPersonalDictionaryTool(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "upserts.json")).updatePersonalDictionary();
+        /*if(reverseDirection) {
+            (new PersonalDictionaryApplicator(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "sanitized_content.txt", "unsanitized_content.txt", true)).executeUpdate();
         } else {
-            (new PersonalDictionaryApplicator(personalDictionaryFileLocation, "unsanitized_content.txt", "sanitized_content.txt", false)).executeUpdate();
-        }
+            (new PersonalDictionaryApplicator(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "unsanitized_content.txt", "sanitized_content.txt", false)).executeUpdate();
+        }*/
     }
 }
