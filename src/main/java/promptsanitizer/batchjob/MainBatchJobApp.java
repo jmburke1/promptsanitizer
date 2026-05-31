@@ -14,8 +14,7 @@ public class MainBatchJobApp {
         }
         String personalDictionaryFileLocationPrefix =
                 System.getProperty("user.home") +
-                System.getProperty("file.separator") +
-                "personal_dictionary.json";
+                System.getProperty("file.separator");
         String personalDictionaryFileLocation =
                 personalDictionaryFileLocationPrefix +
                         "personal_dictionary.json";
