@@ -49,7 +49,7 @@ public class MergeIntoPersonalDictionaryTool {
                 if(o instanceof String) {
                     wroteAtLeastOneSimpleReplacement |= MergeUtil.putIfNotHasOrDifferent(currentPersonalDictionary, k, o);
                     wroteAtLeastOneRegex |= MergeUtil.removeIfHas(currentRegexPersonalDictionary, k);
-                } else if(o instanceof JSONObject validateThisFirst) {
+                } else if(o instanceof JSONObject) {
                     wroteAtLeastOneSimpleReplacement |= MergeUtil.removeIfHas(currentPersonalDictionary, k);
                     wroteAtLeastOneRegex |= MergeUtil.putIfNotHasOrDifferent(currentRegexPersonalDictionary, k, o);
                 }
