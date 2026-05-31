@@ -138,9 +138,9 @@ java -cp build/classes/java/main:lib/json-20250107.jar promptsanitizer.MainApp
 
 This is for a local AI running inside a docker container (for example, openmonoagent.ai), which will probably only have access to a headless java.
 
-It only takes a single command line argument for the direction.  And the values are expected to be either "forward" or "reverse".  If the direction is forward, it will write to a file called "sanitized_content.txt" with the contents of the "unsanitized_content.txt" replaced with their corresponding safe values from your personal dictionary.  If the direction is specified as reverse, everything is done in reverse.  It will write to the file "unsanitized_content.txt" with the contents of the "sanitized_content.txt" after making the dictionary replacements.
+It only takes a single command line argument for the direction.  And the values are expected to be either "forward", "reverse" or "upsertonly".  If the direction is forward, it will write to a file called "sanitized_content.txt" with the contents of the "unsanitized_content.txt" replaced with their corresponding safe values from both your regex personal dictionary followed by your exact personal dictionary.  If the direction is specified as reverse, everything is done in reverse.  It will write to the file "unsanitized_content.txt" with the contents of the "sanitized_content.txt" after making the regex dictionary replacements followed by the exact ones.
 
-Finally, before it does any of this, it checks for a file called upserts.json in the directory that the application is running from.  In it, if it finds json strings of the form `{"key": "value"}` then it will update your personal dictionary so that the indicated key/value pair is there (either overwriting it or creating it as a new key/value pair).  And, if the upserts.json contains `{"key": null}` then that is taken as an instruction to delete "key" out of your personal dictionary altogether.
+Finally, before it does any of this, it checks for a file called upserts.json in the directory that the application is running from.  In it, if it finds json strings either of the form `{"key": "value"}` or of the form `{"some_(.*)_regex": {"repl": "captured_$1", "dir": ">"}}` or of the form `{"some_(.*)_regex": {"repl": "captured_$1", "dir": "<"}}` then it will update the correct personal dictionary so that the value is either overwritten or inserted.  And, if the upserts.json contains `{"key": null}` then that is taken as an instruction to delete "key" out of both of your personal dictionaries altogether.
 
 This part of it is also a click-ops solution.  The assumption is that the hard drive, in your docker container, is mounted in such a way that the human outside of it can open the text file in the corresponding real location on their real hard drive and copy-paste text from the sanitized output into whatever LLM they are using in the cloud.  And that they can copy-paste the answer from that back into the same text file.  The advantage, in this case, is that you're leveraging your local AI to maybe think of things that are sensitive info that you didn't.
 
@@ -154,4 +154,4 @@ MIT - do whatever you want with your downloaded copy of it.
 
 ## Screen Captures
 
-This README.md is already long enough.  See the EXAMPLE_WITH_SCREEN_CAPTURES.md for more details.
+This README.md is already long enough.  See the EXAMPLE_WITH_SCREEN_CAPTURES.md for more details.  Also, for regular expression support, see REGEX_EXAMPLE_WITH_SCREEN_CAPTURES.md.
