@@ -17,7 +17,7 @@ public class MergeUtil {
     static boolean putIfNotHasOrDifferent(JSONObject checkIfHasKey, String key, Object putThisThere) {
         if(checkIfHasKey.has(key)) {
             Object alreadyThere = checkIfHasKey.get(key);
-            if(putThisThere.equals(alreadyThere)) {
+            if(aEqualsBForMergePurposes(putThisThere, alreadyThere)) {
                 return false;
             }
         }
@@ -28,5 +28,16 @@ public class MergeUtil {
         if(wroteAtLeastOneThingToJSONObject) {
             Files.writeString(updatePath, jsonObjectInQuestion.toString(2));   // pretty-print with 2-space indent
         }
+    }
+    static boolean aEqualsBForMergePurposes(Object putThisThere, Object alreadyThere) {
+        if(putThisThere.equals(alreadyThere)) {
+            return true;
+        }
+        if((putThisThere instanceof JSONObject putThisThereJO) && (alreadyThere instanceof JSONObject alreadyThereJO)) {
+            ValidateUtil.validateRegexPersonalDictEntry(putThisThereJO);
+            ValidateUtil.validateRegexPersonalDictEntry(alreadyThereJO);
+            return putThisThereJO.getString("repl").equals(alreadyThereJO.getString("repl")) && putThisThereJO.getString("dir").equals(alreadyThereJO.getString("dir"));
+        }
+        return false;
     }
 }

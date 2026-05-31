@@ -50,7 +50,6 @@ public class MergeIntoPersonalDictionaryTool {
                     wroteAtLeastOneSimpleReplacement |= MergeUtil.putIfNotHasOrDifferent(currentPersonalDictionary, k, o);
                     wroteAtLeastOneRegex |= MergeUtil.removeIfHas(currentRegexPersonalDictionary, k);
                 } else if(o instanceof JSONObject validateThisFirst) {
-                    ValidateUtil.validateRegexPersonalDictEntry(validateThisFirst);
                     wroteAtLeastOneSimpleReplacement |= MergeUtil.removeIfHas(currentPersonalDictionary, k);
                     wroteAtLeastOneRegex |= MergeUtil.putIfNotHasOrDifferent(currentRegexPersonalDictionary, k, o);
                 }
