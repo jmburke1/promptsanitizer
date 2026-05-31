@@ -15,12 +15,12 @@ public class MergeIntoPersonalDictionaryToolTest {
     void upsertShouldUpdatePersonalDictionaryWhenExists() throws Exception {
         Path tmpPersonalDict = Files.createTempFile("personalDict", ".json");
         Path tmpRegexPersonalDict = Path.of(tmpPersonalDict.toString().replace("personalDict", "regexPersonalDict"));
-        Path tmpUpsertDict = Files.createTempFile("upsertDict", ".json");
+        Path tmpUpsertDict = Path.of(tmpPersonalDict.toString().replace("personalDict", "upsert"));
         try {
             Files.writeString(
                     tmpPersonalDict,
                     "{" +
-                            "    \"shouldBeUnchaanged\": \"value1\"," +
+                            "    \"shouldBeUnchanged\": \"value1\"," +
                             "    \"shouldBeModified\": \"value2\"," +
                             "    \"shouldBeDeleted\": \"value4\"" +
                             "}"
@@ -38,7 +38,7 @@ public class MergeIntoPersonalDictionaryToolTest {
             mergeIntoPersonalDictionaryTool.updatePersonalDictionary();
 
             JSONObject currentPersonalDictionary = new JSONObject(Files.readString(tmpPersonalDict));
-            assertEquals("value1", currentPersonalDictionary.getString("shouldBeUnchaanged"));
+            assertEquals("value1", currentPersonalDictionary.getString("shouldBeUnchanged"));
             assertEquals("value3", currentPersonalDictionary.getString("shouldBeModified"));
             assertFalse(currentPersonalDictionary.has("shouldBeDeleted"));
             assertEquals("value5", currentPersonalDictionary.getString("shouldBeInserted"));
