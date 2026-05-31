@@ -81,9 +81,32 @@ class MainBatchJobAppTest {
         try {
             MainBatchJobApp.main(testArgs);
         } catch(IllegalArgumentException iae) {
-            assertEquals("Must specify forward or reverse", iae.getMessage());
+            assertEquals("Must specify forward, reverse or upsertonly", iae.getMessage());
             caught = true;
         }
         assertTrue(caught);
     }
+    @Test
+    void testMainForUpsertOnly() throws IOException {
+        try(
+                MockedConstruction<MergeIntoPersonalDictionaryTool> mgIntoPDectToolMC = Mockito.mockConstruction(
+                        MergeIntoPersonalDictionaryTool.class,
+                        (mock, context) -> {
+                            assertEquals(3, context.arguments().size());
+                            assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
+                            assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
+                            assertEquals("upserts.json", context.arguments().get(2));
+                        }
+                );
+                MockedConstruction<PersonalDictionaryApplicator> personalDictApplMC = Mockito.mockConstruction(
+                        PersonalDictionaryApplicator.class
+                )
+        ) {
+            String[] testArgs = {"upsertonly"};
+            MainBatchJobApp.main(testArgs);
+            Mockito.verify(mgIntoPDectToolMC.constructed().getFirst()).updatePersonalDictionary();
+            assertEquals(0, personalDictApplMC.constructed().size());
+        }
+    }
+
 }
