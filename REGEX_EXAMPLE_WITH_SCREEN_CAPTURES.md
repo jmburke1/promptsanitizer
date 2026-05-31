@@ -15,6 +15,17 @@ The prompt contains:
 - **Pattern targets:** `42_magic_number_99`, `7_magic_number_3`, `100_magic_number_200` (magic numbers with variable digits)
 - **Pattern targets:** `ABC_cliff`, `DEF_cliff`, `GHI_cliff` (canary markers with variable prefixes)
 
+The full unsanitized text:
+
+```
+In the latest sprint for Project Chimera, we noticed that the API endpoint was rejecting requests from john.doe@corp.com because the authentication header contained my-secret-api-key in plaintext.
+
+The configuration file referenced a value of 42_magic_number_99 which was causing unexpected behavior in the staging environment. Additionally, the deployment pipeline uses ABC_cliff as an internal marker for canary releases, and DEF_cliff marks the rollback boundary. Another magic reference is 7_magic_number_3 found in the database migration script.
+
+Please reach out to john.doe@corp.com if you need further clarification on Project Chimera's security posture. Remember that my-secret-api-key should never appear in logs or commit messages, and the 100_magic_number_200 constant must remain unchanged in production builds. The GHI_cliff marker is also used for feature flag gating.
+```
+
+
 ---
 
 ## The Dictionaries
@@ -88,6 +99,10 @@ Because regex replacements can rearrange, drop, or repeat captured content, ther
 
 ## Forward Sanitization (Click `>`)
 
+
+![Restored Unsanitized Lorem Ipsum](docs/regex_screencaps/sanitized_lorem_ipsum.png)
+
+
 After clicking the `>` button, here's what changed:
 
 ```diff
@@ -100,16 +115,6 @@ After clicking the `>` button, here's what changed:
 - ABC_cliff                →  filly_ABC
 - DEF_cliff                →  filly_DEF
 - GHI_cliff                →  filly_GHI
-```
-
-The full unsanitized text:
-
-```
-In the latest sprint for Project Chimera, we noticed that the API endpoint was rejecting requests from john.doe@corp.com because the authentication header contained my-secret-api-key in plaintext.
-
-The configuration file referenced a value of 42_magic_number_99 which was causing unexpected behavior in the staging environment. Additionally, the deployment pipeline uses ABC_cliff as an internal marker for canary releases, and DEF_cliff marks the rollback boundary. Another magic reference is 7_magic_number_3 found in the database migration script.
-
-Please reach out to john.doe@corp.com if you need further clarification on Project Chimera's security posture. Remember that my-secret-api-key should never appear in logs or commit messages, and the 100_magic_number_200 constant must remain unchanged in production builds. The GHI_cliff marker is also used for feature flag gating.
 ```
 
 The full sanitized text:
@@ -125,8 +130,6 @@ Please reach out to big.badass@corp.com if you need further clarification on Pro
 ---
 
 ## Reverse Restoration (Click `<`)
-
-![Restored Unsanitized Lorem Ipsum](docs/regex_screencaps/restored_lorem_ipsum.png)
 
 The restored text is identical to the original — because every regex rule was defined as a paired forward/reverse transformation. The `([0-9]*)_magic_number_([0-9]*) → $1_$2_void` forward rule is perfectly inverted by `([0-9]*)_([0-9]*)_void → $1_magic_number_$2` in the reverse direction.
 
