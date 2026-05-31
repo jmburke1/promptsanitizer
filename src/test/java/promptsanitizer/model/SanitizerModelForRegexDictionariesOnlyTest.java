@@ -81,6 +81,7 @@ class SanitizerModelForRegexDictionariesOnlyTest {
             assertFalse(model.isStronglyValidDictionary());
         } finally {
             model.invalidateDictionary();
+            Files.delete(tmpFile);
             Files.delete(tmpFileRegex);
         }
     }

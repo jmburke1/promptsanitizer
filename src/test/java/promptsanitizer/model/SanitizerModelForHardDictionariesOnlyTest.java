@@ -82,6 +82,7 @@ class SanitizerModelForHardDictionariesOnlyTest {
         } finally {
             model.invalidateDictionary();
             Files.delete(tmpFile);
+            Files.delete(tmpFileRegex);
         }
     }
 
