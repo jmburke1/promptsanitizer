@@ -1,33 +1,29 @@
-# An Example Demonstrating Regex Support
+# Regex Dictionary Support — Walkthrough
 
-Here, I'll go ahead and focus on what happens when you have a regex personal dictionary configured via the *~ button.  We'll start with some lorem ipsum type content.
+The `*~` button opens the **regex dictionary editor**, where you can define pattern-based replacements using full Java regular expressions. This is the heavy artillery for sensitive data you can't enumerate one-by-one.
+
+---
+
+## Starting Point
+
+Here's a sample prompt containing a mix of exact-match secrets and patterns that would be tedious to list individually:
 
 ![An Example Unsanitized Lorem Ipsum](docs/regex_screencaps/unsanitized_lorem_ipsum.png)
 
-Here's the actual content:
+The prompt contains:
+- **Exact-match targets:** `Project Chimera`, `john.doe@corp.com`, `my-secret-api-key`
+- **Pattern targets:** `42_magic_number_99`, `7_magic_number_3`, `100_magic_number_200` (magic numbers with variable digits)
+- **Pattern targets:** `ABC_cliff`, `DEF_cliff`, `GHI_cliff` (canary markers with variable prefixes)
 
-```
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+---
 
-In the latest sprint for Project Chimera, we noticed that the API endpoint was rejecting requests from john.doe@corp.com because the authentication header contained my-secret-api-key in plaintext. This is a known issue and has been flagged as high priority by the team lead.
+## The Dictionaries
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-The configuration file referenced a value of 42_magic_number_99 which was causing unexpected behavior in the staging environment. Additionally, the deployment pipeline uses ABC_cliff as an internal marker for canary releases, and DEF_cliff marks the rollback boundary. Another magic reference is 7_magic_number_3 found in the database migration script.
-
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-
-Please reach out to john.doe@corp.com if you need further clarification on Project Chimera's security posture. Remember that my-secret-api-key should never appear in logs or commit messages, and the 100_magic_number_200 constant must remain unchanged in production builds. The GHI_cliff marker is also used for feature flag gating.
-
-Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.
-```
-
-Next, let's look at both the exact text replacements, as defined by the ~ button and the regular expressions as defined by the *~ button.
+### Exact-Match Dictionary (`~` button)
 
 ![Exact Replacements For This New Example](docs/regex_screencaps/tilde_clip.png)
 
-which is populated by the data:
-```
+```json
 {
   "john.doe@corp.com": "big.badass@corp.com",
   "Project Chimera": "Project Unicorn",
@@ -35,24 +31,31 @@ which is populated by the data:
 }
 ```
 
+### Regex Dictionary (`*~` button)
+
 ![Regex Replacements For This New Example](docs/regex_screencaps/asterisk_tilde_clip.png)
 
-which is populated by the data:
-
-```
+```json
 {
+  // Matches: 42_magic_number_99  →  captures "42" and "99"
   "([0-9]*)_magic_number_([0-9]*)": {
-    "repl": "$1_$2_void",
-    "dir": ">"
+    "repl": "$1_$2_void",        // Becomes: 42_99_void
+    "dir": ">"                     // Forward direction only
   },
+
+  // Reverse: 42_99_void → 42_magic_number_99
   "([0-9]*)_([0-9]*)_void": {
     "repl": "$1_magic_number_$2",
-    "dir": "<"
+    "dir": "<"                      // Reverse direction only
   },
+
+  // Matches: ABC_cliff → filly_ABC
   "([A-Z]+)_cliff": {
     "repl": "filly_$1",
     "dir": ">"
   },
+
+  // Reverse: filly_ABC → ABC_cliff
   "filly_([A-Z]+)": {
     "repl": "$1_cliff",
     "dir": "<"
@@ -60,28 +63,83 @@ which is populated by the data:
 }
 ```
 
-Now, the thing about the regular expression personal dictionary is that, because you are taking full advantage of Java regular expressions, the syntax allows you to use wildcards.  `[0-9]*`, for example, will match any number of digits in a row.  It also allows you to define capture groups and place them in the replaced string.  So, `([0-9]*)_magic_number_([0-9]*)`, if it matches something like "123_magic_number_456", then the replacement will become "123_456_void".  Great, so, how do you perform the replacement in reverse?  Well, this is why a third parameter is needed for a direction.  So, when defining your regular expressions, unlike the exact text dictionary replacements, you have to specify a direction in which they are applied.  > is the direction of unsanitized content to sanitized and the inverse, < is the other direction.  There isn't an automatic bidirectionality defined for these because of the number of ways the replacement can define the movement or repetition of the capture groups.  The way the algorithm works in the forward direction, it applies the regular expressions that you defined as being applicable in the forward direction first and then the exact replacements.  And it goes the opposite in the reverse direction, it applies the exact replacements first and then the regular expressions you defined as being applicable in the reverse direction.  Now, let's click the > button.
+---
 
-And here's the exact text:
+## How Direction Works
+
+> **Key concept:** Unlike exact-match replacements (which are automatically bidirectional), regex rules require you to define *both* a forward (`>`) and reverse (`<`) rule. This gives you full control over how capture groups transform in each direction.
+
+Because regex replacements can rearrange, drop, or repeat captured content, there's no way for the application to guess the inverse of your pattern. You define both directions explicitly:
+
+| Direction | Symbol | When Applied |
+|-----------|--------|-------------|
+| Forward (sanitize) | `"dir": ">"` | Applied first, before exact-match entries |
+| Reverse (restore) | `"dir": "<"` | Applied after exact-match entries (in reverse mode) |
+
+**Replacement order in forward mode:**
+1. Regex rules with `"dir": ">"`
+2. Exact-match dictionary entries
+
+**Replacement order in reverse mode:**
+1. Exact-match dictionary entries (reversed)
+2. Regex rules with `"dir": "<"`
+
+---
+
+## Forward Sanitization (Click `>`)
+
+After clicking the `>` button, here's what changed:
+
+```diff
+- Project Chimera          →  Project Unicorn
+- john.doe@corp.com        →  big.badass@corp.com
+- my-secret-api-key        →  not-really-any-api-key
+- 42_magic_number_99       →  42_99_void
+- 7_magic_number_3         →  7_3_void
+- 100_magic_number_200     →  100_200_void
+- ABC_cliff                →  filly_ABC
+- DEF_cliff                →  filly_DEF
+- GHI_cliff                →  filly_GHI
+```
+
+The full unsanitized text:
 
 ```
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+In the latest sprint for Project Chimera, we noticed that the API endpoint was rejecting requests from john.doe@corp.com because the authentication header contained my-secret-api-key in plaintext.
 
-In the latest sprint for Project Unicorn, we noticed that the API endpoint was rejecting requests from big.badass@corp.com because the authentication header contained not-really-any-api-key in plaintext. This is a known issue and has been flagged as high priority by the team lead.
+The configuration file referenced a value of 42_magic_number_99 which was causing unexpected behavior in the staging environment. Additionally, the deployment pipeline uses ABC_cliff as an internal marker for canary releases, and DEF_cliff marks the rollback boundary. Another magic reference is 7_magic_number_3 found in the database migration script.
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Please reach out to john.doe@corp.com if you need further clarification on Project Chimera's security posture. Remember that my-secret-api-key should never appear in logs or commit messages, and the 100_magic_number_200 constant must remain unchanged in production builds. The GHI_cliff marker is also used for feature flag gating.
+```
+
+The full sanitized text:
+
+```
+In the latest sprint for Project Unicorn, we noticed that the API endpoint was rejecting requests from big.badass@corp.com because the authentication header contained not-really-any-api-key in plaintext.
 
 The configuration file referenced a value of 42_99_void which was causing unexpected behavior in the staging environment. Additionally, the deployment pipeline uses filly_ABC as an internal marker for canary releases, and filly_DEF marks the rollback boundary. Another magic reference is 7_3_void found in the database migration script.
 
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-
 Please reach out to big.badass@corp.com if you need further clarification on Project Unicorn's security posture. Remember that not-really-any-api-key should never appear in logs or commit messages, and the 100_200_void constant must remain unchanged in production builds. The filly_GHI marker is also used for feature flag gating.
-
-Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.
 ```
 
-As an example of what it became, "42_magic_number_99" became "42_99_void".  "7_magic_number_3" became "7_3_void".  However, the exact text replacements happened also.  "Project Chimera" became "Project Unicorn", for example.  If this were a real prompt you were sending to a cloud AI, you would probably have your dictionaries defined differently and would be using the full weight of java regular expressions to mask confidential info if you needed to.  Let's finish up by clicking the < button.
+---
+
+## Reverse Restoration (Click `<`)
 
 ![Restored Unsanitized Lorem Ipsum](docs/regex_screencaps/restored_lorem_ipsum.png)
 
-I *could* paste it here, but it turns out to be identical to the unsanitized lorem ipsum at the beginning of this example.  That happens to be because I defined all of my regular expressions in pairs.  The `([0-9]*)_magic_number_([0-9]*) -> $1_$2_void` in the > direction just happens to be reverted by `([0-9]*)_([0-9]*)_void -> $1_magic_number_$2` in the < direction.  Your mileage may actually vary depending on how you define your regular expressions.  But, the main point, is that it is up to YOU to define the reverse rule to be what YOU consider to be a good enough approximation of inverting the forward rule.  As a practical rule of thumb, you'll probably have a lot fewer regular expression rules defined than just exact text replacements.  In fact, you don't have to have any defined and the application will work exactly as it did before this newer version incorporating regular expressions.
+The restored text is identical to the original — because every regex rule was defined as a paired forward/reverse transformation. The `([0-9]*)_magic_number_([0-9]*) → $1_$2_void` forward rule is perfectly inverted by `([0-9]*)_([0-9]*)_void → $1_magic_number_$2` in the reverse direction.
+
+**Note:** Perfect round-tripping isn't guaranteed with all regex patterns. If your forward rule drops information (e.g., matching `\d+` and replacing with `[NUMBER]`), the reverse rule can't recover what was lost. You define the rules; you control the trade-off.
+
+---
+
+## When to Use Regex vs. Exact-Match
+
+| Use exact-match when... | Use regex when... |
+|------------------------|-------------------|
+| The sensitive value is a known string | You need to match patterns (emails, phone numbers, IDs) |
+| You want automatic bidirectional replacement | You need capture groups to transform the output |
+| Simplicity is the priority | You're dealing with auto-generated or variable content |
+
+In practice, most users will have far more exact-match entries than regex rules. Regex is a powerful supplement — not a replacement for the core dictionary. And if you define zero regex rules, the application works exactly as it did before this feature existed.

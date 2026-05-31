@@ -33,8 +33,8 @@ Entries are saved as a simple JSON file in your home directory.
 1. Paste your raw prompt into the **Unsanitized Prompt** panel (left).
 2. Hit **\>** - every word from your dictionary gets replaced with its safe counterpart.
 3. The result appears in the **Sanitized Prompt** panel (right), ready to copy and send.
-4. Copy-paste it from the **Sanitized Prompt** panel (right), into the prompt input in whatever LLM you are using.
-5. This is actually your classic click-ops type of solution.  You copy-paste everything!  So you are making 100% sure it is exactly what you want.
+4. Copy the sanitized prompt from the right panel into the cloud LLM you are connected to.
+5. This manual, click-driven approach means you always see exactly what leaves your machine — no automation surprises.
 
 ### 3. Bring it home
 
@@ -42,13 +42,15 @@ Entries are saved as a simple JSON file in your home directory.
 2. Hit **<** - every placeholder gets swapped back to the original sensitive value.
 3. The restored answer, based on making all of the text replacements in reverse, appears on the left.
 
-### 4. How it works
-1. If you've ever copy-pasted a prompt into notepad and replaced words before sending it off to an LLM, you get the basic idea.  Prompt sanitization is just text replacement, at the end of the day.
-2. But this application adds the convenience that you have a locally configured dictionary, kept between uses of the application, where the text replacements get applied one after the other.
+### 4. Under the hood
+
+PromptSanitizer is sequential text replacement — the same thing you'd do in Notepad's Find & Replace, but automated from a persistent dictionary. Each entry is applied one after another, in order. No network calls, no telemetry, nothing leaves your machine except what you explicitly copy.
 
 ---
 
 ## Example dictionary
+
+Here's an example with exact text replacements:
 
 ```json
 {
@@ -60,9 +62,17 @@ Entries are saved as a simple JSON file in your home directory.
 }
 ```
 
+And here's one with regular expression replacements:
+```json
+{
+  "([a-z]*)\\Q@gmail.com\\E": {"repl": "$1@proton.me", "dir": "<"},
+  "([a-z]*)\\Q@proton.me\\E": {"repl": "$1@gmail.com", "dir": ">"}
+}
+```
+
 Paste a prompt containing `AKIAxxxxxxxxxxxxxx` → get `[AWS_ACCESS_KEY]` → send to Claude → receive answer → hit **<** → restore the original key in your local copy.
 
-## Don't define your dictionary with cycles
+## Avoid Cyclic Dictionaries
 
 ```json
 {
@@ -71,7 +81,7 @@ Paste a prompt containing `AKIAxxxxxxxxxxxxxx` → get `[AWS_ACCESS_KEY]` → se
 }
 ```
 
-"I saw an abcde go to the fghij." becomes either "I saw an fghij go to the fghij." or "I saw an abcde go to the abcde.".  It doesn't become "I saw an fghij go to the abcde."  So don't do that.  The general rule is, this will do the same as if you had just clicked the "replace all", one-by-one, for each replacement you want to make, in something like notepad.
+Replacements are applied sequentially — not simultaneously. So `"I saw an abcde go to the fghij."` becomes `"I saw an fghij go to the fghij."` (or the reverse, depending on order). It won't do both in one pass. The rule of thumb: think of it as clicking "Replace All" one entry at a time, like in Notepad.
 
 ---
 
@@ -136,13 +146,62 @@ java -cp build/classes/java/main:lib/json-20250107.jar promptsanitizer.MainApp
 
 ## Batch Job Interface
 
-This is for a local AI running inside a docker container (for example, openmonoagent.ai), which will probably only have access to a headless java.
+For headless or automated use — such as a local AI agent running inside a Docker container — the batch mode sanitizes files via command line with no GUI required.
 
-It only takes a single command line argument for the direction.  And the values are expected to be either "forward", "reverse" or "upsertonly".  If the direction is forward, it will write to a file called "sanitized_content.txt" with the contents of the "unsanitized_content.txt" replaced with their corresponding safe values from both your regex personal dictionary followed by your exact personal dictionary.  If the direction is specified as reverse, everything is done in reverse.  It will write to the file "unsanitized_content.txt" with the contents of the "sanitized_content.txt" after making the regex dictionary replacements followed by the exact ones.
+### How to Run
 
-Finally, before it does any of this, it checks for a file called upserts.json in the directory that the application is running from.  In it, if it finds json strings either of the form `{"key": "value"}` or of the form `{"some_(.*)_regex": {"repl": "captured_$1", "dir": ">"}}` or of the form `{"some_(.*)_regex": {"repl": "captured_$1", "dir": "<"}}` then it will update the correct personal dictionary so that the value is either overwritten or inserted.  And, if the upserts.json contains `{"key": null}` then that is taken as an instruction to delete "key" out of both of your personal dictionaries altogether.
+```bash
+# Forward:  unsanitized_content.txt → sanitized_content.txt
+promptsanitizer forward
 
-This part of it is also a click-ops solution.  The assumption is that the hard drive, in your docker container, is mounted in such a way that the human outside of it can open the text file in the corresponding real location on their real hard drive and copy-paste text from the sanitized output into whatever LLM they are using in the cloud.  And that they can copy-paste the answer from that back into the same text file.  The advantage, in this case, is that you're leveraging your local AI to maybe think of things that are sensitive info that you didn't.
+# Reverse:  sanitized_content.txt → unsanitized_content.txt
+promptsanitizer reverse
+
+# Upsert dictionaries only (no sanitization)
+promptsanitizer upsertonly
+```
+
+### Replacement Order
+
+| Direction | Step 1 | Step 2 |
+|-----------|--------|--------|
+| **Forward** (`forward`) | Regex rules with `"dir": ">"` | Exact-match entries |
+| **Reverse** (`reverse`) | Exact-match entries (reversed) | Regex rules with `"dir": "<"` |
+
+Both your exact-match dictionary (`personal_dictionary.json`) and regex dictionary (`regex_personal_dictionary.json`) are applied automatically. The file `unsanitized_content.txt` is read for forward mode; `sanitized_content.txt` is read for reverse mode. Output goes to the opposite file.
+
+### Dictionary Upserts
+
+Before any sanitization, the batch job checks for `upserts.json` in the working directory. Use it to programmatically add, modify, or remove dictionary entries:
+
+| JSON Format | Effect |
+|-------------|--------|
+| `"key": "value"` | Insert or overwrite an exact-match entry |
+| `"regex_pattern": {"repl": "...", "dir": ">"}` | Add a forward regex rule |
+| `"regex_pattern": {"repl": "...", "dir": "<"}` | Add a reverse regex rule |
+| `"key": null` | Delete the entry from both dictionaries |
+
+**Example `upserts.json`:**
+
+```json
+{
+  "my-secret-api-key": "[API_KEY]",
+  "(\\d{3}-\\d{2}-\\d{4})": {"repl": "[SSN]", "dir": ">"},
+  "old-entry-to-remove": null
+}
+```
+
+### Workflow
+
+The batch mode is designed under the assumption of a click-ops workflow: your Docker container's filesystem is mounted so you can inspect files from the host. The typical flow:
+
+1. Place your raw prompt in `unsanitized_content.txt`.
+2. Run (or have your local LLM run) `promptsanitizer forward` — sanitized output appears in `sanitized_content.txt`.
+3. Copy the sanitized text into your cloud LLM.
+4. Paste the LLM's response back into `sanitized_content.txt`.
+5. Run `promptsanitizer reverse` — restored original values appear in `unsanitized_content.txt`.
+
+The advantage: you're leveraging a local AI to surface sensitive information you might have missed, while nothing ever leaves your machine unredacted.
 
 ## License
 
