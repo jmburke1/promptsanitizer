@@ -5,8 +5,8 @@ set -euo pipefail
 INSTALL_DIR="/opt/promptsanitizer"
 LIB_DIR="${INSTALL_DIR}/lib"
 APP_NAME="promptsanitizer"
-#REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/main.zip"
-REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/tags/v1.2.0.zip"
+REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/main.zip"
+#REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/tags/v1.2.0.zip"
 JSON_VERSION="20250107"
 JSON_COORD="org.json:json:${JSON_VERSION}"
 JAVA_MIN=21
@@ -66,14 +66,14 @@ fi
 
 # ── Step 4: Compile MainApp and all main classes ─────────────────────
 info "Compiling Java sources ..."
-#pushd promptsanitizer-main
-pushd promptsanitizer-1.2.0
+pushd promptsanitizer-main
+#pushd promptsanitizer-1.2.0
 sudo mv * ../
 sudo mv .gitignore ../
 sudo mv .gitattributes ../
 popd
-#sudo rmdir promptsanitizer-main
-sudo rmdir promptsanitizer-1.2.0
+sudo rmdir promptsanitizer-main
+#sudo rmdir promptsanitizer-1.2.0
 
 # Collect all .java files under src/main/java
 sudo javac -d build -sourcepath src/main/java \
