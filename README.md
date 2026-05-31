@@ -18,13 +18,22 @@ When you paste a prompt into an LLM you're often including things you'd never pu
 
 ### 1. Build your dictionary
 
-Click the **~** button to open the dictionary editor. Each entry is a pair:
+Click the **~** button to open the simple dictionary editor. Each entry is a pair:
 
 | Sensitive (your data) | Safe (placeholder) |
 |-----------------------|---------------------|
 | `my-secret-api-key`   | `[API_KEY]`         |
 | `john.doe@corp.com`   | `[REDACTED_EMAIL]`  |
 | `Project Chimera`     | `[CLASSIFIED_PROJECT]` |
+
+Entries are saved as a simple JSON file in your home directory.
+
+Click the ***~** button to open the regex dictionary editor. Each entry is a pair:
+
+| Regex                          | Replacement            | Direcion |
+|--------------------------------|------------------------|----------|
+| `([a-z]*)\.([a-z]*)@corp.com`  | `$1.$2@gmail.com`      | >        |
+| `([a-z]*)\.([a-z]*)@gmail.com` | `$1.$2@corp.com`       | <        |
 
 Entries are saved as a simple JSON file in your home directory.
 
@@ -65,12 +74,12 @@ Here's an example with exact text replacements:
 And here's one with regular expression replacements:
 ```json
 {
-  "([a-z]*)\\Q@gmail.com\\E": {"repl": "$1@proton.me", "dir": "<"},
-  "([a-z]*)\\Q@proton.me\\E": {"repl": "$1@gmail.com", "dir": ">"}
+  "([a-z]*)\\Q@corp.com\\E": {"repl": "$1@gmail.com", "dir": "<"},
+  "([a-z]*)\\Q@gmail.com\\E": {"repl": "$1@corp.com", "dir": ">"}
 }
 ```
 
-Paste a prompt containing `AKIAxxxxxxxxxxxxxx` → get `[AWS_ACCESS_KEY]` → send to Claude → receive answer → hit **<** → restore the original key in your local copy.
+Paste a prompt containing `AKIAxxxxxxxxxxxxxx ... walt@corp.com` → get `[AWS_ACCESS_KEY] ... walt@gmail.com` → send to Claude → receive answer → hit **<** → restore the original key in your local copy (if you're using regular expressions, there are some caveats that will be further explained later in this documentation).
 
 ## Avoid Cyclic Dictionaries
 
@@ -81,7 +90,7 @@ Paste a prompt containing `AKIAxxxxxxxxxxxxxx` → get `[AWS_ACCESS_KEY]` → se
 }
 ```
 
-Replacements are applied sequentially — not simultaneously. So `"I saw an abcde go to the fghij."` becomes `"I saw an fghij go to the fghij."` (or the reverse, depending on order). It won't do both in one pass. The rule of thumb: think of it as clicking "Replace All" one entry at a time, like in Notepad.
+Replacements are applied sequentially — not simultaneously. So `"I saw an abcde go to the fghij."` becomes `"I saw an fghij go to the fghij."` (or the reverse, depending on order). It won't do both in one pass. You won't get `"I saw an fghij go to the abcde."`  The rule of thumb: think of it as clicking "Replace All" one entry at a time, like in Notepad.
 
 ---
 
