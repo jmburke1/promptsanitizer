@@ -60,10 +60,7 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
     public void load(JSONObject json) {
         replacementValues.clear();
         for (String k : json.keySet()) {
-            JSONObject jo = json.getJSONObject(k);
-            String dir = jo.getString("dir");
-            if(!"<".equals(dir) && !">".equals(dir)) continue;
-            replacementValues.add(new RegexReplaceRecord(k, jo.getString("repl"), dir));
+            (createReplacementRecord()).pushIntoArrayList(k, json, replacementValues);
         }
         fireTableDataChanged();
     }

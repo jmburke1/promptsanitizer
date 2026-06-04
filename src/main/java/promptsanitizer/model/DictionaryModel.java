@@ -60,7 +60,7 @@ public class DictionaryModel extends javax.swing.table.AbstractTableModel {
     public void load(JSONObject json) {
         replacementValues.clear();
         for (String k : json.keySet()) {
-            replacementValues.add(new SensitiveSafeRecord(k, json.getString(k)));
+            (createReplacementRecord()).pushIntoArrayList(k, json, replacementValues);
         }
         fireTableDataChanged();
     }

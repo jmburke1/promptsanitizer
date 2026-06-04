@@ -6,6 +6,8 @@ package promptsanitizer.model;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 class RegexReplaceRecord implements ReplacementRecord {
     private String regex;
     private String replacement;
@@ -62,5 +64,15 @@ class RegexReplaceRecord implements ReplacementRecord {
         jo.put("repl", replacement);
         jo.put("dir", direction);
         result.put(regex, jo);
+    }
+
+    public void pushIntoArrayList(String k, JSONObject json, List<ReplacementRecord> replacementValues) {
+        JSONObject jo = json.getJSONObject(k);
+        String dir = jo.getString("dir");
+        if(!"<".equals(dir) && !">".equals(dir)) return;
+        regex = k;
+        replacement = jo.getString("repl");
+        direction = dir;
+        replacementValues.add(this);
     }
 }

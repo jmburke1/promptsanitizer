@@ -6,6 +6,8 @@ package promptsanitizer.model;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 class SensitiveSafeRecord implements ReplacementRecord {
     private String sensitive;
     private String safe;
@@ -46,5 +48,11 @@ class SensitiveSafeRecord implements ReplacementRecord {
 
     public void pushIntoJSONObject(JSONObject result) {
         if (!sensitive.isEmpty() || safe.isEmpty()) result.put(sensitive, safe);  // otherwise, skip blank rows
+    }
+
+    public void pushIntoArrayList(String k, JSONObject json, List<ReplacementRecord> replacementValues) {
+        sensitive = k;
+        safe = json.getString(k);
+        replacementValues.add(this);
     }
 }
