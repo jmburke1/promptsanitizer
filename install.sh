@@ -73,6 +73,7 @@ info "Compiling Java sources ..."
 ${JAV_DIR}/${JDK_FOLDER}/bin/javac -d build -sourcepath src/main/java \
     -cp "${INSTALL_DIR}/lib/json-${JSON_VERSION}.jar" \
     src/main/java/promptsanitizer/MainApp.java \
+    src/main/java/promptsanitizer/batchjob/MainBatchJobApp.java \
     || die "Compilation failed."
 
 info "Compilation successful."
