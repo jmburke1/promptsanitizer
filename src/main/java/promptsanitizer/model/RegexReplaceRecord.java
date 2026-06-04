@@ -53,19 +53,4 @@ class RegexReplaceRecord implements ReplacementRecord {
         }
         return directionCompareResult;
     }
-
-    @Deprecated
-    String regex() {
-        return regex;
-    }
-
-    @Deprecated
-    String replacement() {
-        return replacement;
-    }
-
-    @Deprecated
-    String direction() {
-        return direction;
-    }
 }

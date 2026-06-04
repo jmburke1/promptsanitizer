@@ -7,17 +7,13 @@ package promptsanitizer.model;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /** Lightweight model backed by a Map<Integer, String>. */
 public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
     private final List<ReplacementRecord> replacementValues = new ArrayList<>();
-    private static final String[] COLUMN_NAMES = {"Regex", "Replacement", "Direction"};
 
     @Override public int getRowCount()              { return replacementValues.size(); }
-    @Override public int getColumnCount()           { return 3; }
-    @Override public String getColumnName(int c)    { return COLUMN_NAMES[c]; }
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         return String.class;
@@ -37,7 +33,7 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
 
     /** Add a blank row and return its row index. */
     public int addRow() {
-        replacementValues.add(new RegexReplaceRecord("", "", ">"));
+        replacementValues.add(createReplacementRecord());
         fireTableRowsInserted(replacementValues.size() - 1, replacementValues.size() - 1);
         return replacementValues.size() - 1;
     }
@@ -76,9 +72,9 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
     public JSONObject toJSON() {
         JSONObject result = new JSONObject();
         for (int i = 0; i < replacementValues.size() ; i++) {
-            String k = ((RegexReplaceRecord)replacementValues.get(i)).regex();
-            String r1 = ((RegexReplaceRecord)replacementValues.get(i)).replacement();
-            String r2 = ((RegexReplaceRecord)replacementValues.get(i)).direction();
+            String k =  replacementValues.get(i).getColumnValue(0);
+            String r1 = replacementValues.get(i).getColumnValue(1);
+            String r2 = replacementValues.get(i).getColumnValue(2);
             if (!"<".equals(r2) && !">".equals(r2)) continue; // skip the ones where the direction is invalid
             if (k.isEmpty()) continue; // skip the ones where there isn't a regular expression
             JSONObject jo = new JSONObject();
@@ -88,5 +84,11 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
         }
         return result;
     }
+
+    ReplacementRecord createReplacementRecord() {
+        return new RegexReplaceRecord("", "", ">");
+    }
+    @Override public int getColumnCount()           { return 3; }
+    @Override public String getColumnName(int c)    { return c == 0 ? "Regex" : (c == 1 ? "Replacement" : "Direction"); }
 }
 

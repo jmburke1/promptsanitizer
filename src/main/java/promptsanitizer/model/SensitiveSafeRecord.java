@@ -41,14 +41,4 @@ class SensitiveSafeRecord implements ReplacementRecord {
             throw new IllegalArgumentException("Invalid context: " + context);
         }
     }
-
-    @Deprecated
-    String sensitive() {
-        return sensitive;
-    }
-
-    @Deprecated
-    String safe() {
-        return safe;
-    }
 }
