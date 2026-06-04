@@ -50,17 +50,13 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
 
     /** Sort the JTable by sensitive values. */
     public void sortByFirstColumn() {
-        Comparator<ReplacementRecord> comp = (ss1, ss2) -> ((RegexReplaceRecord)ss1).direction().compareTo(((RegexReplaceRecord)ss2).direction());
-        comp = comp.thenComparing((ss1, ss2) -> ((RegexReplaceRecord)ss1).regex().compareTo(((RegexReplaceRecord)ss2).regex()));
-        replacementValues.sort(comp);
+        replacementValues.sort((ss1, ss2) -> ss1.contextCompareToOther("FIRST_COLUMN", ss2));
         fireTableDataChanged();
     }
 
     /** Sort the JTable by safe values. */
     public void sortBySecondColumn() {
-        Comparator<ReplacementRecord> comp = (ss1, ss2) -> ((RegexReplaceRecord)ss1).direction().compareTo(((RegexReplaceRecord)ss2).direction());
-        comp = comp.thenComparing((ss1, ss2) -> ((RegexReplaceRecord)ss1).replacement().compareTo(((RegexReplaceRecord)ss2).replacement()));
-        replacementValues.sort(comp);
+        replacementValues.sort((ss1, ss2) -> ss1.contextCompareToOther("SECOND_COLUMN", ss2));
         fireTableDataChanged();
     }
 

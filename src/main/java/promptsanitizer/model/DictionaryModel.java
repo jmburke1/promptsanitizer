@@ -49,13 +49,13 @@ public class DictionaryModel extends javax.swing.table.AbstractTableModel {
 
     /** Sort the JTable by sensitive values. */
     public void sortByFirstColumn() {
-        replacementValues.sort((ss1, ss2) -> ((SensitiveSafeRecord)ss1).sensitive().compareTo(((SensitiveSafeRecord)ss2).sensitive()));
+        replacementValues.sort((ss1, ss2) -> ss1.contextCompareToOther("FIRST_COLUMN", ss2));
         fireTableDataChanged();
     }
 
     /** Sort the JTable by safe values. */
     public void sortBySecondColumn() {
-        replacementValues.sort((ss1, ss2) -> ((SensitiveSafeRecord)ss1).safe().compareTo(((SensitiveSafeRecord)ss2).safe()));
+        replacementValues.sort((ss1, ss2) -> ss1.contextCompareToOther("SECOND_COLUMN", ss2));
         fireTableDataChanged();
     }
 

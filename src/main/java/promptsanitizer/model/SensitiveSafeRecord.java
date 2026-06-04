@@ -29,6 +29,19 @@ class SensitiveSafeRecord implements ReplacementRecord {
         return other;
     }
 
+    public int contextCompareToOther(String context, ReplacementRecord other) {
+        if(!(other instanceof SensitiveSafeRecord otherSS)) {
+            throw new IllegalArgumentException("Must be comparing to a SensitiveSafeRecord");
+        }
+        if ("FIRST_COLUMN".equalsIgnoreCase(context)) {
+            return sensitive.compareTo(otherSS.sensitive);
+        } else if ("SECOND_COLUMN".equalsIgnoreCase(context)) {
+            return safe.compareTo(otherSS.safe);
+        } else {
+            throw new IllegalArgumentException("Invalid context: " + context);
+        }
+    }
+
     @Deprecated
     String sensitive() {
         return sensitive;
