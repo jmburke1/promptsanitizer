@@ -155,7 +155,7 @@ class RegexDictionaryEditorControllerTest {
 
         controller.sortByRegex();
 
-        Mockito.verify(model).sortByRegexes();
+        Mockito.verify(model).sortByFirstColumn();
         Mockito.verify(table).clearSelection();
     }
 
@@ -169,7 +169,7 @@ class RegexDictionaryEditorControllerTest {
 
         controller.sortByReplacement();
 
-        Mockito.verify(model).sortByReplacements();
+        Mockito.verify(model).sortBySecondColumn();
         Mockito.verify(table).clearSelection();
     }
 

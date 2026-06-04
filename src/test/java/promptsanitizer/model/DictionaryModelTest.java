@@ -6,9 +6,6 @@ package promptsanitizer.model;
 
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class DictionaryModelTest {
@@ -99,7 +96,7 @@ class DictionaryModelTest {
         model.setValueAt("value4", 2, 1);
         model.setValueAt("value1", 3, 1);
         model.setValueAt("value3", 4, 1);
-        model.sortBySensitive();
+        model.sortByFirstColumn();
         assertEquals("key1", model.getValueAt(0, 0));
         assertEquals("key2", model.getValueAt(1, 0));
         assertEquals("key3", model.getValueAt(2, 0));
@@ -130,7 +127,7 @@ class DictionaryModelTest {
         model.setValueAt("value4", 2, 1);
         model.setValueAt("value1", 3, 1);
         model.setValueAt("value3", 4, 1);
-        model.sortBySafe();
+        model.sortBySecondColumn();
         assertEquals("key5", model.getValueAt(0, 0));
         assertEquals("key2", model.getValueAt(1, 0));
         assertEquals("key4", model.getValueAt(2, 0));
@@ -163,7 +160,7 @@ class DictionaryModelTest {
         model.setValueAt("value3", 4, 1);
         DictionaryModel model2 = new DictionaryModel();
         model2.load(model.toJSON());
-        model2.sortBySensitive();
+        model2.sortByFirstColumn();
         assertEquals("key1", model2.getValueAt(0, 0));
         assertEquals("key2", model2.getValueAt(1, 0));
         assertEquals("key3", model2.getValueAt(2, 0));

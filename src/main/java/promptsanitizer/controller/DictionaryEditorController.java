@@ -63,12 +63,12 @@ public class DictionaryEditorController {
     }
 
     public void sortBySensitive() {
-        model.sortBySensitive();
+        model.sortByFirstColumn();
         table.clearSelection();
     }
 
     public void sortBySafe() {
-        model.sortBySafe();
+        model.sortBySecondColumn();
         table.clearSelection();
     }
 

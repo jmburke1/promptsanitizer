@@ -151,7 +151,7 @@ class DictionaryEditorControllerTest {
 
         controller.sortBySensitive();
 
-        Mockito.verify(model).sortBySensitive();
+        Mockito.verify(model).sortByFirstColumn();
         Mockito.verify(table).clearSelection();
     }
 
@@ -165,7 +165,7 @@ class DictionaryEditorControllerTest {
 
         controller.sortBySafe();
 
-        Mockito.verify(model).sortBySafe();
+        Mockito.verify(model).sortBySecondColumn();
         Mockito.verify(table).clearSelection();
     }
 

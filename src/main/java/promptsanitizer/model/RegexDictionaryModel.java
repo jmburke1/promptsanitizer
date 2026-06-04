@@ -12,10 +12,10 @@ import java.util.List;
 
 /** Lightweight model backed by a Map<Integer, String>. */
 public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
-    private final List<RegexReplaceRecord> regexReplacements = new ArrayList<>();
+    private final List<ReplacementRecord> replacementValues = new ArrayList<>();
     private static final String[] COLUMN_NAMES = {"Regex", "Replacement", "Direction"};
 
-    @Override public int getRowCount()              { return regexReplacements.size(); }
+    @Override public int getRowCount()              { return replacementValues.size(); }
     @Override public int getColumnCount()           { return 3; }
     @Override public String getColumnName(int c)    { return COLUMN_NAMES[c]; }
     @Override
@@ -24,26 +24,12 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
     }
 
     @Override public Object getValueAt(int r, int c) {
-        if (c == 0) return regexReplacements.get(r).regex();
-        if (c == 1) return regexReplacements.get(r).replacement();
-        if (c == 2) return regexReplacements.get(r).direction();
-        return null;
+        return replacementValues.get(r).getColumnValue(c);
     }
 
     @Override public void setValueAt(Object v, int r, int c) {
         String s = (v == null) ? "" : v.toString();
-        RegexReplaceRecord regexReplRec;
-        if (c == 0) {
-            regexReplRec = new RegexReplaceRecord(s, regexReplacements.get(r).replacement(), regexReplacements.get(r).direction());
-        } else if (c == 1) {
-            regexReplRec = new RegexReplaceRecord(regexReplacements.get(r).regex(), s, regexReplacements.get(r).direction());
-        } else {
-            if(!"<".equals(s) && !">".equals(s)) {
-                return;
-            }
-            regexReplRec = new RegexReplaceRecord(regexReplacements.get(r).regex(), regexReplacements.get(r).replacement(), s);
-        }
-        regexReplacements.set(r, regexReplRec);
+        replacementValues.set(r, replacementValues.get(r).createOther(s, c));
         fireTableCellUpdated(r, c);
     }
 
@@ -51,41 +37,41 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
 
     /** Add a blank row and return its row index. */
     public int addRow() {
-        regexReplacements.add(new RegexReplaceRecord("", "", ">"));
-        fireTableRowsInserted(regexReplacements.size() - 1, regexReplacements.size() - 1);
-        return regexReplacements.size() - 1;
+        replacementValues.add(new RegexReplaceRecord("", "", ">"));
+        fireTableRowsInserted(replacementValues.size() - 1, replacementValues.size() - 1);
+        return replacementValues.size() - 1;
     }
 
     /** Remove the given row index (shifts subsequent entries). */
     public void removeRow(int r) {
         fireTableRowsDeleted(r, r);
-        regexReplacements.remove(r);
+        replacementValues.remove(r);
     }
 
     /** Sort the JTable by sensitive values. */
-    public void sortByRegexes() {
-        Comparator<RegexReplaceRecord> comp = (ss1, ss2) -> ss1.direction().compareTo(ss2.direction());
-        comp = comp.thenComparing((ss1, ss2) -> ss1.regex().compareTo(ss2.regex()));
-        regexReplacements.sort(comp);
+    public void sortByFirstColumn() {
+        Comparator<ReplacementRecord> comp = (ss1, ss2) -> ((RegexReplaceRecord)ss1).direction().compareTo(((RegexReplaceRecord)ss2).direction());
+        comp = comp.thenComparing((ss1, ss2) -> ((RegexReplaceRecord)ss1).regex().compareTo(((RegexReplaceRecord)ss2).regex()));
+        replacementValues.sort(comp);
         fireTableDataChanged();
     }
 
     /** Sort the JTable by safe values. */
-    public void sortByReplacements() {
-        Comparator<RegexReplaceRecord> comp = (ss1, ss2) -> ss1.direction().compareTo(ss2.direction());
-        comp = comp.thenComparing((ss1, ss2) -> ss1.replacement().compareTo(ss2.replacement()));
-        regexReplacements.sort(comp);
+    public void sortBySecondColumn() {
+        Comparator<ReplacementRecord> comp = (ss1, ss2) -> ((RegexReplaceRecord)ss1).direction().compareTo(((RegexReplaceRecord)ss2).direction());
+        comp = comp.thenComparing((ss1, ss2) -> ((RegexReplaceRecord)ss1).replacement().compareTo(((RegexReplaceRecord)ss2).replacement()));
+        replacementValues.sort(comp);
         fireTableDataChanged();
     }
 
     /** Load all entries from the JSON file into this model. */
     public void load(JSONObject json) {
-        regexReplacements.clear();
+        replacementValues.clear();
         for (String k : json.keySet()) {
             JSONObject jo = json.getJSONObject(k);
             String dir = jo.getString("dir");
             if(!"<".equals(dir) && !">".equals(dir)) continue;
-            regexReplacements.add(new RegexReplaceRecord(k, jo.getString("repl"), dir));
+            replacementValues.add(new RegexReplaceRecord(k, jo.getString("repl"), dir));
         }
         fireTableDataChanged();
     }
@@ -93,10 +79,10 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
     /** Serialize this model back into a JSONObject. */
     public JSONObject toJSON() {
         JSONObject result = new JSONObject();
-        for (int i = 0; i < regexReplacements.size() ; i++) {
-            String k = regexReplacements.get(i).regex();
-            String r1 = regexReplacements.get(i).replacement();
-            String r2 = regexReplacements.get(i).direction();
+        for (int i = 0; i < replacementValues.size() ; i++) {
+            String k = ((RegexReplaceRecord)replacementValues.get(i)).regex();
+            String r1 = ((RegexReplaceRecord)replacementValues.get(i)).replacement();
+            String r2 = ((RegexReplaceRecord)replacementValues.get(i)).direction();
             if (!"<".equals(r2) && !">".equals(r2)) continue; // skip the ones where the direction is invalid
             if (k.isEmpty()) continue; // skip the ones where there isn't a regular expression
             JSONObject jo = new JSONObject();

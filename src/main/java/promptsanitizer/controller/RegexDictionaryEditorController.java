@@ -63,12 +63,12 @@ public class RegexDictionaryEditorController {
     }
 
     public void sortByRegex() {
-        model.sortByRegexes();
+        model.sortByFirstColumn();
         table.clearSelection();
     }
 
     public void sortByReplacement() {
-        model.sortByReplacements();
+        model.sortBySecondColumn();
         table.clearSelection();
     }
 

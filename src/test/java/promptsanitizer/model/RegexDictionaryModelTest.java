@@ -123,7 +123,7 @@ class RegexDictionaryModelTest {
         model.setValueAt("<", 2, 2);
         model.setValueAt("<", 3, 2);
         model.setValueAt("<", 4, 2);
-        model.sortByRegexes();
+        model.sortByFirstColumn();
         assertEquals("(a|b)1", model.getValueAt(0, 0));
         assertEquals("(a|b)2", model.getValueAt(1, 0));
         assertEquals("(a|b)4", model.getValueAt(2, 0));
@@ -164,7 +164,7 @@ class RegexDictionaryModelTest {
         model.setValueAt("<", 2, 2);
         model.setValueAt("<", 3, 2);
         model.setValueAt(">", 4, 2);
-        model.sortByReplacements();
+        model.sortBySecondColumn();
         assertEquals("(a|b)5", model.getValueAt(0, 0));
         assertEquals("(a|b)2", model.getValueAt(1, 0));
         assertEquals("(a|b)1", model.getValueAt(2, 0));
@@ -202,7 +202,7 @@ class RegexDictionaryModelTest {
         model.setValueAt("value_$1_3", 4, 1);
         RegexDictionaryModel model2 = new RegexDictionaryModel();
         model2.load(model.toJSON());
-        model2.sortByRegexes();
+        model2.sortByFirstColumn();
         assertEquals("(a|b)1", model2.getValueAt(0, 0));
         assertEquals("(a|b)2", model2.getValueAt(1, 0));
         assertEquals("(a|b)3", model2.getValueAt(2, 0));
