@@ -42,17 +42,13 @@ class RegexReplaceRecord implements ReplacementRecord {
     }
 
     public int contextCompareToOther(String context, ReplacementRecord other) {
-        if(!(other instanceof RegexReplaceRecord otherRR)) {
-            throw new IllegalArgumentException("Must be comparing to a RegexReplaceRecord");
-        }
+        RegexReplaceRecord otherRR = (RegexReplaceRecord)other;
         int directionCompareResult = direction.compareTo(otherRR.direction);
         if(directionCompareResult == 0) {
             if ("FIRST_COLUMN".equalsIgnoreCase(context)) {
                 return regex.compareTo(otherRR.regex);
-            } else if ("SECOND_COLUMN".equalsIgnoreCase(context)) {
-                return replacement.compareTo(otherRR.replacement);
             } else {
-                throw new IllegalArgumentException("Invalid context: " + context);
+                return replacement.compareTo(otherRR.replacement);
             }
         }
         return directionCompareResult;

@@ -34,20 +34,16 @@ class SensitiveSafeRecord implements ReplacementRecord {
     }
 
     public int contextCompareToOther(String context, ReplacementRecord other) {
-        if(!(other instanceof SensitiveSafeRecord otherSS)) {
-            throw new IllegalArgumentException("Must be comparing to a SensitiveSafeRecord");
-        }
+        SensitiveSafeRecord otherSS = (SensitiveSafeRecord)other;
         if ("FIRST_COLUMN".equalsIgnoreCase(context)) {
             return sensitive.compareTo(otherSS.sensitive);
-        } else if ("SECOND_COLUMN".equalsIgnoreCase(context)) {
-            return safe.compareTo(otherSS.safe);
         } else {
-            throw new IllegalArgumentException("Invalid context: " + context);
+            return safe.compareTo(otherSS.safe);
         }
     }
 
     public void pushIntoJSONObject(JSONObject result) {
-        if (!sensitive.isEmpty() || safe.isEmpty()) result.put(sensitive, safe);  // otherwise, skip blank rows
+        if (!sensitive.isEmpty() || !safe.isEmpty()) result.put(sensitive, safe);  // otherwise, skip blank rows
     }
 
     public void pushIntoArrayList(String k, JSONObject json, List<ReplacementRecord> replacementValues) {
