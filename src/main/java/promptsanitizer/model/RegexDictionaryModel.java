@@ -72,15 +72,7 @@ public class RegexDictionaryModel extends javax.swing.table.AbstractTableModel {
     public JSONObject toJSON() {
         JSONObject result = new JSONObject();
         for (int i = 0; i < replacementValues.size() ; i++) {
-            String k =  replacementValues.get(i).getColumnValue(0);
-            String r1 = replacementValues.get(i).getColumnValue(1);
-            String r2 = replacementValues.get(i).getColumnValue(2);
-            if (!"<".equals(r2) && !">".equals(r2)) continue; // skip the ones where the direction is invalid
-            if (k.isEmpty()) continue; // skip the ones where there isn't a regular expression
-            JSONObject jo = new JSONObject();
-            jo.put("repl", r1);
-            jo.put("dir", r2);
-            result.put(k, jo);
+            replacementValues.get(i).pushIntoJSONObject(result);
         }
         return result;
     }

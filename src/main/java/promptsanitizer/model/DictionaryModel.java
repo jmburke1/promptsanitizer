@@ -69,10 +69,7 @@ public class DictionaryModel extends javax.swing.table.AbstractTableModel {
     public JSONObject toJSON() {
         JSONObject result = new JSONObject();
         for (int i = 0; i < replacementValues.size() ; i++) {
-            String k = replacementValues.get(i).getColumnValue(0);
-            String v = replacementValues.get(i).getColumnValue(1);
-            if (k.isEmpty() && v.isEmpty()) continue; // skip blank rows
-            result.put(k, v);
+            replacementValues.get(i).pushIntoJSONObject(result);
         }
         return result;
     }

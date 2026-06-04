@@ -4,6 +4,8 @@
  */
 package promptsanitizer.model;
 
+import org.json.JSONObject;
+
 class SensitiveSafeRecord implements ReplacementRecord {
     private String sensitive;
     private String safe;
@@ -40,5 +42,9 @@ class SensitiveSafeRecord implements ReplacementRecord {
         } else {
             throw new IllegalArgumentException("Invalid context: " + context);
         }
+    }
+
+    public void pushIntoJSONObject(JSONObject result) {
+        if (!sensitive.isEmpty() || safe.isEmpty()) result.put(sensitive, safe);  // otherwise, skip blank rows
     }
 }

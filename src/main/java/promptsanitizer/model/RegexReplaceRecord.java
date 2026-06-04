@@ -4,6 +4,8 @@
  */
 package promptsanitizer.model;
 
+import org.json.JSONObject;
+
 class RegexReplaceRecord implements ReplacementRecord {
     private String regex;
     private String replacement;
@@ -52,5 +54,13 @@ class RegexReplaceRecord implements ReplacementRecord {
             }
         }
         return directionCompareResult;
+    }
+    public void pushIntoJSONObject(JSONObject result) {
+        if (!"<".equals(direction) && !">".equals(direction)) return; // skip the ones where the direction is invalid
+        if (regex.isEmpty()) return; // skip the ones where there isn't a regular expression
+        JSONObject jo = new JSONObject();
+        jo.put("repl", replacement);
+        jo.put("dir", direction);
+        result.put(regex, jo);
     }
 }
