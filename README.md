@@ -115,6 +115,12 @@ curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/feature/lo
 
 This downloads the source, compiles it with Java 21+, and installs a `promptsanitizer` command to `/usr/local/bin`.
 
+```bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/feature/localinstall/localinstall.sh | bash
+```
+
+Similar to the first one, but installs just for your local user id rather than for everyone on your system.
+
 ### Build From source (Gradle)
 
 ```bash
