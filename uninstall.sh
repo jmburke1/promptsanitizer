@@ -10,7 +10,7 @@ info() { echo "[INFO]  $*"; }
 
 # ── Step 1: Remove symbolic link in /usr/local/bin ────────────────────
 LINK_TARGET="${HOME}/.local/bin/${APP_NAME}"
-LINK_TARGET="${HOME}/.local/bin/${APP_NAME}batch"
+LINK_TARGET_BATCH="${HOME}/.local/bin/${APP_NAME}batch"
 
 if [ -L "$LINK_TARGET" ] || [ -e "$LINK_TARGET" ]; then
     info "Removing existing ${LINK_TARGET} ..."
