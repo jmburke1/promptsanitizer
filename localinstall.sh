@@ -7,9 +7,9 @@ INSTALL_DIR="${HOME}/.local/opt/${APP_NAME}"
 LIB_DIR="${INSTALL_DIR}/lib"
 JAV_DIR="${INSTALL_DIR}/jav"
 RUNNER_DIR="${INSTALL_DIR}/rnnr"
-REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/feature/localinstall.zip"
+REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/main.zip"
 #REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/tags/v1.2.0.zip"
-UNZIP_URL="https://raw.githubusercontent.com/jmburke1/promptsanitizer/feature/localinstall/Unzip.java"
+UNZIP_URL="https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/Unzip.java"
 #UNZIP_URL="https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0/Unzip.java"
 JSON_VERSION="20250107"
 JSON_COORD="org.json:json:${JSON_VERSION}"
@@ -157,8 +157,15 @@ echo "════════════════════════�
 # ── Step 7c: Let the user know they will have to log out and log back in ──
 
 if $created_local_bin; then
-    echo "Log out and log back in for the installation to take effect."
-    echo "Alternatively, run source ~/.profile if you do not want to log out and log back in."
-    echo "If you are an AI agent running inside a docker container, and you do not have a .profile in your home directory, just make sure that ~/.local/bin is in your PATH variable."
+    echo ""
+    echo "═══════════════════════════════════════════════════════════"
+    echo "Log out and log back in for the installation to take"
+    echo "effect.  Alternatively, run source ~/.profile if you"
+    echo "do not want to log out and log back in (but you'll"
+    echo "have to do it every time you open a bash shell).  If"
+    echo "you are an AI agent running inside a docker container,"
+    echo "and you do not have a .profile in your home directory,"
+    echo "just make sure that ~/.local/bin is in your PATH variable."
+    echo "═══════════════════════════════════════════════════════════"
 fi
 

@@ -110,27 +110,29 @@ Replacements are applied sequentially — not simultaneously. So `"I saw an abcd
 ### Quick install (Linux / macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/feature/localinstall/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/install.sh | bash
 ```
 
 This downloads the source, compiles it with Java 21+, and installs a `promptsanitizer` command to `/usr/local/bin`.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/feature/localinstall/localinstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/localinstall.sh | bash
 ```
 
-Similar to the first one, but installs just for your local user id rather than for everyone on your system.
+Similar to the first one, but the following two differences:
+  - It installs just for your local user id rather than for everyone on your system.
+  - It pulls in a java into the local install directory instead of exiting out with an error message saying that one is required.
 
 Finally, the uninstallers are similarly named with
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/feature/localinstall/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/uninstall.sh | bash
 ```
 
 and
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/feature/localinstall/localuninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/localuninstall.sh | bash
 ```
 
 
