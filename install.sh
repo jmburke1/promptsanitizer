@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # ── Configuration ─────────────────────────────────────────────────────
-INSTALL_DIR="/opt/promptsanitizer"
-LIB_DIR="${INSTALL_DIR}/lib"
 APP_NAME="promptsanitizer"
+INSTALL_DIR="/opt/${APP_NAME}"
+LIB_DIR="${INSTALL_DIR}/lib"
 REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/main.zip"
 #REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/tags/v1.2.0.zip"
 JSON_VERSION="20250107"

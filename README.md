@@ -115,6 +115,27 @@ curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/insta
 
 This downloads the source, compiles it with Java 21+, and installs a `promptsanitizer` command to `/usr/local/bin`.
 
+```bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/localinstall.sh | bash
+```
+
+Similar to the first one, but the following two differences:
+  - It installs just for your local user id rather than for everyone on your system.
+  - It pulls in a java into the local install directory instead of exiting out with an error message saying that one is required.
+
+Finally, the uninstallers are similarly named with
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/uninstall.sh | bash
+```
+
+and
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/localuninstall.sh | bash
+```
+
+
 ### Build From source (Gradle)
 
 ```bash
@@ -123,7 +144,7 @@ cd promptsanitizer
 ./gradlew build   # requires JDK 21+
 ```
 
-If you're building from Gradle, you're a power user.  Consider creating the artifacts in the `/opt/` folder and the link in the `/usr/local/bin`.
+This option might be good for Windows users as I haven't created any kind of installer for Windows.  Consider creating the artifacts in the `/opt/` folder and the link in the `/usr/local/bin`.
 
 ### Run directly
 
