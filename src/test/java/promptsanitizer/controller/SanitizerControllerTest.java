@@ -12,14 +12,16 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
 import org.mockito.quality.Strictness;
+import promptsanitizer.model.DictionaryModel;
+import promptsanitizer.model.RegexDictionaryModel;
 import promptsanitizer.model.SanitizerModel;
 import promptsanitizer.view.DictionaryEditorView;
-import promptsanitizer.view.RegexDictionaryEditorView;
 
 import java.util.List;
 import javax.swing.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class SanitizerControllerTest {
 
@@ -162,7 +164,9 @@ class SanitizerControllerTest {
         controller.init(model, fileName, regexFileName);
 
         try (MockedConstruction<DictionaryEditorView> viewMockedConstruction = Mockito.mockConstruction(
-                DictionaryEditorView.class)) {
+                DictionaryEditorView.class, (mock, context) -> {
+                    assertInstanceOf(DictionaryModel.class, context.arguments().get(2));
+                })) {
             controller.handleTilde();
 
             Mockito.verify(model).invalidateDictionary();
@@ -182,12 +186,14 @@ class SanitizerControllerTest {
         SanitizerController controller = new SanitizerController();
         controller.init(model, fileName, regexFileName);
 
-        try (MockedConstruction<RegexDictionaryEditorView> viewMockedConstruction = Mockito.mockConstruction(
-                RegexDictionaryEditorView.class)) {
+        try (MockedConstruction<DictionaryEditorView> viewMockedConstruction = Mockito.mockConstruction(
+                DictionaryEditorView.class, (mock, context) -> {
+                    assertInstanceOf(RegexDictionaryModel.class, context.arguments().get(2));
+                })) {
             controller.handleAsteriskTilde();
 
             Mockito.verify(model).invalidateDictionary();
-            List<RegexDictionaryEditorView> editorViews = viewMockedConstruction.constructed();
+            List<DictionaryEditorView> editorViews = viewMockedConstruction.constructed();
             assertEquals(1, editorViews.size());
             Mockito.verify(editorViews.getFirst()).createUI();
         }

@@ -8,7 +8,6 @@ import promptsanitizer.model.DictionaryModel;
 import promptsanitizer.model.RegexDictionaryModel;
 import promptsanitizer.model.SanitizerModel;
 import promptsanitizer.view.DictionaryEditorView;
-import promptsanitizer.view.RegexDictionaryEditorView;
 
 import javax.swing.*;
 
@@ -47,6 +46,6 @@ public class SanitizerController {
     }
     public void handleAsteriskTilde() {
         model.invalidateDictionary();
-        new RegexDictionaryEditorView(regexFileName, new DictionaryEditorController(), new RegexDictionaryModel()).createUI();
+        new DictionaryEditorView(regexFileName, new DictionaryEditorController(), new RegexDictionaryModel()).createUI();
     }
 }
