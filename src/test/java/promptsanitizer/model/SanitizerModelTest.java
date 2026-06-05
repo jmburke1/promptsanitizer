@@ -68,6 +68,19 @@ class SanitizerModelTest {
     }
 
     @Test
+    void shouldExceptionWhenInvalidRegexDirection() throws Exception {
+        SanitizerModel model = new SanitizerModel();
+        Path tmpFile = Files.createTempFile("dict", ".json");
+        Files.delete(tmpFile);
+        Path tmpFileRegex = Files.createTempFile("dict_regex", ".json");
+        Files.writeString(tmpFileRegex, "{\"QED\": {\"repl\": \"QEF\", \"dir\": \"!\"}}");
+        model.init(tmpFile.toString(), tmpFileRegex.toString());
+        model.loadDictionary();
+        assertFalse(model.isStronglyValidDictionary());
+    }
+
+
+    @Test
     void dictionaryCanBeValidWithoutStronglyValid() throws Exception {
         SanitizerModel model = new SanitizerModel();
 
