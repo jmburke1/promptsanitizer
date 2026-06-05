@@ -146,28 +146,28 @@ class RegexDictionaryEditorControllerTest {
     // --- sortBySensitive / sortBySafe ---
 
     @Test
-    void sortByRegex_shouldDelegateToModelAndClearSelection() {
+    void sortByFirstColumn_shouldDelegateToModelAndClearSelection() {
         RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
-        controller.sortByRegex();
+        controller.sortByFirstColumn();
 
         Mockito.verify(model).sortByFirstColumn();
         Mockito.verify(table).clearSelection();
     }
 
     @Test
-    void sortBySafe_shouldDelegateToModelAndClearSelection() {
+    void sortBySecondColumn_shouldDelegateToModelAndClearSelection() {
         RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         RegexDictionaryEditorController controller = new RegexDictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
-        controller.sortByReplacement();
+        controller.sortBySecondColumn();
 
         Mockito.verify(model).sortBySecondColumn();
         Mockito.verify(table).clearSelection();

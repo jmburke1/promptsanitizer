@@ -115,9 +115,9 @@ public class RegexDictionaryEditorView {
 
         rmBtn.addActionListener(e -> controller.removeRow());
 
-        sortBySensitiveBtn.addActionListener(e -> controller.sortByRegex());
+        sortBySensitiveBtn.addActionListener(e -> controller.sortByFirstColumn());
 
-        sortBySafeBtn.addActionListener(e -> controller.sortByReplacement());
+        sortBySafeBtn.addActionListener(e -> controller.sortBySecondColumn());
 
         saveBtn.addActionListener(e -> controller.saveToFile());
         cancelBtn.addActionListener(e -> controller.cancel());

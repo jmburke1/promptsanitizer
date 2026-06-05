@@ -142,28 +142,28 @@ class DictionaryEditorControllerTest {
     // --- sortBySensitive / sortBySafe ---
 
     @Test
-    void sortBySensitive_shouldDelegateToModelAndClearSelection() {
+    void sortByFirstColumn_shouldDelegateToModelAndClearSelection() {
         DictionaryModel model = Mockito.mock(DictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         DictionaryEditorController controller = new DictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
-        controller.sortBySensitive();
+        controller.sortByFirstColumn();
 
         Mockito.verify(model).sortByFirstColumn();
         Mockito.verify(table).clearSelection();
     }
 
     @Test
-    void sortBySafe_shouldDelegateToModelAndClearSelection() {
+    void sortBySecondColumn_shouldDelegateToModelAndClearSelection() {
         DictionaryModel model = Mockito.mock(DictionaryModel.class);
         JTable table = Mockito.mock(JTable.class);
         JFrame frame = Mockito.mock(JFrame.class);
         DictionaryEditorController controller = new DictionaryEditorController();
         controller.init("/tmp/nonexistent/file.json", model, table, frame);
 
-        controller.sortBySafe();
+        controller.sortBySecondColumn();
 
         Mockito.verify(model).sortBySecondColumn();
         Mockito.verify(table).clearSelection();

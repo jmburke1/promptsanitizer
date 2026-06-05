@@ -15,12 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.json.JSONObject;
-import promptsanitizer.model.DictionaryModel;
+import promptsanitizer.model.AbstractDictionaryModel;
 
 public class DictionaryEditorController {
     public void init(
             String fileName,
-            DictionaryModel model,
+            AbstractDictionaryModel model,
             JTable table,
             JFrame frame
     ) {
@@ -33,7 +33,7 @@ public class DictionaryEditorController {
 
     private String fileName;
 
-    private DictionaryModel model;
+    private AbstractDictionaryModel model;
     private JTable table;
     private JFrame frame;
 
@@ -62,12 +62,12 @@ public class DictionaryEditorController {
         model.removeRow(r);
     }
 
-    public void sortBySensitive() {
+    public void sortByFirstColumn() {
         model.sortByFirstColumn();
         table.clearSelection();
     }
 
-    public void sortBySafe() {
+    public void sortBySecondColumn() {
         model.sortBySecondColumn();
         table.clearSelection();
     }

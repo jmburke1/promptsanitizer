@@ -15,12 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.json.JSONObject;
-import promptsanitizer.model.RegexDictionaryModel;
+import promptsanitizer.model.AbstractDictionaryModel;
 
 public class RegexDictionaryEditorController {
     public void init(
             String fileName,
-            RegexDictionaryModel model,
+            AbstractDictionaryModel model,
             JTable table,
             JFrame frame
     ) {
@@ -33,7 +33,7 @@ public class RegexDictionaryEditorController {
 
     private String fileName;
 
-    private RegexDictionaryModel model;
+    private AbstractDictionaryModel model;
     private JTable table;
     private JFrame frame;
 
@@ -62,12 +62,12 @@ public class RegexDictionaryEditorController {
         model.removeRow(r);
     }
 
-    public void sortByRegex() {
+    public void sortByFirstColumn() {
         model.sortByFirstColumn();
         table.clearSelection();
     }
 
-    public void sortByReplacement() {
+    public void sortBySecondColumn() {
         model.sortBySecondColumn();
         table.clearSelection();
     }

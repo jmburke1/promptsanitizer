@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Lightweight model backed by a Map<Integer, String>. */
-abstract class AbstractDictionaryModel extends javax.swing.table.AbstractTableModel {
+public abstract class AbstractDictionaryModel extends javax.swing.table.AbstractTableModel {
     private final List<ReplacementRecord> replacementValues = new ArrayList<>();
 
     @Override public int getRowCount()              { return replacementValues.size(); }

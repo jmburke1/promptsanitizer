@@ -114,9 +114,9 @@ public class DictionaryEditorView {
 
         rmBtn.addActionListener(e -> controller.removeRow());
 
-        sortBySensitiveBtn.addActionListener(e -> controller.sortBySensitive());
+        sortBySensitiveBtn.addActionListener(e -> controller.sortByFirstColumn());
 
-        sortBySafeBtn.addActionListener(e -> controller.sortBySafe());
+        sortBySafeBtn.addActionListener(e -> controller.sortBySecondColumn());
 
         saveBtn.addActionListener(e -> controller.saveToFile());
         cancelBtn.addActionListener(e -> controller.cancel());
