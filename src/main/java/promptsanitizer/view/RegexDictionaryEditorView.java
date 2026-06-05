@@ -9,6 +9,7 @@ import promptsanitizer.controller.ScrollPaneMouseAdapter;
 import promptsanitizer.controller.CenteredCellEditor;
 import promptsanitizer.controller.TableMouseAdapter;
 import promptsanitizer.model.RegexDictionaryModel;
+import promptsanitizer.model.AbstractDictionaryModel;
 
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
@@ -16,25 +17,27 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class RegexDictionaryEditorView {
-    public RegexDictionaryEditorView(String fileName, DictionaryEditorController controller, RegexDictionaryModel model) {
+    public RegexDictionaryEditorView(String fileName, DictionaryEditorController controller, AbstractDictionaryModel model) {
         this.fileName = fileName;
         this.controller = controller;
         this.model = model;
+        this.isRegexModel = model instanceof RegexDictionaryModel;
         addBtn = new JButton("Add Row");
         rmBtn = new JButton("Remove Row");
-        sortBySensitiveBtn = new JButton("Sort By Regex");
-        sortBySafeBtn = new JButton("Sort By Replacement");
+        sortBySensitiveBtn = new JButton("Sort By " + (isRegexModel ? "Regex" : "Sensitive Words/Phrases"));
+        sortBySafeBtn = new JButton("Sort By " + (isRegexModel ? "Replacement" : "Safe Words/Phrases"));
         saveBtn = new JButton("Save to File");
         cancelBtn = new JButton("Cancel");
         table = new JTable(model);
-        frame = new JFrame("Edit Your Personal Dictionary of Regex Snippets");
+        frame = new JFrame("Edit Your Personal Dictionary of " + (isRegexModel ? "Regex" : "Sensitive") + " Snippets");
     }
 
     private final String fileName;
 
     private static final Font BUTTON_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 
-    private final RegexDictionaryModel model;
+    private final AbstractDictionaryModel model;
+    private final boolean isRegexModel;
     private final JTable table;
     private final JButton addBtn;
     private final JButton rmBtn;
@@ -59,7 +62,9 @@ public class RegexDictionaryEditorView {
         if (tcm.getColumnCount() > 0) {
             tcm.getColumn(0).setPreferredWidth(180); // Key column wider
             tcm.getColumn(1).setPreferredWidth(320);
-            tcm.getColumn(2).setPreferredWidth(250);
+            if(isRegexModel) {
+                tcm.getColumn(2).setPreferredWidth(250);
+            }
         }
 
         java.util.List<JButton> disableTheseWhenEditingTableCell = new ArrayList<>();
