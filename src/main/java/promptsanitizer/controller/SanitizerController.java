@@ -47,6 +47,6 @@ public class SanitizerController {
     }
     public void handleAsteriskTilde() {
         model.invalidateDictionary();
-        new RegexDictionaryEditorView(regexFileName, new RegexDictionaryEditorController(), new RegexDictionaryModel()).createUI();
+        new RegexDictionaryEditorView(regexFileName, new DictionaryEditorController(), new RegexDictionaryModel()).createUI();
     }
 }

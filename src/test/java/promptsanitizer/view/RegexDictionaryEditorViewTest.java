@@ -7,7 +7,7 @@ package promptsanitizer.view;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
-import promptsanitizer.controller.RegexDictionaryEditorController;
+import promptsanitizer.controller.DictionaryEditorController;
 import promptsanitizer.model.RegexDictionaryModel;
 
 import javax.swing.*;
@@ -18,7 +18,7 @@ public class RegexDictionaryEditorViewTest {
         try(MockedConstruction<JFrame> jfMC = Mockito.mockConstruction(JFrame.class)) {
             RegexDictionaryEditorView regexDictionaryEditorView = new RegexDictionaryEditorView(
                     "/path/to/file.json",
-                    Mockito.mock(RegexDictionaryEditorController.class),
+                    Mockito.mock(DictionaryEditorController.class),
                     Mockito.mock(RegexDictionaryModel.class)
             );
             regexDictionaryEditorView.createUI();

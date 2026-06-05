@@ -4,7 +4,7 @@
  */
 package promptsanitizer.view;
 
-import promptsanitizer.controller.RegexDictionaryEditorController;
+import promptsanitizer.controller.DictionaryEditorController;
 import promptsanitizer.controller.ScrollPaneMouseAdapter;
 import promptsanitizer.controller.CenteredCellEditor;
 import promptsanitizer.controller.TableMouseAdapter;
@@ -16,7 +16,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class RegexDictionaryEditorView {
-    public RegexDictionaryEditorView(String fileName, RegexDictionaryEditorController controller, RegexDictionaryModel model) {
+    public RegexDictionaryEditorView(String fileName, DictionaryEditorController controller, RegexDictionaryModel model) {
         this.fileName = fileName;
         this.controller = controller;
         this.model = model;
@@ -43,7 +43,7 @@ public class RegexDictionaryEditorView {
     private final JButton saveBtn;
     private final JButton cancelBtn;
     private final JFrame frame;
-    private final RegexDictionaryEditorController controller;
+    private final DictionaryEditorController controller;
 
     public void createUI() {
         controller.init(fileName, model, table, frame);

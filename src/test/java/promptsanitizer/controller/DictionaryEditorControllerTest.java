@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoSession;
 import org.mockito.quality.Strictness;
 import promptsanitizer.model.DictionaryModel;
+import promptsanitizer.model.RegexDictionaryModel;
 
 import javax.swing.*;
 import java.nio.file.Files;
@@ -53,6 +54,25 @@ class DictionaryEditorControllerTest {
         controller.init(fileName, model, table, frame);
 
         Mockito.verify(model).load(Mockito.argThat(jsonObject -> jsonObject.getString("key1").equals("value1")));
+        Files.delete(tmp);
+    }
+    private boolean jsonObjectArgThat(JSONObject jo) {
+        JSONObject t = jo.getJSONObject("key1");
+        return t.getString("repl").equals("value1") && t.getString("dir").equals("<");
+    }
+    @Test
+    void init_shouldSetFieldsAndCallLoadWhenFileExistsRegexModelExample() throws Exception {
+        Path tmp = Files.createTempFile("dict", ".json");
+        Files.writeString(tmp, "{\"key1\":{\"repl\": \"value1\", \"dir\": \"<\"}}"); //change this?
+        String fileName = tmp.toString();
+        RegexDictionaryModel model = Mockito.mock(RegexDictionaryModel.class);
+        JTable table = Mockito.mock(JTable.class);
+        JFrame frame = Mockito.mock(JFrame.class);
+        DictionaryEditorController controller = new DictionaryEditorController();
+
+        controller.init(fileName, model, table, frame);
+
+        Mockito.verify(model).load(Mockito.argThat(this::jsonObjectArgThat));
         Files.delete(tmp);
     }
 
