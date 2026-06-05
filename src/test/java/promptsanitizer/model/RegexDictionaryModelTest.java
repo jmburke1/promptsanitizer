@@ -4,6 +4,7 @@
  */
 package promptsanitizer.model;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -182,9 +183,9 @@ class RegexDictionaryModelTest {
         assertEquals(">", model.getValueAt(4, 2));
     }
 
-    @Test
-    void canSaveAndLoad() {
+    private void canSaveAndLoad(boolean isInvalidCharTest) {
         RegexDictionaryModel model = new RegexDictionaryModel();
+        model.addRow();
         model.addRow();
         model.addRow();
         model.addRow();
@@ -195,23 +196,53 @@ class RegexDictionaryModelTest {
         model.setValueAt("(a|b)1", 2, 0);
         model.setValueAt("(a|b)5", 3, 0);
         model.setValueAt("(a|b)4", 4, 0);
+        model.setValueAt("", 5, 0);
         model.setValueAt("value_$1_2", 0, 1);
         model.setValueAt("value_$1_5", 1, 1);
         model.setValueAt("value_$1_4", 2, 1);
         model.setValueAt("value_$1_1", 3, 1);
         model.setValueAt("value_$1_3", 4, 1);
+        model.setValueAt("value_$1_99", 5, 1);
+        model.setValueAt("<", 1, 2);
+        model.setValueAt("<", 2, 2);
         RegexDictionaryModel model2 = new RegexDictionaryModel();
-        model2.load(model.toJSON());
+        JSONObject json = model.toJSON();
+        if(isInvalidCharTest) {
+            json.getJSONObject("(a|b)5").put("dir", "!");
+        }
+        model2.load(json);
         model2.sortByFirstColumn();
         assertEquals("(a|b)1", model2.getValueAt(0, 0));
-        assertEquals("(a|b)2", model2.getValueAt(1, 0));
-        assertEquals("(a|b)3", model2.getValueAt(2, 0));
+        assertEquals("(a|b)3", model2.getValueAt(1, 0));
+        assertEquals("(a|b)2", model2.getValueAt(2, 0));
         assertEquals("(a|b)4", model2.getValueAt(3, 0));
-        assertEquals("(a|b)5", model2.getValueAt(4, 0));
+        if(isInvalidCharTest) {
+            assertEquals(4, model2.getRowCount());
+        } else {
+            assertEquals(5, model2.getRowCount());
+            assertEquals("(a|b)5", model2.getValueAt(4, 0));
+        }
         assertEquals("value_$1_4", model2.getValueAt(0, 1));
-        assertEquals("value_$1_2", model2.getValueAt(1, 1));
-        assertEquals("value_$1_5", model2.getValueAt(2, 1));
+        assertEquals("value_$1_5", model2.getValueAt(1, 1));
+        assertEquals("value_$1_2", model2.getValueAt(2, 1));
         assertEquals("value_$1_3", model2.getValueAt(3, 1));
-        assertEquals("value_$1_1", model2.getValueAt(4, 1));
+        if(!isInvalidCharTest) {
+            assertEquals("value_$1_1", model2.getValueAt(4, 1));
+        }
+        assertEquals("<", model2.getValueAt(0, 2));
+        assertEquals("<", model2.getValueAt(1, 2));
+        assertEquals(">", model2.getValueAt(2, 2));
+        assertEquals(">", model2.getValueAt(3, 2));
+        if(!isInvalidCharTest) {
+            assertEquals(">", model2.getValueAt(4, 2));
+        }
+    }
+    @Test
+    void canSaveAndLoadNormalCase() {
+        canSaveAndLoad(false);
+    }
+    @Test
+    void canSaveAndLoadInvalidChar() {
+        canSaveAndLoad(true);
     }
 }
