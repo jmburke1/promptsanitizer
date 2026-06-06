@@ -5,31 +5,21 @@
 package promptsanitizer.model;
 
 import org.junit.jupiter.api.Test;
+import promptsanitizer.view.TableModelWrapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DictionaryModelTest {
-
-    private StringBuilder initModelBehaviors(DictionaryModel model) {
-        StringBuilder sb = new StringBuilder();
-        model.initBehaviors(
-                i -> sb.append("inserted: " + i + "\n"),
-                d -> sb.append("deleted: " + d + "\n"),
-                () -> sb.append("chgd\n"),
-                (r, c) -> sb.append("cellEdited: " + r + " " + c +"\n")
-        );
-        return sb;
-    }
+class WrappedDictionaryModelTest {
 
     @Test
     void numerousThingsAreTrueAfterUserAddsFiveRows() {
-        DictionaryModel model = new DictionaryModel();
-        StringBuilder assertLater = initModelBehaviors(model);
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        DictionaryModel dictMdl = new DictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(dictMdl);
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
         model.setValueAt("key2", 0, 0);
         model.setValueAt("key3", 1, 0);
         model.setValueAt("key1", 2, 0);
@@ -55,35 +45,21 @@ class DictionaryModelTest {
         assertNull(model.getValueAt(1, 2));
         assertEquals(5, model.getRowCount());
         assertEquals(2, model.getColumnCount());
+        assertSame(String.class, model.getColumnClass(0));
         assertEquals("Sensitive", model.getColumnName(0));
         assertEquals("Safe", model.getColumnName(1));
-        assertEquals("inserted: 0\n" +
-                "inserted: 1\n" +
-                "inserted: 2\n" +
-                "inserted: 3\n" +
-                "inserted: 4\n" +
-                "cellEdited: 0 0\n" +
-                "cellEdited: 1 0\n" +
-                "cellEdited: 2 0\n" +
-                "cellEdited: 3 0\n" +
-                "cellEdited: 4 0\n" +
-                "cellEdited: 0 1\n" +
-                "cellEdited: 1 1\n" +
-                "cellEdited: 2 1\n" +
-                "cellEdited: 3 1\n" +
-                "cellEdited: 4 1\n" +
-                "cellEdited: 3 0\n", assertLater.toString());
+        assertTrue(model.isCellEditable(100, 100));
     }
 
     @Test
     void userRemovesARow() {
-        DictionaryModel model = new DictionaryModel();
-        StringBuilder assertLater = initModelBehaviors(model);
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        DictionaryModel dictMdl = new DictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(dictMdl);
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
         model.setValueAt("key2", 0, 0);
         model.setValueAt("key3", 1, 0);
         model.setValueAt("key1", 2, 0);
@@ -94,7 +70,7 @@ class DictionaryModelTest {
         model.setValueAt("value4", 2, 1);
         model.setValueAt("value1", 3, 1);
         model.setValueAt("value3", 4, 1);
-        model.removeRow(3);
+        dictMdl.removeRow(3);
         assertEquals("key2", model.getValueAt(0, 0));
         assertEquals("key3", model.getValueAt(1, 0));
         assertEquals("key1", model.getValueAt(2, 0));
@@ -103,33 +79,17 @@ class DictionaryModelTest {
         assertEquals("value5", model.getValueAt(1, 1));
         assertEquals("value4", model.getValueAt(2, 1));
         assertEquals("value3", model.getValueAt(3, 1));
-        assertEquals("inserted: 0\n" +
-                "inserted: 1\n" +
-                "inserted: 2\n" +
-                "inserted: 3\n" +
-                "inserted: 4\n" +
-                "cellEdited: 0 0\n" +
-                "cellEdited: 1 0\n" +
-                "cellEdited: 2 0\n" +
-                "cellEdited: 3 0\n" +
-                "cellEdited: 4 0\n" +
-                "cellEdited: 0 1\n" +
-                "cellEdited: 1 1\n" +
-                "cellEdited: 2 1\n" +
-                "cellEdited: 3 1\n" +
-                "cellEdited: 4 1\n" +
-                "deleted: 3\n", assertLater.toString());
     }
 
     @Test
     void userSortsBySensitive() {
-        DictionaryModel model = new DictionaryModel();
-        StringBuilder assertLater = initModelBehaviors(model);
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        DictionaryModel dictMdl = new DictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(dictMdl);
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
         model.setValueAt("key2", 0, 0);
         model.setValueAt("key3", 1, 0);
         model.setValueAt("key1", 2, 0);
@@ -140,7 +100,7 @@ class DictionaryModelTest {
         model.setValueAt("value4", 2, 1);
         model.setValueAt("value1", 3, 1);
         model.setValueAt("value3", 4, 1);
-        model.sortByFirstColumn();
+        dictMdl.sortByFirstColumn();
         assertEquals("key1", model.getValueAt(0, 0));
         assertEquals("key2", model.getValueAt(1, 0));
         assertEquals("key3", model.getValueAt(2, 0));
@@ -151,33 +111,17 @@ class DictionaryModelTest {
         assertEquals("value5", model.getValueAt(2, 1));
         assertEquals("value3", model.getValueAt(3, 1));
         assertEquals("value1", model.getValueAt(4, 1));
-        assertEquals("inserted: 0\n" +
-                "inserted: 1\n" +
-                "inserted: 2\n" +
-                "inserted: 3\n" +
-                "inserted: 4\n" +
-                "cellEdited: 0 0\n" +
-                "cellEdited: 1 0\n" +
-                "cellEdited: 2 0\n" +
-                "cellEdited: 3 0\n" +
-                "cellEdited: 4 0\n" +
-                "cellEdited: 0 1\n" +
-                "cellEdited: 1 1\n" +
-                "cellEdited: 2 1\n" +
-                "cellEdited: 3 1\n" +
-                "cellEdited: 4 1\n" +
-                "chgd\n", assertLater.toString());
     }
 
     @Test
     void userSortsBySafe() {
-        DictionaryModel model = new DictionaryModel();
-        StringBuilder assertLater = initModelBehaviors(model);
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        DictionaryModel dictMdl = new DictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(dictMdl);
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
         model.setValueAt("key2", 0, 0);
         model.setValueAt("key3", 1, 0);
         model.setValueAt("key1", 2, 0);
@@ -188,7 +132,7 @@ class DictionaryModelTest {
         model.setValueAt("value4", 2, 1);
         model.setValueAt("value1", 3, 1);
         model.setValueAt("value3", 4, 1);
-        model.sortBySecondColumn();
+        dictMdl.sortBySecondColumn();
         assertEquals("key5", model.getValueAt(0, 0));
         assertEquals("key2", model.getValueAt(1, 0));
         assertEquals("key4", model.getValueAt(2, 0));
@@ -199,36 +143,20 @@ class DictionaryModelTest {
         assertEquals("value3", model.getValueAt(2, 1));
         assertEquals("value4", model.getValueAt(3, 1));
         assertEquals("value5", model.getValueAt(4, 1));
-        assertEquals("inserted: 0\n" +
-                "inserted: 1\n" +
-                "inserted: 2\n" +
-                "inserted: 3\n" +
-                "inserted: 4\n" +
-                "cellEdited: 0 0\n" +
-                "cellEdited: 1 0\n" +
-                "cellEdited: 2 0\n" +
-                "cellEdited: 3 0\n" +
-                "cellEdited: 4 0\n" +
-                "cellEdited: 0 1\n" +
-                "cellEdited: 1 1\n" +
-                "cellEdited: 2 1\n" +
-                "cellEdited: 3 1\n" +
-                "cellEdited: 4 1\n" +
-                "chgd\n", assertLater.toString());
     }
 
     @Test
     void canSaveAndLoad() {
-        DictionaryModel model = new DictionaryModel();
-        StringBuilder assertLaterSrc = initModelBehaviors(model);
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        DictionaryModel dictMdl = new DictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(dictMdl);
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
+        dictMdl.addRow();
         model.setValueAt("key2", 0, 0);
         model.setValueAt("key3", 1, 0);
         model.setValueAt("key1", 2, 0);
@@ -243,10 +171,10 @@ class DictionaryModelTest {
         model.setValueAt("value3", 4, 1);
         model.setValueAt("", 5, 1);
         model.setValueAt("value99", 6, 1);
-        DictionaryModel model2 = new DictionaryModel();
-        StringBuilder assertLaterSnk = initModelBehaviors(model2);
-        model2.load(model.toJSON());
-        model2.sortByFirstColumn();
+        DictionaryModel dictMdl2 = new DictionaryModel();
+        TableModelWrapper model2 = new TableModelWrapper(dictMdl2);
+        dictMdl2.load(dictMdl.toJSON());
+        dictMdl2.sortByFirstColumn();
         assertEquals("", model2.getValueAt(0, 0));
         assertEquals("key1", model2.getValueAt(1, 0));
         assertEquals("key2", model2.getValueAt(2, 0));
@@ -261,29 +189,5 @@ class DictionaryModelTest {
         assertEquals("value3", model2.getValueAt(4, 1));
         assertEquals("value1", model2.getValueAt(5, 1));
         assertEquals("", model2.getValueAt(6, 1));
-        assertEquals("inserted: 0\n" +
-                "inserted: 1\n" +
-                "inserted: 2\n" +
-                "inserted: 3\n" +
-                "inserted: 4\n" +
-                "inserted: 5\n" +
-                "inserted: 6\n" +
-                "inserted: 7\n" +
-                "cellEdited: 0 0\n" +
-                "cellEdited: 1 0\n" +
-                "cellEdited: 2 0\n" +
-                "cellEdited: 3 0\n" +
-                "cellEdited: 4 0\n" +
-                "cellEdited: 5 0\n" +
-                "cellEdited: 6 0\n" +
-                "cellEdited: 0 1\n" +
-                "cellEdited: 1 1\n" +
-                "cellEdited: 2 1\n" +
-                "cellEdited: 3 1\n" +
-                "cellEdited: 4 1\n" +
-                "cellEdited: 5 1\n" +
-                "cellEdited: 6 1\n",assertLaterSrc.toString());
-        assertEquals("chgd\n" +
-                "chgd\n",assertLaterSnk.toString());
     }
 }

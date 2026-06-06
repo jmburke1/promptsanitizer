@@ -7,35 +7,44 @@ package promptsanitizer.controller;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.json.JSONObject;
-import promptsanitizer.model.DictionaryModel;
+import promptsanitizer.model.AbstractDictionaryModel;
+
+import java.util.function.Supplier;
+import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class DictionaryEditorController {
     public void init(
             String fileName,
-            DictionaryModel model,
-            JTable table,
-            JFrame frame
+            AbstractDictionaryModel model,
+            Supplier<Integer> tableRowSource,
+            Consumer<Integer> tableIndexSink,
+            Runnable tableClrSel,
+            Runnable frameDisposed,
+            BiConsumer<String, String> handleErrorMessage
     ) {
         this.model = model;
-        this.table = table;
+        this.tableRowSource = tableRowSource;
+        this.tableIndexSink = tableIndexSink;
+        this.tableClrSel = tableClrSel;
         this.fileName = fileName;
-        this.frame = frame;
+        this.frameDisposed = frameDisposed;
+        this.handleErrorMessage = handleErrorMessage;
         loadFromFile();
     }
 
     private String fileName;
 
-    private DictionaryModel model;
-    private JTable table;
-    private JFrame frame;
+    private AbstractDictionaryModel model;
+    private Supplier<Integer> tableRowSource;
+    private Consumer<Integer> tableIndexSink;
+    private Runnable tableClrSel;
+    private Runnable frameDisposed;
+    private BiConsumer<String, String> handleErrorMessage;
 
     /** Read the JSON file and populate the table. */
     private void loadFromFile() {
@@ -45,31 +54,28 @@ public class DictionaryEditorController {
             JSONObject json = new JSONObject(Files.readString(Path.of(fileName)));
             model.load(json);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null,
-                "Could not read " + fileName + ":\n" + ex.getMessage(),
-                "Load Error", JOptionPane.ERROR_MESSAGE);
+            handleErrorMessage.accept("Load Error", "Could not read " + fileName + ":\n" + ex.getMessage());
         }
     }
     public void addRow() {
         int idx = model.addRow();
-        table.setRowSelectionInterval(idx, idx);
-        table.editCellAt(idx, 0);
+        tableIndexSink.accept(idx);
     }
 
     public void removeRow() {
-        int r = table.getSelectedRow();
+        int r = tableRowSource.get();
         if (r < 0) return;
         model.removeRow(r);
     }
 
-    public void sortBySensitive() {
-        model.sortBySensitive();
-        table.clearSelection();
+    public void sortByFirstColumn() {
+        model.sortByFirstColumn();
+        tableClrSel.run();
     }
 
-    public void sortBySafe() {
-        model.sortBySafe();
-        table.clearSelection();
+    public void sortBySecondColumn() {
+        model.sortBySecondColumn();
+        tableClrSel.run();
     }
 
     /** Serialize the table back to JSON and write it to disk. */
@@ -78,15 +84,13 @@ public class DictionaryEditorController {
         try {
             JSONObject json = model.toJSON();
             Files.writeString(p, json.toString(2));   // pretty-print with 2-space indent
-            frame.dispose();
+            frameDisposed.run();
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null,
-                "Could not save to " + fileName + ":\n" + ex.getMessage(),
-                "Save Error", JOptionPane.ERROR_MESSAGE);
+            handleErrorMessage.accept("Save Error", "Could not save to " + fileName + ":\n" + ex.getMessage());
         }
     }
     /** Cancel the operation. */
     public void cancel() {
-        frame.dispose();
+        frameDisposed.run();
     }
 }

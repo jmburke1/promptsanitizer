@@ -8,7 +8,10 @@ import promptsanitizer.controller.DictionaryEditorController;
 import promptsanitizer.controller.ScrollPaneMouseAdapter;
 import promptsanitizer.controller.CenteredCellEditor;
 import promptsanitizer.controller.TableMouseAdapter;
-import promptsanitizer.model.DictionaryModel;
+import promptsanitizer.model.RegexDictionaryModel;
+import promptsanitizer.model.AbstractDictionaryModel;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.JOptionPane;
 
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
@@ -16,25 +19,28 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class DictionaryEditorView {
-    public DictionaryEditorView(String fileName, DictionaryEditorController controller, DictionaryModel model) {
+    public DictionaryEditorView(String fileName, DictionaryEditorController controller, AbstractDictionaryModel model) {
         this.fileName = fileName;
         this.controller = controller;
         this.model = model;
+        this.isRegexModel = model instanceof RegexDictionaryModel;
         addBtn = new JButton("Add Row");
         rmBtn = new JButton("Remove Row");
-        sortBySensitiveBtn = new JButton("Sort By Sensitive Words/Phrases");
-        sortBySafeBtn = new JButton("Sort By Safe Words/Phrases");
+        sortBySensitiveBtn = new JButton("Sort By " + (isRegexModel ? "Regex" : "Sensitive Words/Phrases"));
+        sortBySafeBtn = new JButton("Sort By " + (isRegexModel ? "Replacement" : "Safe Words/Phrases"));
         saveBtn = new JButton("Save to File");
         cancelBtn = new JButton("Cancel");
-        table = new JTable(model);
-        frame = new JFrame("Edit Your Personal Dictionary of Sensitive Snippets");
+        AbstractTableModel atm = new TableModelWrapper(model);
+        table = new JTable(atm);
+        frame = new JFrame("Edit Your Personal Dictionary of " + (isRegexModel ? "Regex" : "Sensitive") + " Snippets");
     }
 
     private final String fileName;
 
     private static final Font BUTTON_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 
-    private final DictionaryModel model;
+    private final AbstractDictionaryModel model;
+    private final boolean isRegexModel;
     private final JTable table;
     private final JButton addBtn;
     private final JButton rmBtn;
@@ -46,7 +52,13 @@ public class DictionaryEditorView {
     private final DictionaryEditorController controller;
 
     public void createUI() {
-        controller.init(fileName, model, table, frame);
+        ViewSetupUtil.initDictionaryEditorControllerWithSwingComponents(
+                controller,
+                fileName,
+                model,
+                table,
+                frame
+        );
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Center the editor vertically so the cursor is visible
@@ -59,6 +71,9 @@ public class DictionaryEditorView {
         if (tcm.getColumnCount() > 0) {
             tcm.getColumn(0).setPreferredWidth(180); // Key column wider
             tcm.getColumn(1).setPreferredWidth(320);
+            if(isRegexModel) {
+                tcm.getColumn(2).setPreferredWidth(250);
+            }
         }
 
         java.util.List<JButton> disableTheseWhenEditingTableCell = new ArrayList<>();
@@ -114,9 +129,9 @@ public class DictionaryEditorView {
 
         rmBtn.addActionListener(e -> controller.removeRow());
 
-        sortBySensitiveBtn.addActionListener(e -> controller.sortBySensitive());
+        sortBySensitiveBtn.addActionListener(e -> controller.sortByFirstColumn());
 
-        sortBySafeBtn.addActionListener(e -> controller.sortBySafe());
+        sortBySafeBtn.addActionListener(e -> controller.sortBySecondColumn());
 
         saveBtn.addActionListener(e -> controller.saveToFile());
         cancelBtn.addActionListener(e -> controller.cancel());
