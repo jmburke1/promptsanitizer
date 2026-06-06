@@ -1,52 +1,58 @@
 package promptsanitizer.view;
 
+import promptsanitizer.controller.DictionaryEditorController;
+import promptsanitizer.model.AbstractDictionaryModel;
+
 import javax.swing.*;
-import javax.swing.table.TableCellEditor;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 
 public class DictionaryEditorPromptLoop {
-    private final JButton addBtn;
-    private final JButton rmBtn;
-    private final JButton sortByFirstBtn;
-    private final JButton sortBySecondBtn;
-    private final JTable table;
-    private final JButton saveBtn;
+    private boolean keepGoing;
+    private DictionaryEditorController controller;
+    private AbstractDictionaryModel model;
+    private int selectedRow;
     private final PrintStream shouldBeSystemOut;
     private final PrintStream shouldBeSystemErr;
     private final InputStream shouldBeSystemIn;
     public DictionaryEditorPromptLoop(
-            JButton addBtn,
-            JButton rmBtn,
-            JButton sortByFirstBtn,
-            JButton sortBySecondBtn,
-            JButton saveBtn,
-            JTable table,
+            String fileName,
+            DictionaryEditorController controller,
+            AbstractDictionaryModel model,
             PrintStream shouldBeSystemOut,
             PrintStream shouldBeSystemErr,
             InputStream shouldBeSystemIn
     ) {
-        this.addBtn = addBtn;
-        this.rmBtn = rmBtn;
-        this.sortByFirstBtn = sortByFirstBtn;
-        this.sortBySecondBtn = sortBySecondBtn;
-        this.table = table;
-        this.saveBtn = saveBtn;
+        this.controller = controller;
+        this.model = model;
         this.shouldBeSystemOut = shouldBeSystemOut;
         this.shouldBeSystemErr = shouldBeSystemErr;
         this.shouldBeSystemIn = shouldBeSystemIn;
+        selectedRow = -1;
+        keepGoing = true;
+        controller.init(
+                fileName,
+                model,
+                this::getSelectedRow,
+                this::setSelectedRow,
+                () -> setSelectedRow(-1),
+                () -> keepGoing = false,
+                (title, message) -> JOptionPane.showMessageDialog(null,
+                        message,
+                        title, JOptionPane.ERROR_MESSAGE)
+        );
+        model.initBehaviors(this::printTable, this::printTable, () -> printTable(-1), (r, c) -> System.out.println("Cell contents changed to: " + model.getValueAt(r, c)));
     }
     public void promptForWhatToDo() {
-        boolean keepGoing = true;
         Scanner scanner = new Scanner(shouldBeSystemIn);
         while(keepGoing) {
             shouldBeSystemOut.print(getRegexPrefix() + "DictionaryEditorPromptLoop ... What do you want to do: ");
             String command = scanner.hasNextLine() ? scanner.nextLine() : "clickCancel";
             if("clickCancel".equals(command)) {
-                keepGoing = false;
+                controller.cancel();
             } else if("clickAdd".equals(command)) {
-                addBtn.doClick();
+                controller.addRow();
             } else if("clickRemove".equals(command)) {
                 shouldBeSystemOut.println("Enter row number (counting from zero'th row):");
                 command = scanner.nextLine();
@@ -57,23 +63,18 @@ public class DictionaryEditorPromptLoop {
                     shouldBeSystemErr.println("invalid, row doesn't parse as integer");
                     continue;
                 }
-                if(row < 0 || table.getRowCount() <= row) {
+                if(row < 0 || model.getRowCount() <= row) {
                     shouldBeSystemErr.println("invalid, row is out of range");
                     continue;
                 }
-                table.setRowSelectionInterval(row, row);
-                rmBtn.doClick();
+                selectedRow = row;
+                controller.removeRow();
             } else if(getSortByFirstLabel().equals(command)) {
-                sortByFirstBtn.doClick();
+                controller.sortByFirstColumn();
             } else if(getSortBySecondLabel().equals(command)) {
-                sortBySecondBtn.doClick();
+                controller.sortBySecondColumn();
             } else if("printTable".equals(command)) {
-                int rowCount = table.getRowCount();
-                shouldBeSystemOut.println("**********************");
-                for(int i=0; i<rowCount; i++) {
-                    shouldBeSystemOut.println(table.getValueAt(i,0) + "\t\t\t" + table.getValueAt(i,1) + getThirdValue(i));
-                }
-                shouldBeSystemOut.println("**********************");
+                printTable(-1);
             } else if(command.equals("editCellContents")) {
                 shouldBeSystemOut.println("Enter row number (counting from zero'th row):");
                 command = scanner.nextLine();
@@ -95,18 +96,16 @@ public class DictionaryEditorPromptLoop {
                 }
                 shouldBeSystemOut.println("Enter new value:");
                 command = scanner.nextLine();
-                if(!table.editCellAt(row, column)) {
+                if(model.getValueAt(row, column) == null) {
                     shouldBeSystemErr.println("invalid, either row or column are out of range");
                     continue;
                 }
                 if(!isValidThirdColumn(column, command)) {
                     continue;
                 }
-                TableCellEditor editor = table.getCellEditor();
-                ((JTextField)((DefaultCellEditor)editor).getComponent()).setText(command);
-                editor.stopCellEditing();
+                model.setValueAt(command, row, column);
             } else if("clickSaveToFile".equals(command)) {
-                saveBtn.doClick();
+                controller.saveToFile();
             } else if("help".equals(command)) {
                 printHelp();
             } else {
@@ -139,6 +138,20 @@ public class DictionaryEditorPromptLoop {
     }
     boolean isValidThirdColumn(int column, String command) {
         return true;
+    }
+    private void printTable(int index) {
+        int rowCount = model.getRowCount();
+        shouldBeSystemOut.println("**********************");
+        for(int i=0; i<rowCount; i++) {
+            shouldBeSystemOut.println(model.getValueAt(i,0) + "\t\t\t" + model.getValueAt(i,1) + getThirdValue(i) + (i == index ? "<<<<<" : ""));
+        }
+        shouldBeSystemOut.println("**********************" + (rowCount == index ? "<<<<<" : ""));
+    }
+    private int getSelectedRow() {
+        return selectedRow;
+    }
+    private void setSelectedRow(int value) {
+        selectedRow = value;
     }
 }
 

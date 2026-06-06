@@ -1,26 +1,26 @@
 package promptsanitizer.view;
 
+import promptsanitizer.controller.DictionaryEditorController;
+import promptsanitizer.model.AbstractDictionaryModel;
+
 import javax.swing.*;
 import java.io.InputStream;
 import java.io.PrintStream;
 
 public class RegexDictionaryEditorPromptLoop extends DictionaryEditorPromptLoop {
-    private final JTable table;
+    private final AbstractDictionaryModel model;
     private final PrintStream shouldBeSystemOut;
     private final PrintStream shouldBeSystemErr;
     public RegexDictionaryEditorPromptLoop(
-            JButton addBtn,
-            JButton rmBtn,
-            JButton sortByFirstBtn,
-            JButton sortBySecondBtn,
-            JButton saveBtn,
-            JTable table,
+            String fileName,
+            DictionaryEditorController controller,
+            AbstractDictionaryModel model,
             PrintStream shouldBeSystemOut,
             PrintStream shouldBeSystemErr,
             InputStream shouldBeSystemIn
     ) {
-        super(addBtn, rmBtn, sortByFirstBtn, sortBySecondBtn, saveBtn, table, shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemIn);
-        this.table = table;
+        super(fileName, controller, model, shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemIn);
+        this.model = model;
         this.shouldBeSystemOut = shouldBeSystemOut;
         this.shouldBeSystemErr = shouldBeSystemErr;
     }
@@ -34,7 +34,7 @@ public class RegexDictionaryEditorPromptLoop extends DictionaryEditorPromptLoop 
         return "clickSortByReplacement";
     }
     String getThirdValue(int i) {
-        return "\t" + table.getValueAt(i, 2);
+        return "\t" + model.getValueAt(i, 2);
     }
     void printHelp() {
         shouldBeSystemOut.println("You are in the regex dictionary editor prompt loop.  Choices are:");

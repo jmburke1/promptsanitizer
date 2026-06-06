@@ -7,8 +7,12 @@ package promptsanitizer.controller;
 import promptsanitizer.model.DictionaryModel;
 import promptsanitizer.model.RegexDictionaryModel;
 import promptsanitizer.model.SanitizerModel;
+import promptsanitizer.view.DictionaryEditorPromptLoop;
 import promptsanitizer.view.DictionaryEditorView;
+import promptsanitizer.view.RegexDictionaryEditorPromptLoop;
 
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.function.Supplier;
 import java.util.function.Consumer;
 import java.util.function.BiConsumer;
@@ -41,12 +45,28 @@ public class SanitizerController {
             fromAreaConsumer.accept("");
         }
     }
-    public void handleTilde() {
+    public void handleTilde(
+            PrintStream shouldBeSystemOut,
+            PrintStream shouldBeSystemErr,
+            InputStream shouldBeSystemIn
+    ) {
         model.invalidateDictionary();
-        new DictionaryEditorView(fileName, new DictionaryEditorController(), new DictionaryModel()).createUI();
+        if(shouldBeSystemOut != null) {
+            new DictionaryEditorPromptLoop(fileName, new DictionaryEditorController(), new DictionaryModel(), shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemIn).promptForWhatToDo();
+        } else {
+            new DictionaryEditorView(fileName, new DictionaryEditorController(), new DictionaryModel()).createUI();
+        }
     }
-    public void handleAsteriskTilde() {
+    public void handleAsteriskTilde(
+            PrintStream shouldBeSystemOut,
+            PrintStream shouldBeSystemErr,
+            InputStream shouldBeSystemIn
+    ) {
         model.invalidateDictionary();
-        new DictionaryEditorView(regexFileName, new DictionaryEditorController(), new RegexDictionaryModel()).createUI();
+        if(shouldBeSystemOut != null) {
+            new RegexDictionaryEditorPromptLoop(regexFileName, new DictionaryEditorController(), new RegexDictionaryModel(), shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemIn).promptForWhatToDo();
+        } else {
+            new DictionaryEditorView(regexFileName, new DictionaryEditorController(), new RegexDictionaryModel()).createUI();
+        }
     }
 }

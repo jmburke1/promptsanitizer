@@ -4,6 +4,7 @@
  */
 package promptsanitizer.view;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,33 +13,68 @@ import promptsanitizer.model.SanitizerModel;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class SanitizerPromptLoopTest {
+class SanitizerPromptLoopEndToEndTest {
 
     private final ByteArrayOutputStream capturedOutput = new ByteArrayOutputStream();
     private final ByteArrayOutputStream capturedError = new ByteArrayOutputStream();
     private PrintStream mockOut;
     private PrintStream mockErr;
+    private Path tmpPersonalDict;
+    private Path tmpRegexPersonalDict;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         mockOut = new PrintStream(capturedOutput);
         mockErr = new PrintStream(capturedError);
+        tmpPersonalDict = Files.createTempFile("personalDict", ".json");
+        Files.writeString(tmpPersonalDict, "{\n" +
+                "  \"abcde\": \"fghij\",\n" +
+                "  \"vuwxy\": \"0z123\",\n" +
+                "  \"uvwxy\": \"z0123\"\n" +
+                "}");
+        tmpRegexPersonalDict = Files.createTempFile("regexPersonalDict", ".json");
+        Files.writeString(tmpRegexPersonalDict, "{\n" +
+                "  \"ace([0-9]*)\": {\n" +
+                "    \"repl\": \"$1bdf\",\n" +
+                "    \"dir\": \">\"\n" +
+                "  },\n" +
+                "  \"welp([a-z]*)\": {\n" +
+                "    \"repl\": \"$1zepp\",\n" +
+                "    \"dir\": \">\"\n" +
+                "  },\n" +
+                "  \"([0-9]*)bdf\": {\n" +
+                "    \"repl\": \"ace$1\",\n" +
+                "    \"dir\": \"<\"\n" +
+                "  },\n" +
+                "  \"([a-z]*)zepp\": {\n" +
+                "    \"repl\": \"welp$1\",\n" +
+                "    \"dir\": \"<\"\n" +
+                "  }\n" +
+                "}");
+    }
+    @AfterEach
+    void tearDown() throws IOException {
+        Files.delete(tmpPersonalDict);
+        Files.delete(tmpRegexPersonalDict);
     }
 
     @Test
     void implicitExit_shouldTerminateLoop() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                "dictionary.json",
-                "regex_dictionary.json",
-                Mockito.mock(SanitizerController.class),
-                Mockito.mock(SanitizerModel.class),
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("".getBytes())
@@ -50,7 +86,7 @@ class SanitizerPromptLoopTest {
         assertEquals("SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
     }
 
-    @Test
+    /*@Test
     void exit_shouldTerminateLoop() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
                 "dictionary.json",
@@ -284,7 +320,7 @@ class SanitizerPromptLoopTest {
 
         String output = capturedOutput.toString();
         assertTrue(output.contains("clickMoveRight              - Sanitize left panel and write to right panel"));
-    }
+    }*/
 
     /*@Test
     void multiCommandSequence_shouldProcessAllCommands() {

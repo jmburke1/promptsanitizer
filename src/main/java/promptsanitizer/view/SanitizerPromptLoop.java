@@ -64,9 +64,9 @@ public class SanitizerPromptLoop {
             } else if("clickMoveRight".equals(command)) {
                 controller.moveText(() -> leftAreaText, s -> rightAreaText = s, s -> leftAreaText = s, false);
             } else if("clickTildeButton".equals(command)) {
-                controller.handleTilde();
+                controller.handleTilde(shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemIn);
             } else if("clickAsteriskTildeButton".equals(command)) {
-                controller.handleAsteriskTilde();
+                controller.handleAsteriskTilde(shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemIn);
             } else if("help".equals(command)) {
                 shouldBeSystemOut.println("You are in the sanitizer prompt loop.  Choices are:");
                 shouldBeSystemOut.println("  exit                        - Exit the application");
