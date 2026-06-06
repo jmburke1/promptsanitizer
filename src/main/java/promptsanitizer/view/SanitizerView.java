@@ -44,7 +44,7 @@ public class SanitizerView {
 
     public void createUI() {
         model.init(fileName, regexFileName);
-        controller.init(model, fileName, regexFileName);
+        ViewSetupUtil.initSanitizerController(controller, model, fileName, regexFileName);
         JFrame frame = new JFrame("Replace Sensitive Strings in Your Prompts to an LLM.  Back replace the answer from the LLM.");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -84,9 +84,9 @@ public class SanitizerView {
         JButton moveLeftButton  = new JButton("<");
         moveLeftButton.setFont(font);
 
-        moveRightButton.addActionListener(e -> controller.moveText(leftArea, rightArea, false));
+        moveRightButton.addActionListener(e -> controller.moveText(leftArea::getText, rightArea::setText, leftArea::setText, false));
 
-        moveLeftButton.addActionListener(e -> controller.moveText(rightArea, leftArea, true));
+        moveLeftButton.addActionListener(e -> controller.moveText(rightArea::getText, leftArea::setText, rightArea::setText, true));
 
         topButtons.add(moveLeftButton);
         topButtons.add(moveRightButton);

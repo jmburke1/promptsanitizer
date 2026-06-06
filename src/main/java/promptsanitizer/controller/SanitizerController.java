@@ -9,35 +9,36 @@ import promptsanitizer.model.RegexDictionaryModel;
 import promptsanitizer.model.SanitizerModel;
 import promptsanitizer.view.DictionaryEditorView;
 
-import javax.swing.*;
+import java.util.function.Supplier;
+import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class SanitizerController {
     private SanitizerModel model;
     private String fileName;
     private String regexFileName;
+    private BiConsumer<String, String> infoMessageHandler;
 
-    public void init(SanitizerModel model, String fileName, String regexFileName) {
+    public void init(SanitizerModel model, String fileName, String regexFileName, BiConsumer<String, String> infoMessageHandler) {
         this.model = model;
         this.fileName = fileName;
         this.regexFileName = regexFileName;
+        this.infoMessageHandler = infoMessageHandler;
     }
     /** Move text from one area to another, applying the dictionary replacements in the appropriate direction. */
-    public void moveText(JTextArea fromArea, JTextArea toArea, boolean isReverseDirection) {
+    public void moveText(Supplier<String> fromArea, Consumer<String> toArea, Consumer<String> fromAreaConsumer, boolean isReverseDirection) {
         if (!model.isValidDictionary()) {
             model.loadDictionary();
             if (!model.isStronglyValidDictionary()) {
-                JOptionPane.showMessageDialog(null,
-                        "You either haven't configured a personal dictionary yet or it has no data in it.\nClick the ~ button to set one up.",
-                        "No Dictionary Configured",
-                        JOptionPane.INFORMATION_MESSAGE);
+                infoMessageHandler.accept("No Dictionary Configured", "You either haven't configured a personal dictionary yet or it has no data in it.\nClick the ~ button to set one up.");
                 model.invalidateDictionary();
                 return;
             }
         }
-        String text = fromArea.getText();
+        String text = fromArea.get();
         if(!text.isEmpty()) {
-            toArea.setText(model.applyDictionary(text, isReverseDirection));
-            fromArea.setText("");
+            toArea.accept(model.applyDictionary(text, isReverseDirection));
+            fromAreaConsumer.accept("");
         }
     }
     public void handleTilde() {
