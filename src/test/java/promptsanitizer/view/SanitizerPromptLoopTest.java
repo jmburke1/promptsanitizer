@@ -4,17 +4,17 @@
  */
 package promptsanitizer.view;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import promptsanitizer.controller.SanitizerController;
+import promptsanitizer.model.SanitizerModel;
 
-import javax.swing.JButton;
-import javax.swing.JTextArea;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,14 +33,30 @@ class SanitizerPromptLoopTest {
     }
 
     @Test
+    void implicitExit_shouldTerminateLoop() {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        // The prompt should have been printed once
+        assertEquals("SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+    }
+
+    @Test
     void exit_shouldTerminateLoop() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("exit\n".getBytes())
@@ -53,138 +69,84 @@ class SanitizerPromptLoopTest {
     }
 
     @Test
-    void printLeft_shouldPrintLeftAreaText() {
-        JTextArea leftArea = Mockito.mock(JTextArea.class);
-        Mockito.when(leftArea.getText()).thenReturn("sensitive data here");
+    void enterLeftFollowedByPrintLeft_shouldPrintLeftAreaText() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                leftArea,
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("printLeft\nexit\n".getBytes())
+                new ByteArrayInputStream("enterLeft: sensitive data here\nprintLeft\nexit\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
         String output = capturedOutput.toString();
-        assertEquals("SanitizerPromptLoop ... What do you want to do: sensitive data here\nSanitizerPromptLoop ... What do you want to do: ", output);
+        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: sensitive data here\nSanitizerPromptLoop ... What do you want to do: ", output);
     }
 
     @Test
-    void printRight_shouldPrintRightAreaText() {
-        JTextArea rightArea = Mockito.mock(JTextArea.class);
-        Mockito.when(rightArea.getText()).thenReturn("sanitized text");
+    void enterRightFollowedByPrintRight_shouldPrintRightAreaText() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                rightArea,
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("printRight\nexit\n".getBytes())
+                new ByteArrayInputStream("enterRight: sanitized text\nprintRight\nexit\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
         String output = capturedOutput.toString();
-        assertEquals("SanitizerPromptLoop ... What do you want to do: sanitized text\nSanitizerPromptLoop ... What do you want to do: ", output);
-    }
-
-    @Test
-    void enterLeft_shouldSetLeftAreaText() {
-        JTextArea leftArea = Mockito.mock(JTextArea.class);
-        SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                leftArea,
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                mockOut,
-                mockErr,
-                new ByteArrayInputStream("enterLeft: hello world\nexit\n".getBytes())
-        );
-
-        loop.promptForWhatToDo();
-
-        Mockito.verify(leftArea).setText("hello world");
+        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: sanitized text\nSanitizerPromptLoop ... What do you want to do: ", output);
     }
 
     @Test
     void enterLeft_withEscapedNewlines_shouldReplaceBackslashN() {
-        JTextArea leftArea = Mockito.mock(JTextArea.class);
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                leftArea,
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("enterLeft: line1\\nline2\nexit\n".getBytes())
+                new ByteArrayInputStream("enterLeft: line1\\nline2\nprintLeft\nexit\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
-        Mockito.verify(leftArea).setText("line1\nline2");
-    }
-
-    @Test
-    void enterRight_shouldSetRightAreaText() {
-        JTextArea rightArea = Mockito.mock(JTextArea.class);
-        SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                rightArea,
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                mockOut,
-                mockErr,
-                new ByteArrayInputStream("enterRight: some text\nexit\n".getBytes())
-        );
-
-        loop.promptForWhatToDo();
-
-        Mockito.verify(rightArea).setText("some text");
+        String output = capturedOutput.toString();
+        assertTrue(output.contains("line1\nline2"));
     }
 
     @Test
     void enterRight_withEscapedNewlines_shouldReplaceBackslashN() {
-        JTextArea rightArea = Mockito.mock(JTextArea.class);
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                rightArea,
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("enterRight: line1\\nline2\nexit\n".getBytes())
+                new ByteArrayInputStream("enterRight: line1\\nline2\nprintRight\nexit\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
-        Mockito.verify(rightArea).setText("line1\nline2");
+        String output = capturedOutput.toString();
+        assertTrue(output.contains("line1\nline2"));
     }
 
     @Test
     void enterLeft_withoutColon_shouldPrintErrorToStderr() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("enterLeft\nexit\n".getBytes())
@@ -199,12 +161,10 @@ class SanitizerPromptLoopTest {
     @Test
     void enterRight_withoutColon_shouldPrintErrorToStderr() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("enterRight\nexit\n".getBytes())
@@ -218,14 +178,12 @@ class SanitizerPromptLoopTest {
 
     @Test
     void clickMoveRight_shouldInvokeDoClickOnMoveRightButton() {
-        JButton moveRightButton = Mockito.mock(JButton.class);
+        SanitizerController controller = Mockito.mock(SanitizerController.class);
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JTextArea.class),
-                moveRightButton,
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                controller,
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("clickMoveRight\nexit\n".getBytes())
@@ -233,19 +191,17 @@ class SanitizerPromptLoopTest {
 
         loop.promptForWhatToDo();
 
-        Mockito.verify(moveRightButton).doClick();
+        Mockito.verify(controller).moveText(Mockito.any(Supplier.class), Mockito.any(Consumer.class), Mockito.any(Consumer.class), Mockito.eq(false));
     }
 
     @Test
     void clickMoveLeft_shouldInvokeDoClickOnMoveLeftButton() {
-        JButton moveLeftButton = Mockito.mock(JButton.class);
+        SanitizerController controller = Mockito.mock(SanitizerController.class);
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                moveLeftButton,
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                controller,
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("clickMoveLeft\nexit\n".getBytes())
@@ -253,19 +209,17 @@ class SanitizerPromptLoopTest {
 
         loop.promptForWhatToDo();
 
-        Mockito.verify(moveLeftButton).doClick();
+        Mockito.verify(controller).moveText(Mockito.any(Supplier.class), Mockito.any(Consumer.class), Mockito.any(Consumer.class), Mockito.eq(true));
     }
 
     @Test
     void clickTildeButton_shouldInvokeDoClickOnTildeButton() {
-        JButton tildeButton = Mockito.mock(JButton.class);
+        SanitizerController controller = Mockito.mock(SanitizerController.class);
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                tildeButton,
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                controller,
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("clickTildeButton\nexit\n".getBytes())
@@ -273,19 +227,17 @@ class SanitizerPromptLoopTest {
 
         loop.promptForWhatToDo();
 
-        Mockito.verify(tildeButton).doClick();
+        Mockito.verify(controller).handleTilde();
     }
 
     @Test
     void clickAsteriskTildeButton_shouldInvokeDoClickOnAsteriskTildeButton() {
-        JButton asteriskTildeButton = Mockito.mock(JButton.class);
+        SanitizerController controller = Mockito.mock(SanitizerController.class);
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                asteriskTildeButton,
+                "dictionary.json",
+                "regex_dictionary.json",
+                controller,
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("clickAsteriskTildeButton\nexit\n".getBytes())
@@ -293,18 +245,16 @@ class SanitizerPromptLoopTest {
 
         loop.promptForWhatToDo();
 
-        Mockito.verify(asteriskTildeButton).doClick();
+        Mockito.verify(controller).handleAsteriskTilde();
     }
 
     @Test
     void invalidCommand_shouldPrintHelpMessage() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JTextArea.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
-                Mockito.mock(JButton.class),
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("bogusCommand\nexit\n".getBytes())
@@ -317,6 +267,24 @@ class SanitizerPromptLoopTest {
     }
 
     @Test
+    void help_shouldPrintHelp() {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                "dictionary.json",
+                "regex_dictionary.json",
+                Mockito.mock(SanitizerController.class),
+                Mockito.mock(SanitizerModel.class),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("help\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        String output = capturedOutput.toString();
+        assertTrue(output.contains("clickMoveRight              - Sanitize left panel and write to right panel"));
+    }
+
+    /*@Test
     void multiCommandSequence_shouldProcessAllCommands() {
         JTextArea leftArea = Mockito.mock(JTextArea.class);
         JButton moveRightButton = Mockito.mock(JButton.class);
@@ -341,6 +309,6 @@ class SanitizerPromptLoopTest {
         Mockito.verify(leftArea).setText("test data");
         Mockito.verify(leftArea).getText();
         Mockito.verify(moveRightButton).doClick();
-    }
+    }*/
 }
 

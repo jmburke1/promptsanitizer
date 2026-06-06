@@ -1,42 +1,41 @@
 package promptsanitizer.view;
 
-import javax.swing.JTextArea;
-import javax.swing.JButton;
+import promptsanitizer.controller.SanitizerController;
+import promptsanitizer.model.SanitizerModel;
+
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
 
 public class SanitizerPromptLoop {
-    private final JTextArea leftArea;
-    private final JTextArea rightArea;
-    private final JButton moveRightButton;
-    private final JButton moveLeftButton;
-    private final JButton tildeButton;
-    private final JButton asteriskTildeButton;
     private final PrintStream shouldBeSystemOut;
     private final PrintStream shouldBeSystemErr;
     private final InputStream shouldBeSystemIn;
-    public SanitizerPromptLoop(JTextArea leftArea,
-                               JTextArea rightArea,
-                               JButton moveRightButton,
-                               JButton moveLeftButton,
-                               JButton tildeButton,
-                               JButton asteriskTildeButton,
+    private String leftAreaText;
+    private String rightAreaText;
+    private final SanitizerController controller;
+    private final SanitizerModel model;
+    private final String fileName;
+    private final String regexFileName;
+    public SanitizerPromptLoop(String fileName,
+                               String regexFileName,
+                               SanitizerController controller,
+                               SanitizerModel model,
                                PrintStream shouldBeSystemOut,
                                PrintStream shouldBeSystemErr,
                                InputStream shouldBeSystemIn
     ) {
-        this.leftArea = leftArea;
-        this.rightArea = rightArea;
-        this.moveRightButton = moveRightButton;
-        this.moveLeftButton = moveLeftButton;
-        this.tildeButton = tildeButton;
-        this.asteriskTildeButton = asteriskTildeButton;
         this.shouldBeSystemOut = shouldBeSystemOut;
         this.shouldBeSystemErr = shouldBeSystemErr;
         this.shouldBeSystemIn = shouldBeSystemIn;
+        this.controller = controller;
+        this.model = model;
+        this.fileName = fileName;
+        this.regexFileName = regexFileName;
     }
+
     public void promptForWhatToDo() {
+        controller.init(model, fileName, regexFileName, (title, message) -> shouldBeSystemOut.println("[%s] %s"));
         boolean keepGoing = true;
         Scanner scanner = new Scanner(shouldBeSystemIn);
         while(keepGoing) {
@@ -45,31 +44,29 @@ public class SanitizerPromptLoop {
             if("exit".equals(command)) {
                 keepGoing = false;
             } else if("printLeft".equals(command)) {
-                shouldBeSystemOut.println(leftArea.getText());
+                shouldBeSystemOut.println(leftAreaText);
             } else if(command.startsWith("enterLeft")) {
                 if(!command.startsWith("enterLeft: ")) {
                     shouldBeSystemErr.println("invalid.  Expected format is \"enterLeft: <text you want to enter with just type \\n for newlines>");
                     continue;
                 }
-                String actualText = command.substring(11).replace("\\n", "\n");
-                leftArea.setText(actualText);
+                leftAreaText = command.substring(11).replace("\\n", "\n");
             } else if("printRight".equals(command)) {
-                shouldBeSystemOut.println(rightArea.getText());
+                shouldBeSystemOut.println(rightAreaText);
             } else if(command.startsWith("enterRight")) {
                 if(!command.startsWith("enterRight: ")) {
                     shouldBeSystemErr.println("invalid.  Expected format is \"enterRight: <text you want to enter with just type \\n for newlines>");
                     continue;
                 }
-                String actualText = command.substring(12).replace("\\n", "\n");
-                rightArea.setText(actualText);
+                rightAreaText = command.substring(12).replace("\\n", "\n");
             } else if("clickMoveLeft".equals(command)) {
-                moveLeftButton.doClick();
+                controller.moveText(() -> rightAreaText, s -> leftAreaText = s, s -> rightAreaText = s, true);
             } else if("clickMoveRight".equals(command)) {
-                moveRightButton.doClick();
+                controller.moveText(() -> leftAreaText, s -> rightAreaText = s, s -> leftAreaText = s, false);
             } else if("clickTildeButton".equals(command)) {
-                tildeButton.doClick();
+                controller.handleTilde();
             } else if("clickAsteriskTildeButton".equals(command)) {
-                asteriskTildeButton.doClick();
+                controller.handleAsteriskTilde();
             } else if("help".equals(command)) {
                 shouldBeSystemOut.println("You are in the sanitizer prompt loop.  Choices are:");
                 shouldBeSystemOut.println("  exit                        - Exit the application");
