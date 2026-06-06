@@ -8,52 +8,52 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 /** Lightweight model backed by a Map<Integer, String>. */
-public abstract class AbstractDictionaryModel extends javax.swing.table.AbstractTableModel {
+public abstract class AbstractDictionaryModel {
+    private Consumer<Integer> insertedBehavior;
+    private Consumer<Integer> deletedBehavior;
+    private Runnable changedBehavior;
+    private BiConsumer<Integer, Integer> cellChangeBehavior;
     private final List<ReplacementRecord> replacementValues = new ArrayList<>();
 
-    @Override public int getRowCount()              { return replacementValues.size(); }
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return String.class;
-    }
+    public int getRowCount()              {  return replacementValues.size(); }
 
-    @Override public Object getValueAt(int r, int c) {
+    public Object getValueAt(int r, int c) {
         return replacementValues.get(r).getColumnValue(c);
     }
 
-    @Override public void setValueAt(Object v, int r, int c) {
+    public void setValueAt(Object v, int r, int c) {
         String s = (v == null) ? "" : v.toString();
         replacementValues.set(r, replacementValues.get(r).createOther(s, c));
-        fireTableCellUpdated(r, c);
+        cellChangeBehavior.accept(r, c);
     }
-
-    @Override public boolean isCellEditable(int r, int c) { return true; }
 
     /** Add a blank row and return its row index. */
     public int addRow() {
         replacementValues.add(createReplacementRecord());
-        fireTableRowsInserted(replacementValues.size() - 1, replacementValues.size() - 1);
+        insertedBehavior.accept(replacementValues.size() - 1);
         return replacementValues.size() - 1;
     }
 
     /** Remove the given row index (shifts subsequent entries). */
     public void removeRow(int r) {
-        fireTableRowsDeleted(r, r);
+        deletedBehavior.accept(r);
         replacementValues.remove(r);
     }
 
     /** Sort the JTable by sensitive values. */
     public void sortByFirstColumn() {
         replacementValues.sort((ss1, ss2) -> ss1.contextCompareToOther("FIRST_COLUMN", ss2));
-        fireTableDataChanged();
+        changedBehavior.run();
     }
 
     /** Sort the JTable by safe values. */
     public void sortBySecondColumn() {
         replacementValues.sort((ss1, ss2) -> ss1.contextCompareToOther("SECOND_COLUMN", ss2));
-        fireTableDataChanged();
+        changedBehavior.run();
     }
 
     /** Load all entries from the JSON file into this model. */
@@ -62,7 +62,7 @@ public abstract class AbstractDictionaryModel extends javax.swing.table.Abstract
         for (String k : json.keySet()) {
             (createReplacementRecord()).pushIntoArrayList(k, json, replacementValues);
         }
-        fireTableDataChanged();
+        changedBehavior.run();
     }
 
     /** Serialize this model back into a JSONObject. */
@@ -75,5 +75,18 @@ public abstract class AbstractDictionaryModel extends javax.swing.table.Abstract
     }
 
     abstract ReplacementRecord createReplacementRecord();
+    abstract public int getColumnCount();
+    abstract public String getColumnName(int c);
+
+    public void initBehaviors(
+            Consumer<Integer> insBeh,
+            Consumer<Integer> delBeh,
+            Runnable chgBeh,
+            BiConsumer<Integer, Integer> cellChgBeh) {
+        insertedBehavior = insBeh;
+        deletedBehavior = delBeh;
+        changedBehavior = chgBeh;
+        cellChangeBehavior = cellChgBeh;
+    }
 }
 

@@ -10,6 +10,8 @@ import promptsanitizer.controller.CenteredCellEditor;
 import promptsanitizer.controller.TableMouseAdapter;
 import promptsanitizer.model.RegexDictionaryModel;
 import promptsanitizer.model.AbstractDictionaryModel;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.JOptionPane;
 
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;
@@ -28,7 +30,8 @@ public class DictionaryEditorView {
         sortBySafeBtn = new JButton("Sort By " + (isRegexModel ? "Replacement" : "Safe Words/Phrases"));
         saveBtn = new JButton("Save to File");
         cancelBtn = new JButton("Cancel");
-        table = new JTable(model);
+        AbstractTableModel atm = new TableModelWrapper(model);
+        table = new JTable(atm);
         frame = new JFrame("Edit Your Personal Dictionary of " + (isRegexModel ? "Regex" : "Sensitive") + " Snippets");
     }
 
@@ -49,7 +52,13 @@ public class DictionaryEditorView {
     private final DictionaryEditorController controller;
 
     public void createUI() {
-        controller.init(fileName, model, table, frame);
+        ViewSetupUtil.initDictionaryEditorControllerWithSwingComponents(
+                controller,
+                fileName,
+                model,
+                table,
+                frame
+        );
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         // Center the editor vertically so the cursor is visible

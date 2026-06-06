@@ -6,20 +6,21 @@ package promptsanitizer.model;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import promptsanitizer.view.TableModelWrapper;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class RegexDictionaryModelTest {
+class WrappedRegexDictionaryModelTest {
 
     @Test
     void numerousThingsAreTrueAfterUserAddsFiveRows() {
-        RegexDictionaryModel model = new RegexDictionaryModel();
-        model.initBehaviors(i -> {}, d -> {}, () -> {}, (r, c) -> {});
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        RegexDictionaryModel regexDictMdl = new RegexDictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(regexDictMdl);
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
         //(a|b)
         //$1
         model.setValueAt("(a|b)2", 0, 0);
@@ -57,20 +58,22 @@ class RegexDictionaryModelTest {
         assertNull(model.getValueAt(1, 3));
         assertEquals(5, model.getRowCount());
         assertEquals(3, model.getColumnCount());
+        assertSame(String.class, model.getColumnClass(0));
         assertEquals("Regex", model.getColumnName(0));
         assertEquals("Replacement", model.getColumnName(1));
         assertEquals("Direction", model.getColumnName(2));
+        assertTrue(model.isCellEditable(100, 100));
     }
 
     @Test
     void userRemovesARow() {
-        RegexDictionaryModel model = new RegexDictionaryModel();
-        model.initBehaviors(i -> {}, d -> {}, () -> {}, (r, c) -> {});
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        RegexDictionaryModel regexDictMdl = new RegexDictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(regexDictMdl);
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
         model.setValueAt("(a|b)2", 0, 0);
         model.setValueAt("(a|b)3", 1, 0);
         model.setValueAt("(a|b)1", 2, 0);
@@ -86,7 +89,7 @@ class RegexDictionaryModelTest {
         model.setValueAt(">", 2, 2);
         model.setValueAt(">", 3, 2);
         model.setValueAt(">", 4, 2);
-        model.removeRow(3);
+        regexDictMdl.removeRow(3);
         assertEquals("(a|b)2", model.getValueAt(0, 0));
         assertEquals("(a|b)3", model.getValueAt(1, 0));
         assertEquals("(a|b)1", model.getValueAt(2, 0));
@@ -103,13 +106,13 @@ class RegexDictionaryModelTest {
 
     @Test
     void userSortsByRegexes() {
-        RegexDictionaryModel model = new RegexDictionaryModel();
-        model.initBehaviors(i -> {}, d -> {}, () -> {}, (r, c) -> {});
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        RegexDictionaryModel regexDictMdl = new RegexDictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(regexDictMdl);
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
         model.setValueAt("(a|b)2", 0, 0);
         model.setValueAt("(a|b)3", 1, 0);
         model.setValueAt("(a|b)1", 2, 0);
@@ -125,7 +128,7 @@ class RegexDictionaryModelTest {
         model.setValueAt("<", 2, 2);
         model.setValueAt("<", 3, 2);
         model.setValueAt("<", 4, 2);
-        model.sortByFirstColumn();
+        regexDictMdl.sortByFirstColumn();
         assertEquals("(a|b)1", model.getValueAt(0, 0));
         assertEquals("(a|b)2", model.getValueAt(1, 0));
         assertEquals("(a|b)4", model.getValueAt(2, 0));
@@ -145,13 +148,13 @@ class RegexDictionaryModelTest {
 
     @Test
     void userSortsByReplacements() {
-        RegexDictionaryModel model = new RegexDictionaryModel();
-        model.initBehaviors(i -> {}, d -> {}, () -> {}, (r, c) -> {});
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        RegexDictionaryModel regexDictMdl = new RegexDictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(regexDictMdl);
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
         model.setValueAt("(a|b)2", 0, 0);
         model.setValueAt("(a|b)3", 1, 0);
         model.setValueAt("(a|b)1", 2, 0);
@@ -167,7 +170,7 @@ class RegexDictionaryModelTest {
         model.setValueAt("<", 2, 2);
         model.setValueAt("<", 3, 2);
         model.setValueAt(">", 4, 2);
-        model.sortBySecondColumn();
+        regexDictMdl.sortBySecondColumn();
         assertEquals("(a|b)5", model.getValueAt(0, 0));
         assertEquals("(a|b)2", model.getValueAt(1, 0));
         assertEquals("(a|b)1", model.getValueAt(2, 0));
@@ -186,14 +189,14 @@ class RegexDictionaryModelTest {
     }
 
     private void canSaveAndLoad(boolean isInvalidCharTest) {
-        RegexDictionaryModel model = new RegexDictionaryModel();
-        model.initBehaviors(i -> {}, d -> {}, () -> {}, (r, c) -> {});
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
-        model.addRow();
+        RegexDictionaryModel regexDictMdl = new RegexDictionaryModel();
+        TableModelWrapper model = new TableModelWrapper(regexDictMdl);
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
+        regexDictMdl.addRow();
         model.setValueAt("(a|b)2", 0, 0);
         model.setValueAt("(a|b)3", 1, 0);
         model.setValueAt("(a|b)1", 2, 0);
@@ -208,14 +211,14 @@ class RegexDictionaryModelTest {
         model.setValueAt("value_$1_99", 5, 1);
         model.setValueAt("<", 1, 2);
         model.setValueAt("<", 2, 2);
-        RegexDictionaryModel model2 = new RegexDictionaryModel();
-        model2.initBehaviors(i -> {}, d -> {}, () -> {}, (r, c) -> {});
-        JSONObject json = model.toJSON();
+        RegexDictionaryModel regexDictMdl2 = new RegexDictionaryModel();
+        TableModelWrapper model2 = new TableModelWrapper(regexDictMdl2);
+        JSONObject json = regexDictMdl.toJSON();
         if(isInvalidCharTest) {
             json.getJSONObject("(a|b)5").put("dir", "!");
         }
-        model2.load(json);
-        model2.sortByFirstColumn();
+        regexDictMdl2.load(json);
+        regexDictMdl2.sortByFirstColumn();
         assertEquals("(a|b)1", model2.getValueAt(0, 0));
         assertEquals("(a|b)3", model2.getValueAt(1, 0));
         assertEquals("(a|b)2", model2.getValueAt(2, 0));
