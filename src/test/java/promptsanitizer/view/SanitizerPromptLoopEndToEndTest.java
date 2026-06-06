@@ -71,6 +71,50 @@ class SanitizerPromptLoopEndToEndTest {
     }
 
     @Test
+    void shouldUnknownCommandFollowedByHelp() {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("clickAsteriskTildeButton\nhungry\nhelp\nclickCancel\nclickTildeButton\nhungry\nhelp\nclickCancel\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        // The prompt should have been printed once
+        assertEquals("SanitizerPromptLoop ... What do you want to do: **********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: Unknown command.  Type 'help' for a list of commands.\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: You are in the regex dictionary editor prompt loop.  Choices are:\n" +
+                "  clickCancel               - Close the regex dictionary editor and return to main loop\n" +
+                "  clickAdd                    - Add a new empty row to the regex dictionary\n" +
+                "  clickRemove                 - Remove the selected row (prompts for row number)\n" +
+                "  clickSortByRegex            - Sort rows by the regex column\n" +
+                "  clickSortByReplacement      - Sort rows by the replacement column\n" +
+                "  printTable                  - Print the current regex dictionary table\n" +
+                "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
+                "  clickSaveToFile             - Save the regex dictionary to file\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: **********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "vuwxy\t\t\t0z123\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: Unknown command.  Type 'help' for a list of commands.\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: You are in the dictionary editor prompt loop.  Choices are:\n" +
+                "  clickCancel               - Close the dictionary editor and return to main loop\n" +
+                "  clickAdd                    - Add a new empty row to the dictionary\n" +
+                "  clickRemove                 - Remove the selected row (prompts for row number)\n" +
+                "  clickSortBySensitive        - Sort rows by the sensitive (left) column\n" +
+                "  clickSortBySafe             - Sort rows by the safe (right) column\n" +
+                "  printTable                  - Print the current dictionary table\n" +
+                "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
+                "  clickSaveToFile             - Save the dictionary to file\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+    }
+
+    @Test
     void implicitExit_shouldTerminateLoop() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
                 tmpPersonalDict.toString(),
@@ -79,13 +123,14 @@ class SanitizerPromptLoopEndToEndTest {
                 new SanitizerModel(),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("".getBytes())
+                new ByteArrayInputStream("clickAsteriskTildeButton\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+        assertEquals("SanitizerPromptLoop ... What do you want to do: **********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
     }
 
     @Test
