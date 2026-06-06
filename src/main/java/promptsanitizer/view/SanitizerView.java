@@ -43,9 +43,9 @@ public class SanitizerView {
     private final JTextArea rightArea;
 
     public void createUI() {
+        JFrame frame = new JFrame("Replace Sensitive Strings in Your Prompts to an LLM.  Back replace the answer from the LLM.");
         model.init(fileName, regexFileName);
         ViewSetupUtil.initSanitizerController(controller, model, fileName, regexFileName);
-        JFrame frame = new JFrame("Replace Sensitive Strings in Your Prompts to an LLM.  Back replace the answer from the LLM.");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Left text area (source for >, destination for <)

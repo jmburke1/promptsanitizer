@@ -35,6 +35,7 @@ public class SanitizerPromptLoop {
     }
 
     public void promptForWhatToDo() {
+        model.init(fileName, regexFileName);
         controller.init(model, fileName, regexFileName, (title, message) -> shouldBeSystemOut.println("[%s] %s"));
         boolean keepGoing = true;
         Scanner scanner = new Scanner(shouldBeSystemIn);

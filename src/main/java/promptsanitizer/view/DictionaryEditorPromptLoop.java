@@ -31,6 +31,7 @@ public class DictionaryEditorPromptLoop {
         this.shouldBeSystemIn = shouldBeSystemIn;
         selectedRow = -1;
         keepGoing = true;
+        model.initBehaviors(this::printTable, this::printTable, () -> printTable(-1), (r, c) -> System.out.println("Cell contents changed to: " + model.getValueAt(r, c)));
         controller.init(
                 fileName,
                 model,
@@ -38,11 +39,8 @@ public class DictionaryEditorPromptLoop {
                 this::setSelectedRow,
                 () -> setSelectedRow(-1),
                 () -> keepGoing = false,
-                (title, message) -> JOptionPane.showMessageDialog(null,
-                        message,
-                        title, JOptionPane.ERROR_MESSAGE)
+                (title, message) -> System.err.println(String.format("[%s] %s", title, message))
         );
-        model.initBehaviors(this::printTable, this::printTable, () -> printTable(-1), (r, c) -> System.out.println("Cell contents changed to: " + model.getValueAt(r, c)));
     }
     public void promptForWhatToDo() {
         Scanner scanner = new Scanner(shouldBeSystemIn);

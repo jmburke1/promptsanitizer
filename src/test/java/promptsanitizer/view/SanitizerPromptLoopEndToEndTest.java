@@ -7,7 +7,6 @@ package promptsanitizer.view;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import promptsanitizer.controller.SanitizerController;
 import promptsanitizer.model.SanitizerModel;
 
@@ -25,8 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SanitizerPromptLoopEndToEndTest {
 
-    private final ByteArrayOutputStream capturedOutput = new ByteArrayOutputStream();
-    private final ByteArrayOutputStream capturedError = new ByteArrayOutputStream();
+    private ByteArrayOutputStream capturedOutput;
+    private ByteArrayOutputStream capturedError;
     private PrintStream mockOut;
     private PrintStream mockErr;
     private Path tmpPersonalDict;
@@ -34,6 +33,8 @@ class SanitizerPromptLoopEndToEndTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        capturedOutput = new ByteArrayOutputStream();
+        capturedError = new ByteArrayOutputStream();
         mockOut = new PrintStream(capturedOutput);
         mockErr = new PrintStream(capturedError);
         tmpPersonalDict = Files.createTempFile("personalDict", ".json");
@@ -86,31 +87,49 @@ class SanitizerPromptLoopEndToEndTest {
         assertEquals("SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
     }
 
-    /*@Test
-    void exit_shouldTerminateLoop() {
+    @Test
+    void shouldBeAbleToSanitizePrompt() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                "dictionary.json",
-                "regex_dictionary.json",
-                Mockito.mock(SanitizerController.class),
-                Mockito.mock(SanitizerModel.class),
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("exit\n".getBytes())
+                new ByteArrayInputStream("enterLeft: Lorem ipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nclickMoveRight\nprintRight\nexit\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem ipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nSanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
     }
 
     @Test
-    void enterLeftFollowedByPrintLeft_shouldPrintLeftAreaText() {
+    void shouldBeAbleToPersonalizeResponse() {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("enterRight: Lorem ipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nclickMoveLeft\nprintLeft\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        // The prompt should have been printed once
+        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem ipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nSanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+    }
+
+    @Test
+    void shouldBeAbleToEditDictionary() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
                 "dictionary.json",
                 "regex_dictionary.json",
-                Mockito.mock(SanitizerController.class),
-                Mockito.mock(SanitizerModel.class),
+                new SanitizerController(),
+                new SanitizerModel(),
                 mockOut,
                 mockErr,
                 new ByteArrayInputStream("enterLeft: sensitive data here\nprintLeft\nexit\n".getBytes())
@@ -122,7 +141,7 @@ class SanitizerPromptLoopEndToEndTest {
         assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: sensitive data here\nSanitizerPromptLoop ... What do you want to do: ", output);
     }
 
-    @Test
+    /*@Test
     void enterRightFollowedByPrintRight_shouldPrintRightAreaText() {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
                 "dictionary.json",
