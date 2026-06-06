@@ -4,6 +4,7 @@
  */
 package promptsanitizer.view;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -124,22 +125,90 @@ class SanitizerPromptLoopEndToEndTest {
     }
 
     @Test
-    void shouldBeAbleToEditDictionary() {
+    void shouldBeAbleToEditDictionary() throws IOException {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
-                "dictionary.json",
-                "regex_dictionary.json",
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
                 new SanitizerModel(),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("enterLeft: sensitive data here\nprintLeft\nexit\n".getBytes())
+                new ByteArrayInputStream("clickTildeButton\neditCellContents\n-1\n40\nqqqqq\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
         String output = capturedOutput.toString();
-        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: sensitive data here\nSanitizerPromptLoop ... What do you want to do: ", output);
+        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "vuwxy\t\t\t0z123\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "Enter new value:\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "Enter new value:\n" +
+                "Cell contents changed to: TTVVV\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "TTVVV\t\t\t0z123\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "SanitizerPromptLoop ... What do you want to do: ", output);
+        String err = capturedError.toString();
+        assertEquals("invalid, either row or column are out of range\n", err);
+        JSONObject jo = new JSONObject(Files.readString(tmpPersonalDict));
+        assertEquals("0z123", jo.getString("TTVVV"));
+        assertEquals("fghij", jo.getString("abcde"));
+        assertEquals("z0123", jo.getString("uvwxy"));
     }
+
+    @Test
+    void shouldCatchRowNotParseAsIntegerAndColumnNotParseAsIntegerEditDictionary() {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("clickTildeButton\neditCellContents\nq\neditCellContents\n1\nv\nprintTable\nclickCancel\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        String output = capturedOutput.toString();
+        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "vuwxy\t\t\t0z123\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "vuwxy\t\t\t0z123\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "SanitizerPromptLoop ... What do you want to do: ", output);
+        String err = capturedError.toString();
+        assertEquals("invalid, row doesn't parse as integer\n" +
+                "invalid, column doesn't parse as integer\n", err);
+    }
+
 
     /*@Test
     void enterRightFollowedByPrintRight_shouldPrintRightAreaText() {

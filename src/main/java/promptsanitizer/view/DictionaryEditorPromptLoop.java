@@ -15,23 +15,23 @@ public class DictionaryEditorPromptLoop {
     private int selectedRow;
     private final PrintStream shouldBeSystemOut;
     private final PrintStream shouldBeSystemErr;
-    private final InputStream shouldBeSystemIn;
+    private final Scanner shouldBeSystemInScanner;
     public DictionaryEditorPromptLoop(
             String fileName,
             DictionaryEditorController controller,
             AbstractDictionaryModel model,
             PrintStream shouldBeSystemOut,
             PrintStream shouldBeSystemErr,
-            InputStream shouldBeSystemIn
+            Scanner shouldBeSystemInScanner
     ) {
         this.controller = controller;
         this.model = model;
         this.shouldBeSystemOut = shouldBeSystemOut;
         this.shouldBeSystemErr = shouldBeSystemErr;
-        this.shouldBeSystemIn = shouldBeSystemIn;
+        this.shouldBeSystemInScanner = shouldBeSystemInScanner;
         selectedRow = -1;
         keepGoing = true;
-        model.initBehaviors(this::printTable, this::printTable, () -> printTable(-1), (r, c) -> System.out.println("Cell contents changed to: " + model.getValueAt(r, c)));
+        model.initBehaviors(this::printTable, this::printTable, () -> printTable(-1), (r, c) -> shouldBeSystemOut.println("Cell contents changed to: " + model.getValueAt(r, c)));
         controller.init(
                 fileName,
                 model,
@@ -39,21 +39,20 @@ public class DictionaryEditorPromptLoop {
                 this::setSelectedRow,
                 () -> setSelectedRow(-1),
                 () -> keepGoing = false,
-                (title, message) -> System.err.println(String.format("[%s] %s", title, message))
+                (title, message) -> shouldBeSystemErr.println(String.format("[%s] %s", title, message))
         );
     }
     public void promptForWhatToDo() {
-        Scanner scanner = new Scanner(shouldBeSystemIn);
         while(keepGoing) {
             shouldBeSystemOut.print(getRegexPrefix() + "DictionaryEditorPromptLoop ... What do you want to do: ");
-            String command = scanner.hasNextLine() ? scanner.nextLine() : "clickCancel";
+            String command = shouldBeSystemInScanner.hasNextLine() ? shouldBeSystemInScanner.nextLine() : "clickCancel";
             if("clickCancel".equals(command)) {
                 controller.cancel();
             } else if("clickAdd".equals(command)) {
                 controller.addRow();
             } else if("clickRemove".equals(command)) {
                 shouldBeSystemOut.println("Enter row number (counting from zero'th row):");
-                command = scanner.nextLine();
+                command = shouldBeSystemInScanner.nextLine();
                 int row;
                 try {
                     row = Integer.parseInt(command);
@@ -75,7 +74,7 @@ public class DictionaryEditorPromptLoop {
                 printTable(-1);
             } else if(command.equals("editCellContents")) {
                 shouldBeSystemOut.println("Enter row number (counting from zero'th row):");
-                command = scanner.nextLine();
+                command = shouldBeSystemInScanner.nextLine();
                 int row;
                 try {
                     row = Integer.parseInt(command);
@@ -85,7 +84,7 @@ public class DictionaryEditorPromptLoop {
                 }
                 int column;
                 shouldBeSystemOut.println("Enter column number (counting from zero'th column):");
-                command = scanner.nextLine();
+                command = shouldBeSystemInScanner.nextLine();
                 try {
                     column = Integer.parseInt(command);
                 } catch(NumberFormatException nfe) {
@@ -93,8 +92,8 @@ public class DictionaryEditorPromptLoop {
                     continue;
                 }
                 shouldBeSystemOut.println("Enter new value:");
-                command = scanner.nextLine();
-                if(model.getValueAt(row, column) == null) {
+                command = shouldBeSystemInScanner.nextLine();
+                if(model.isOutOfRange(row, column)) {
                     shouldBeSystemErr.println("invalid, either row or column are out of range");
                     continue;
                 }

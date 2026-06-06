@@ -13,6 +13,7 @@ import promptsanitizer.model.SanitizerModel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Scanner;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -228,7 +229,7 @@ class SanitizerPromptLoopTest {
 
         loop.promptForWhatToDo();
 
-        Mockito.verify(controller).handleTilde(mockOut, mockErr, mockIn);
+        Mockito.verify(controller).handleTilde(Mockito.same(mockOut), Mockito.same(mockErr), Mockito.any(Scanner.class));
     }
 
     @Test
@@ -247,7 +248,7 @@ class SanitizerPromptLoopTest {
 
         loop.promptForWhatToDo();
 
-        Mockito.verify(controller).handleAsteriskTilde(mockOut, mockErr, mockIn);
+        Mockito.verify(controller).handleAsteriskTilde(Mockito.same(mockOut), Mockito.same(mockErr), Mockito.any(Scanner.class));
     }
 
     @Test

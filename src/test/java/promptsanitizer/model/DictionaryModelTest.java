@@ -286,4 +286,22 @@ class DictionaryModelTest {
         assertEquals("chgd\n" +
                 "chgd\n",assertLaterSnk.toString());
     }
+
+    @Test
+    void rangeCheck() {
+        DictionaryModel model = new DictionaryModel();
+        model.initBehaviors(i -> {}, d -> {}, () -> {}, (r, c) -> {});
+        model.addRow();
+        model.addRow();
+        model.addRow();
+        assertTrue(model.isOutOfRange(-1, 0));
+        assertFalse(model.isOutOfRange(0, 0));
+        assertFalse(model.isOutOfRange(1, 0));
+        assertFalse(model.isOutOfRange(2, 0));
+        assertTrue(model.isOutOfRange(3, 0));
+        assertTrue(model.isOutOfRange(1, -1));
+        assertFalse(model.isOutOfRange(1, 0));
+        assertFalse(model.isOutOfRange(1, 1));
+        assertTrue(model.isOutOfRange(1, 2));
+    }
 }

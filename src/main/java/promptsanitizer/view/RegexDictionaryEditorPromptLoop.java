@@ -6,6 +6,7 @@ import promptsanitizer.model.AbstractDictionaryModel;
 import javax.swing.*;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Scanner;
 
 public class RegexDictionaryEditorPromptLoop extends DictionaryEditorPromptLoop {
     private final AbstractDictionaryModel model;
@@ -17,9 +18,9 @@ public class RegexDictionaryEditorPromptLoop extends DictionaryEditorPromptLoop 
             AbstractDictionaryModel model,
             PrintStream shouldBeSystemOut,
             PrintStream shouldBeSystemErr,
-            InputStream shouldBeSystemIn
+            Scanner shouldBeSystemInScanner
     ) {
-        super(fileName, controller, model, shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemIn);
+        super(fileName, controller, model, shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemInScanner);
         this.model = model;
         this.shouldBeSystemOut = shouldBeSystemOut;
         this.shouldBeSystemErr = shouldBeSystemErr;

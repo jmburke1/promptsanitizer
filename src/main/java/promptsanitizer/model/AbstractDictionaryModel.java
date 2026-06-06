@@ -88,5 +88,15 @@ public abstract class AbstractDictionaryModel {
         changedBehavior = chgBeh;
         cellChangeBehavior = cellChgBeh;
     }
+
+    public boolean isOutOfRange(int row, int column) {
+        if((row < 0) || (getRowCount() <= row)) {
+            return true;
+        }
+        if((column < 0) || (getColumnCount() <= column)) {
+            return true;
+        }
+        return false;
+    }
 }
 
