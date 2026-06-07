@@ -108,7 +108,7 @@ public class SanitizerView {
         buttonPanel.add(asteriskTildeRow);
         buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
-        // Assemble the center panel — GridBagLayout for proportional widths (46% / 8% / 46%)
+        // Assemble the center panel - GridBagLayout for proportional widths (46% / 8% / 46%)
         JPanel topRow = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(2, 2, 2, 2);

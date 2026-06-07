@@ -43,7 +43,7 @@ Entries are saved as a simple JSON file in your home directory.
 2. Hit **\>** - every word from your dictionary gets replaced with its safe counterpart.
 3. The result appears in the **Sanitized Prompt** panel (right), ready to copy and send.
 4. Copy the sanitized prompt from the right panel into the cloud LLM you are connected to.
-5. This manual, click-driven approach means you always see exactly what leaves your machine — no automation surprises.
+5. This manual, click-driven approach means you always see exactly what leaves your machine - no automation surprises.
 
 ### 3. Bring it home
 
@@ -53,7 +53,7 @@ Entries are saved as a simple JSON file in your home directory.
 
 ### 4. Under the hood
 
-PromptSanitizer is sequential text replacement — the same thing you'd do in Notepad's Find & Replace, but automated from a persistent dictionary. Each entry is applied one after another, in order. No network calls, no telemetry, nothing leaves your machine except what you explicitly copy.
+PromptSanitizer is sequential text replacement - the same thing you'd do in Notepad's Find & Replace, but automated from a persistent dictionary. Each entry is applied one after another, in order. No network calls, no telemetry, nothing leaves your machine except what you explicitly copy.
 
 ---
 
@@ -79,7 +79,7 @@ And here's one with regular expression replacements:
 }
 ```
 
-Paste a prompt containing `AKIAxxxxxxxxxxxxxx ... walt@corp.com` → get `[AWS_ACCESS_KEY] ... walt@gmail.com` → send to Claude → receive answer → hit **<** → restore the original key in your local copy (if you're using regular expressions, there are some caveats that will be further explained later in this documentation).
+Paste a prompt containing `AKIAxxxxxxxxxxxxxx ... walt@corp.com` -> get `[AWS_ACCESS_KEY] ... walt@gmail.com` -> send to Claude -> receive answer -> hit **<** -> restore the original key in your local copy (if you're using regular expressions, there are some caveats that will be further explained later in this documentation).
 
 ## Avoid Cyclic Dictionaries
 
@@ -90,7 +90,7 @@ Paste a prompt containing `AKIAxxxxxxxxxxxxxx ... walt@corp.com` → get `[AWS_A
 }
 ```
 
-Replacements are applied sequentially — not simultaneously. So `"I saw an abcde go to the fghij."` becomes `"I saw an fghij go to the fghij."` (or the reverse, depending on order). It won't do both in one pass. You won't get `"I saw an fghij go to the abcde."`  The rule of thumb: think of it as clicking "Replace All" one entry at a time, like in Notepad.
+Replacements are applied sequentially - not simultaneously. So `"I saw an abcde go to the fghij."` becomes `"I saw an fghij go to the fghij."` (or the reverse, depending on order). It won't do both in one pass. You won't get `"I saw an fghij go to the abcde."`  The rule of thumb: think of it as clicking "Replace All" one entry at a time, like in Notepad.
 
 ---
 
@@ -176,7 +176,7 @@ java -cp build/classes/java/main:lib/json-20250107.jar promptsanitizer.MainApp
 
 ## TUI Mode (Headless / Terminal Interface)
 
-When there is no display available (e.g., inside a Docker container or on a headless server), PromptSanitizer automatically detects the missing GUI and launches in **TUI mode** — an interactive command-line prompt that mirrors every GUI feature.
+When there is no display available (e.g., inside a Docker container or on a headless server), PromptSanitizer automatically detects the missing GUI and launches in **TUI mode** - an interactive command-line prompt that mirrors every GUI feature.
 
 Note, this mode is meant for the human operator exec'ing into the docker container to try and troubleshoot things that might be going on with the agent's personal dictionary file.  I suppose it is also for a human user that doesn't have a GUI.  But that sounds rare.  The agent, itself, is meant to use batch mode (see the next section after this).
 
@@ -200,10 +200,10 @@ SanitizerPromptLoop ... What do you want to do? (Type "help" for a list of comma
 |---|------------------------------------------------------------------------------------------------------------------------------|
 | `enterLeft: <text>` | Populate text into the left panel (the **unsanitized** side). Use `\n` for newlines.                                         |
 | `printLeft` | Print the current contents of the unsanitized left panel.                                                                    |
-| `clickMoveRight` | Sanitize the left panel → writes safe text to the right panel.                                                               |
+| `clickMoveRight` | Sanitize the left panel -> writes safe text to the right panel.                                                               |
 | `printRight` | Print the current contents of the right panel (the **sanitized** side).                                                      |
 | `enterRight: <text>` | Paste text into the right panel (useful for pasting an LLM response back in).                                                |
-| `clickMoveLeft` | Reverse-sanitize the right panel → restores original sensitive text to the left, thus personalizing the LLM answer received. |
+| `clickMoveLeft` | Reverse-sanitize the right panel -> restores original sensitive text to the left, thus personalizing the LLM answer received. |
 | `clickTildeButton` | Open the **dictionary editor** (plain string replacements).                                                                  |
 | `clickAsteriskTildeButton` | Open the **regex dictionary editor**.                                                                                        |
 | `help` | Show all available commands.                                                                                                 |
@@ -216,7 +216,7 @@ SanitizerPromptLoop ... What do you want to do? (Type "help" for a list of comma
 | `printTable` | Print the current dictionary entries.                                                |
 | `clickAdd` | Add a new empty row.                                                                 |
 | `clickRemove` | Remove a row (prompts for row number, 0-indexed).                                    |
-| `editCellContents` | Edit a cell — prompts for row, column, and new value.                                |
+| `editCellContents` | Edit a cell - prompts for row, column, and new value.                                |
 | `clickSortBySensitive` | Sort rows by the sensitive (left) column.                                            |
 | `clickSortBySafe` | Sort rows by the safe (right) column.                                                |
 | `clickSaveToFile` | Save the dictionary to `~/personal_dictionary.json` and go back to main prompt loop. |
@@ -252,15 +252,15 @@ SanitizerPromptLoop ... What do you want to do? exit
 ---
 ## Batch Job Interface
 
-For headless or automated use — such as a local AI agent running inside a Docker container — the batch mode sanitizes files via command line with no GUI required.  Unlike TUI mode, the agent is actually meant to run this for you (although you can run it, if you prefer a batch job).  Whereas TUI mode is meant for troubleshooting the docker container that the agent is inside of.
+For headless or automated use - such as a local AI agent running inside a Docker container - the batch mode sanitizes files via command line with no GUI required.  Unlike TUI mode, the agent is actually meant to run this for you (although you can run it, if you prefer a batch job).  Whereas TUI mode is meant for troubleshooting the docker container that the agent is inside of.
 
 ### How to Run
 
 ```bash
-# Forward:  unsanitized_content.txt → sanitized_content.txt
+# Forward:  unsanitized_content.txt -> sanitized_content.txt
 promptsanitizer forward
 
-# Reverse:  sanitized_content.txt → unsanitized_content.txt
+# Reverse:  sanitized_content.txt -> unsanitized_content.txt
 promptsanitizer reverse
 
 # Upsert dictionaries only (no sanitization)
@@ -302,10 +302,10 @@ Before any sanitization, the batch job checks for `upserts.json` in the working 
 The batch mode is designed under the assumption of a click-ops workflow: your Docker container's filesystem is mounted so you can inspect files from the host. The typical flow:
 
 1. Place your raw prompt in `unsanitized_content.txt`.
-2. Run (or have your local LLM run) `promptsanitizer forward` — sanitized output appears in `sanitized_content.txt`.
+2. Run (or have your local LLM run) `promptsanitizer forward` - sanitized output appears in `sanitized_content.txt`.
 3. Copy the sanitized text into your cloud LLM.
 4. Paste the LLM's response back into `sanitized_content.txt`.
-5. Run `promptsanitizer reverse` — restored original values appear in `unsanitized_content.txt`.
+5. Run `promptsanitizer reverse` - restored original values appear in `unsanitized_content.txt`.
 
 The advantage: you're leveraging a local AI to surface sensitive information you might have missed, while nothing ever leaves your machine unredacted.
 

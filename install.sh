@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ── Configuration ─────────────────────────────────────────────────────
+# -- Configuration -----------------------------------------------------
 APP_NAME="promptsanitizer"
 INSTALL_DIR="/opt/${APP_NAME}"
 LIB_DIR="${INSTALL_DIR}/lib"
@@ -11,11 +11,11 @@ JSON_VERSION="20250107"
 JSON_COORD="org.json:json:${JSON_VERSION}"
 JAVA_MIN=21
 
-# ── Helpers ───────────────────────────────────────────────────────────
+# -- Helpers -----------------------------------------------------------
 die() { echo "[ERROR] $*" >&2; exit 1; }
 info() { echo "[INFO]  $*"; }
 
-# ── Step 0: Check Java ────────────────────────────────────────────────
+# -- Step 0: Check Java ------------------------------------------------
 if ! command -v java &>/dev/null; then
     die "java not found. Please install JDK ${JAVA_MIN}+ and try again."
 fi
@@ -35,7 +35,7 @@ fi
 
 info "Java version OK (java=${java_major}, javac=${javac_major})."
 
-# ── Step 1: Create install directory ──────────────────────────────────
+# -- Step 1: Create install directory ----------------------------------
 if [ -d "$INSTALL_DIR" ]; then
     info "Removing existing installation at ${INSTALL_DIR} ..."
     sudo rm -rf "$INSTALL_DIR"
@@ -44,7 +44,7 @@ fi
 sudo mkdir -p "${LIB_DIR}"
 info "Created ${INSTALL_DIR}." # mkdir -p implicitly creates the INSTALL_DIR in addition to the LIB_DIR because of the -p option.
 
-# ── Step 2: Download the repo as a zip (no git required) ──────────
+# -- Step 2: Download the repo as a zip (no git required) ----------
 
 info "Downloading repository from ${REPO_URL} ..."
 if ! curl -fsSL "${REPO_URL}" -o "downloaded.zip"; then
@@ -55,7 +55,7 @@ pushd ${INSTALL_DIR}
 sudo unzip downloaded.zip
 sudo rm downloaded.zip
 
-# ── Step 3: Download org.json jar ─────────────────────────────────────
+# -- Step 3: Download org.json jar -------------------------------------
 JAR_URL="https://repo1.maven.org/maven2/org/json/json/${JSON_VERSION}/json-${JSON_VERSION}.jar"
 JAR_PATH="${LIB_DIR}/json-${JSON_VERSION}.jar"
 
@@ -64,7 +64,7 @@ if [ ! -f "$JAR_PATH" ]; then
     sudo curl -fsSL -o "$JAR_PATH" "$JAR_URL" || die "Failed to download ${JAR_URL}"
 fi
 
-# ── Step 4: Compile MainApp and all main classes ─────────────────────
+# -- Step 4: Compile MainApp and all main classes ---------------------
 info "Compiling Java sources ..."
 pushd promptsanitizer-main
 #pushd promptsanitizer-1.2.0
@@ -84,7 +84,7 @@ sudo javac -d build -sourcepath src/main/java \
 
 info "Compilation successful."
 
-# ── Step 6: Create the application runner script ──────────────────────
+# -- Step 6: Create the application runner script ----------------------
 popd
 RUNNER="run-${APP_NAME}"
 
@@ -118,7 +118,7 @@ sudo mv ${RUNNER_BATCH} ${INSTALL_DIR}
 sudo chmod +x "${INSTALL_DIR}/${RUNNER_BATCH}"
 info "Created runner script at ${RUNNER_BATCH}."
 
-# ── Step 7: Create symbolic link in /usr/local/bin ────────────────────
+# -- Step 7: Create symbolic link in /usr/local/bin --------------------
 LINK_TARGET="/usr/local/bin/${APP_NAME}"
 LINK_TARGET_BATCH="/usr/local/bin/${APP_NAME}batch"
 
@@ -138,10 +138,10 @@ info "Created symlink: ${LINK_TARGET} -> ${INSTALL_DIR}/${RUNNER}"
 sudo ln -sf "${INSTALL_DIR}/${RUNNER_BATCH}" "$LINK_TARGET_BATCH"
 info "Created symlink: ${LINK_TARGET_BATCH} -> ${INSTALL_DIR}/${RUNNER_BATCH}"
 
-# ── Done ──────────────────────────────────────────────────────────────
+# -- Done --------------------------------------------------------------
 echo ""
-echo "═══════════════════════════════════════════════════"
+echo "==================================================="
 echo "  Installation complete!"
 echo "  Run '${APP_NAME}' from anywhere to start."
 echo "  'promptsanitizerbatch' for headless environments."
-echo "═══════════════════════════════════════════════════"
+echo "==================================================="

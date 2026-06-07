@@ -1,4 +1,4 @@
-# Regex Dictionary Support — Walkthrough
+# Regex Dictionary Support - Walkthrough
 
 The `*~` button opens the **regex dictionary editor**, where you can define pattern-based replacements using full Java regular expressions. This is the heavy artillery for sensitive data you can't enumerate one-by-one.
 
@@ -48,25 +48,25 @@ Please reach out to john.doe@corp.com if you need further clarification on Proje
 
 ```json
 {
-  // Matches: 42_magic_number_99  →  captures "42" and "99"
+  // Matches: 42_magic_number_99  ->  captures "42" and "99"
   "([0-9]*)_magic_number_([0-9]*)": {
     "repl": "$1_$2_void",        // Becomes: 42_99_void
     "dir": ">"                     // Forward direction only
   },
 
-  // Reverse: 42_99_void → 42_magic_number_99
+  // Reverse: 42_99_void -> 42_magic_number_99
   "([0-9]*)_([0-9]*)_void": {
     "repl": "$1_magic_number_$2",
     "dir": "<"                      // Reverse direction only
   },
 
-  // Matches: ABC_cliff → filly_ABC
+  // Matches: ABC_cliff -> filly_ABC
   "([A-Z]+)_cliff": {
     "repl": "filly_$1",
     "dir": ">"
   },
 
-  // Reverse: filly_ABC → ABC_cliff
+  // Reverse: filly_ABC -> ABC_cliff
   "filly_([A-Z]+)": {
     "repl": "$1_cliff",
     "dir": "<"
@@ -106,15 +106,15 @@ Because regex replacements can rearrange, drop, or repeat captured content, ther
 After clicking the `>` button, here's what changed:
 
 ```diff
-- Project Chimera          →  Project Unicorn
-- john.doe@corp.com        →  big.badass@corp.com
-- my-secret-api-key        →  not-really-any-api-key
-- 42_magic_number_99       →  42_99_void
-- 7_magic_number_3         →  7_3_void
-- 100_magic_number_200     →  100_200_void
-- ABC_cliff                →  filly_ABC
-- DEF_cliff                →  filly_DEF
-- GHI_cliff                →  filly_GHI
+- Project Chimera          ->  Project Unicorn
+- john.doe@corp.com        ->  big.badass@corp.com
+- my-secret-api-key        ->  not-really-any-api-key
+- 42_magic_number_99       ->  42_99_void
+- 7_magic_number_3         ->  7_3_void
+- 100_magic_number_200     ->  100_200_void
+- ABC_cliff                ->  filly_ABC
+- DEF_cliff                ->  filly_DEF
+- GHI_cliff                ->  filly_GHI
 ```
 
 The full sanitized text:
@@ -131,7 +131,7 @@ Please reach out to big.badass@corp.com if you need further clarification on Pro
 
 ## Reverse Restoration (Click `<`)
 
-The restored text is identical to the original — because every regex rule was defined as a paired forward/reverse transformation. The `([0-9]*)_magic_number_([0-9]*) → $1_$2_void` forward rule is perfectly inverted by `([0-9]*)_([0-9]*)_void → $1_magic_number_$2` in the reverse direction.
+The restored text is identical to the original - because every regex rule was defined as a paired forward/reverse transformation. The `([0-9]*)_magic_number_([0-9]*) -> $1_$2_void` forward rule is perfectly inverted by `([0-9]*)_([0-9]*)_void -> $1_magic_number_$2` in the reverse direction.
 
 **Note:** Perfect round-tripping isn't guaranteed with all regex patterns. If your forward rule drops information (e.g., matching `\d+` and replacing with `[NUMBER]`), the reverse rule can't recover what was lost. You define the rules; you control the trade-off.
 
@@ -145,4 +145,4 @@ The restored text is identical to the original — because every regex rule was 
 | You want automatic bidirectional replacement | You need capture groups to transform the output |
 | Simplicity is the priority | You're dealing with auto-generated or variable content |
 
-In practice, most users will have far more exact-match entries than regex rules. Regex is a powerful supplement — not a replacement for the core dictionary. And if you define zero regex rules, the application works exactly as it did before this feature existed.
+In practice, most users will have far more exact-match entries than regex rules. Regex is a powerful supplement - not a replacement for the core dictionary. And if you define zero regex rules, the application works exactly as it did before this feature existed.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ── Configuration ─────────────────────────────────────────────────────
+# -- Configuration -----------------------------------------------------
 APP_NAME="promptsanitizer"
 INSTALL_DIR="${HOME}/.local/opt/${APP_NAME}"
 LIB_DIR="${INSTALL_DIR}/lib"
@@ -14,18 +14,18 @@ UNZIP_URL="https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/Unzip
 JSON_VERSION="20250107"
 JSON_COORD="org.json:json:${JSON_VERSION}"
 
-# ── Helpers ───────────────────────────────────────────────────────────
+# -- Helpers -----------------------------------------------------------
 die() { echo "[ERROR] $*" >&2; exit 1; }
 info() { echo "[INFO]  $*"; }
 
-# ── Step 1: Create install directory ──────────────────────────────────
+# -- Step 1: Create install directory ----------------------------------
 if [ -d "$INSTALL_DIR" ]; then
     info "Removing existing installation at ${INSTALL_DIR} ..."
     rm -rf "$INSTALL_DIR"
 fi
 mkdir -p "${LIB_DIR}"
 
-# ── Step 1a: Put java in install directory ──────────────────────────────────
+# -- Step 1a: Put java in install directory ----------------------------------
 DOWNLOAD_JAVA_URL=$(curl -sL "https://api.github.com/repos/adoptium/temurin21-binaries/releases/latest" | grep 'browser_download_url.*jdk_x64_linux_hotspot' | grep -v debug | head -1 | grep -o '"[^"]*tar\.gz"' | head -1 | tr -d '"')
 info "Downloading JDK from Adoptium..."
 curl -L -o /tmp/openjdk-21.tar.gz "$DOWNLOAD_JAVA_URL"
@@ -40,7 +40,7 @@ popd
 JDK_FOLDER=$(ls ${JAV_DIR}/ | grep jdk | grep -v '^openjdk-21\.tar\.gz$')
 info "JDK folder: ${JDK_FOLDER}"
 
-# ── Step 2: Download the repo as a zip (no git required) ──────────
+# -- Step 2: Download the repo as a zip (no git required) ----------
 info "Downloading repository from ${REPO_URL} ..."
 if ! curl -fsSL "${REPO_URL}" -o "/tmp/downloaded.zip"; then
     die "Failed to download ${REPO_URL}. Is the URL correct?"
@@ -55,13 +55,13 @@ ${JAV_DIR}/${JDK_FOLDER}/bin/javac Unzip.java
 ${JAV_DIR}/${JDK_FOLDER}/bin/java Unzip
 rm downloaded.zip
 
-# ── Step 3: Download org.json jar ─────────────────────────────────────
+# -- Step 3: Download org.json jar -------------------------------------
 JAR_URL="https://repo1.maven.org/maven2/org/json/json/${JSON_VERSION}/json-${JSON_VERSION}.jar"
 JAR_PATH="${LIB_DIR}/json-${JSON_VERSION}.jar"
 info "Downloading ${JSON_COORD} ..."
 curl -fsSL -o "$JAR_PATH" "$JAR_URL" || die "Failed to download ${JAR_URL}"
 
-# ── Step 4: Compile MainApp and all main classes ─────────────────────
+# -- Step 4: Compile MainApp and all main classes ---------------------
 EXTRACTED_FOLDER=$(ls -d promptsanitizer-*/ | head -1 | tr -d '\n')
 mv ${EXTRACTED_FOLDER}/* ./
 mv ${EXTRACTED_FOLDER}/.gitignore ./ 2>/dev/null || true
@@ -78,7 +78,7 @@ ${JAV_DIR}/${JDK_FOLDER}/bin/javac -d build -sourcepath src/main/java \
 
 info "Compilation successful."
 
-# ── Step 6: Create the application runner script ──────────────────────
+# -- Step 6: Create the application runner script ----------------------
 popd
 mkdir ${RUNNER_DIR}
 RUNNER="run-${APP_NAME}"
@@ -117,8 +117,8 @@ mv ${RUNNER_BATCH} ${RUNNER_DIR}
 chmod u+x "${RUNNER_DIR}/${RUNNER_BATCH}"
 info "Created runner script at ${RUNNER_BATCH}."
 
-# ── Step 7: Create symbolic link in /usr/local/bin ────────────────────
-# ── Step 7a: See if we need to create the local .bin first ────────────
+# -- Step 7: Create symbolic link in /usr/local/bin --------------------
+# -- Step 7a: See if we need to create the local .bin first ------------
 
 created_local_bin=false
 
@@ -127,7 +127,7 @@ if [ ! -d "${HOME}/.local/bin" ]; then
     created_local_bin=true
 fi
 
-# ── Step 7b: Now create the actual link ────────────
+# -- Step 7b: Now create the actual link ------------
 LINK_TARGET="${HOME}/.local/bin/${APP_NAME}"
 LINK_TARGET_BATCH="${HOME}/.local/bin/${APP_NAME}batch"
 
@@ -147,18 +147,18 @@ info "Created symlink: ${LINK_TARGET} -> ${RUNNER_DIR}/${RUNNER}"
 ln -sf "${RUNNER_DIR}/${RUNNER_BATCH}" "$LINK_TARGET_BATCH"
 info "Created symlink: ${LINK_TARGET_BATCH} -> ${RUNNER_DIR}/${RUNNER_BATCH}"
 
-# ── Done ──────────────────────────────────────────────────────────────
+# -- Done --------------------------------------------------------------
 echo ""
-echo "═══════════════════════════════════════════════════"
+echo "==================================================="
 echo "  Installation complete!"
 echo "  Run '${APP_NAME}' from anywhere to start."
-echo "═══════════════════════════════════════════════════"
+echo "==================================================="
 
-# ── Step 7c: Let the user know they will have to log out and log back in ──
+# -- Step 7c: Let the user know they will have to log out and log back in --
 
 if $created_local_bin; then
     echo ""
-    echo "═══════════════════════════════════════════════════════════"
+    echo "==========================================================="
     echo "Log out and log back in for the installation to take"
     echo "effect.  Alternatively, run source ~/.profile if you"
     echo "do not want to log out and log back in (but you'll"
@@ -166,6 +166,6 @@ if $created_local_bin; then
     echo "you are an AI agent running inside a docker container,"
     echo "and you do not have a .profile in your home directory,"
     echo "just make sure that ~/.local/bin is in your PATH variable."
-    echo "═══════════════════════════════════════════════════════════"
+    echo "==========================================================="
 fi
 
