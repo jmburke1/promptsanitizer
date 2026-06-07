@@ -152,13 +152,15 @@ class SanitizerPromptLoopEndToEndTest {
                 new SanitizerModel(),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("enterLeft: Lorem ipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nclickMoveRight\nprintRight\nexit\n".getBytes())
+                new ByteArrayInputStream("enterLeft\nenterLeft: Lorem \\nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nclickMoveRight\nprintRight\nexit\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem ipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nSanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem \nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nSanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+        String err = capturedError.toString();
+        assertEquals("invalid.  Expected format is \"enterLeft: <text you want to enter with just type \\n for newlines>\n", err);
     }
 
     @Test
@@ -170,13 +172,15 @@ class SanitizerPromptLoopEndToEndTest {
                 new SanitizerModel(),
                 mockOut,
                 mockErr,
-                new ByteArrayInputStream("enterRight: Lorem ipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nclickMoveLeft\nprintLeft\nexit\n".getBytes())
+                new ByteArrayInputStream("enterRight\nenterRight: Lorem \\nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nclickMoveLeft\nprintLeft\nexit\n".getBytes())
         );
 
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem ipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nSanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+        assertEquals("SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem \nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nSanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+        String err = capturedError.toString();
+        assertEquals("invalid.  Expected format is \"enterRight: <text you want to enter with just type \\n for newlines>\n", err);
     }
 
     @Test
