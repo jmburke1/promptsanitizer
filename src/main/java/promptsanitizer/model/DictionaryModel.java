@@ -6,7 +6,7 @@ package promptsanitizer.model;
 
 /** Lightweight model backed by a Map<Integer, String>. */
 public class DictionaryModel extends AbstractDictionaryModel {
-    ReplacementRecord createReplacementRecord() {
+    protected ReplacementRecord createReplacementRecord() {
         return new SensitiveSafeRecord("", "");
     }
     @Override public int getColumnCount()           { return 2; }

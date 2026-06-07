@@ -74,7 +74,7 @@ public abstract class AbstractDictionaryModel {
         return result;
     }
 
-    abstract ReplacementRecord createReplacementRecord();
+    abstract protected ReplacementRecord createReplacementRecord();
     abstract public int getColumnCount();
     abstract public String getColumnName(int c);
 

@@ -9,7 +9,6 @@ import java.io.PrintStream;
 import java.util.Scanner;
 
 public class RegexDictionaryEditorPromptLoop extends DictionaryEditorPromptLoop {
-    private final AbstractDictionaryModel model;
     private final PrintStream shouldBeSystemOut;
     private final PrintStream shouldBeSystemErr;
     public RegexDictionaryEditorPromptLoop(

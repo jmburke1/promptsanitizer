@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-interface ReplacementRecord {
+public interface ReplacementRecord {
     String getColumnValue(int c);
     ReplacementRecord createOther(String s, int c);
     int contextCompareToOther(String context, ReplacementRecord other);

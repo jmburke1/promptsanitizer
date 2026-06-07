@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class DictionaryEditorPromptLoop {
     private boolean keepGoing;
     private DictionaryEditorController controller;
-    private AbstractDictionaryModel model;
+    protected AbstractDictionaryModel model;
     private int selectedRow;
     private final PrintStream shouldBeSystemOut;
     private final PrintStream shouldBeSystemErr;

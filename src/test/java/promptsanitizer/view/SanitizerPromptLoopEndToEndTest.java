@@ -86,6 +86,11 @@ class SanitizerPromptLoopEndToEndTest {
 
         // The prompt should have been printed once
         assertEquals("SanitizerPromptLoop ... What do you want to do: **********************\n" +
+                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
+                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
+                "([0-9]*)bdf\t\t\tace$1\t<\n" +
+                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: Unknown command.  Type 'help' for a list of commands.\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: You are in the regex dictionary editor prompt loop.  Choices are:\n" +
                 "  clickCancel               - Close the regex dictionary editor and return to main loop\n" +
@@ -130,6 +135,11 @@ class SanitizerPromptLoopEndToEndTest {
 
         // The prompt should have been printed once
         assertEquals("SanitizerPromptLoop ... What do you want to do: **********************\n" +
+                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
+                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
+                "([0-9]*)bdf\t\t\tace$1\t<\n" +
+                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
     }
 
@@ -254,6 +264,70 @@ class SanitizerPromptLoopEndToEndTest {
                 "invalid, column doesn't parse as integer\n", err);
     }
 
+
+    @Test
+    void shouldBeAbleToEditThirdColumnWithLessThanOrGreaterThanOnly() throws IOException {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("clickAsteriskTildeButton\neditCellContents\n2\n2\n%\neditCellContents\n2\n2\n>\nprintTable\neditCellContents\n2\n2\n<\nprintTable\neditCellContents\n2\n1\nabe$1\nprintTable\nclickCancel\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        String output = capturedOutput.toString();
+        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
+                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
+                "([0-9]*)bdf\t\t\tace$1\t<\n" +
+                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "**********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "Enter new value:\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "Enter new value:\n" +
+                "Cell contents changed to: >\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
+                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
+                "([0-9]*)bdf\t\t\tace$1\t>\n" +
+                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "**********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "Enter new value:\n" +
+                "Cell contents changed to: <\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: **********************\n" +
+                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
+                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
+                "([0-9]*)bdf\t\t\tace$1\t<\n" +
+                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "**********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "Enter new value:\n" +
+                "Cell contents changed to: abe$1\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: **********************\n" +
+                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
+                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
+                "([0-9]*)bdf\t\t\tabe$1\t<\n" +
+                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "**********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
+                "SanitizerPromptLoop ... What do you want to do: ", output);
+        String err = capturedError.toString();
+        assertEquals("invalid, direction column must be either < or >\n", err);
+    }
 
     /*@Test
     void enterRightFollowedByPrintRight_shouldPrintRightAreaText() {
