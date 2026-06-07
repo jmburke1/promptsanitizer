@@ -264,7 +264,6 @@ class SanitizerPromptLoopEndToEndTest {
                 "invalid, column doesn't parse as integer\n", err);
     }
 
-
     @Test
     void shouldBeAbleToEditThirdColumnWithLessThanOrGreaterThanOnly() throws IOException {
         SanitizerPromptLoop loop = new SanitizerPromptLoop(
@@ -328,6 +327,83 @@ class SanitizerPromptLoopEndToEndTest {
         String err = capturedError.toString();
         assertEquals("invalid, direction column must be either < or >\n", err);
     }
+
+
+    @Test
+    void shouldBeAbleToAddAndRemoveRows() throws IOException {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("clickTildeButton\nclickAdd\neditCellContents\n3\n0\nbbbbb\neditCellContents\n3\n1\nqqqqq\nprintTable\nclickRemove\n1\nclickRemove\n-1\nclickRemove\n99\nclickRemove\nx\nprintTable\nclickCancel\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        String output = capturedOutput.toString();
+        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "vuwxy\t\t\t0z123\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "vuwxy\t\t\t0z123\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "\t\t\t<<<<<\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "Enter new value:\n" +
+                "Cell contents changed to: bbbbb\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "Enter column number (counting from zero'th column):\n" +
+                "Enter new value:\n" +
+                "Cell contents changed to: qqqqq\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "vuwxy\t\t\t0z123\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "bbbbb\t\t\tqqqqq\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "vuwxy\t\t\t0z123<<<<<\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "bbbbb\t\t\tqqqqq\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "Enter row number (counting from zero'th row):\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde\t\t\tfghij\n" +
+                "uvwxy\t\t\tz0123\n" +
+                "bbbbb\t\t\tqqqqq\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "SanitizerPromptLoop ... What do you want to do: ", output);
+        String err = capturedError.toString();
+        assertEquals("invalid, row is out of range\n" +
+                "invalid, row is out of range\n" +
+                "invalid, row doesn't parse as integer\n", err);
+    }
+
+/*
+*/
 
     /*@Test
     void enterRightFollowedByPrintRight_shouldPrintRightAreaText() {
