@@ -437,8 +437,42 @@ class SanitizerPromptLoopEndToEndTest {
                 "invalid, row doesn't parse as integer\n", err);
     }
 
-/*
-*/
+    @Test
+    void shouldBeAbleToSortRows() throws IOException {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("clickTildeButton\nclickSortBySensitive\nclickSortBySafe\nclickCancel\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        String output = capturedOutput.toString();
+        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde			fghij\n" +
+                "vuwxy			0z123\n" +
+                "uvwxy			z0123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "abcde			fghij\n" +
+                "uvwxy			z0123\n" +
+                "vuwxy			0z123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "**********************\n" +
+                "vuwxy			0z123\n" +
+                "abcde			fghij\n" +
+                "uvwxy			z0123\n" +
+                "**********************\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "SanitizerPromptLoop ... What do you want to do: ", output);
+    }
 
     /*@Test
     void enterRightFollowedByPrintRight_shouldPrintRightAreaText() {
