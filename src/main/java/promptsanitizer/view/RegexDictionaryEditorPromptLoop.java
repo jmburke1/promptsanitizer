@@ -45,7 +45,7 @@ public class RegexDictionaryEditorPromptLoop extends DictionaryEditorPromptLoop 
         shouldBeSystemOut.println("  clickSortByReplacement      - Sort rows by the replacement column");
         shouldBeSystemOut.println("  printTable                  - Print the current regex dictionary table");
         shouldBeSystemOut.println("  editCellContents            - Edit a cell (prompts for row, column, and new value)");
-        shouldBeSystemOut.println("  clickSaveToFile             - Save the regex dictionary to file");
+        shouldBeSystemOut.println("  clickSaveToFile             - Save the regex dictionary to file and closes the regex dictionary editor to return to main loop");
     }
     boolean isValidThirdColumn(int column, String command) {
         if(column != 2 || ">".equals(command) || "<".equals(command)) {

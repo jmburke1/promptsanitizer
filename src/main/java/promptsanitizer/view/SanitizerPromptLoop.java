@@ -71,12 +71,13 @@ public class SanitizerPromptLoop {
             } else if("help".equals(command)) {
                 shouldBeSystemOut.println("You are in the sanitizer prompt loop.  Choices are:");
                 shouldBeSystemOut.println("  exit                        - Exit the application");
-                shouldBeSystemOut.println("  printLeft                   - Print the left panel text");
-                shouldBeSystemOut.println("  enterLeft: <text>           - Set the left panel text (use \\n for newlines)");
-                shouldBeSystemOut.println("  printRight                  - Print the right panel text");
-                shouldBeSystemOut.println("  enterRight: <text>          - Set the right panel text (use \\n for newlines)");
+                shouldBeSystemOut.println("  help                        - Show this menu of available commands");
+                shouldBeSystemOut.println("  printLeft                   - Print the unsanitized left panel text");
+                shouldBeSystemOut.println("  enterLeft: <text>           - Set the unsanitized left panel text (use \\n for newlines)");
+                shouldBeSystemOut.println("  printRight                  - Print the right panel sanitized text");
+                shouldBeSystemOut.println("  enterRight: <text>          - Set the right panel sanitized text which is the answer you received (use \\n for newlines)");
                 shouldBeSystemOut.println("  clickMoveRight              - Sanitize left panel and write to right panel");
-                shouldBeSystemOut.println("  clickMoveLeft               - Restore right panel and write to left panel");
+                shouldBeSystemOut.println("  clickMoveLeft               - Personalize right panel and write to left panel");
                 shouldBeSystemOut.println("  clickTildeButton            - Open the dictionary editor (~)");
                 shouldBeSystemOut.println("  clickAsteriskTildeButton    - Open the regex dictionary editor (*~)");
             } else {

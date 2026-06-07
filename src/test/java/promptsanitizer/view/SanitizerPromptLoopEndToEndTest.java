@@ -90,12 +90,13 @@ class SanitizerPromptLoopEndToEndTest {
                 "SanitizerPromptLoop ... What do you want to do: " +
                 "You are in the sanitizer prompt loop.  Choices are:\n" +
                 "  exit                        - Exit the application\n" +
-                "  printLeft                   - Print the left panel text\n" +
-                "  enterLeft: <text>           - Set the left panel text (use \\n for newlines)\n" +
-                "  printRight                  - Print the right panel text\n" +
-                "  enterRight: <text>          - Set the right panel text (use \\n for newlines)\n" +
+                "  help                        - Show this menu of available commands\n" +
+                "  printLeft                   - Print the unsanitized left panel text\n" +
+                "  enterLeft: <text>           - Set the unsanitized left panel text (use \\n for newlines)\n" +
+                "  printRight                  - Print the right panel sanitized text\n" +
+                "  enterRight: <text>          - Set the right panel sanitized text which is the answer you received (use \\n for newlines)\n" +
                 "  clickMoveRight              - Sanitize left panel and write to right panel\n" +
-                "  clickMoveLeft               - Restore right panel and write to left panel\n" +
+                "  clickMoveLeft               - Personalize right panel and write to left panel\n" +
                 "  clickTildeButton            - Open the dictionary editor (~)\n" +
                 "  clickAsteriskTildeButton    - Open the regex dictionary editor (*~)\n" +
                 "SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
@@ -131,7 +132,7 @@ class SanitizerPromptLoopEndToEndTest {
                 "  clickSortByReplacement      - Sort rows by the replacement column\n" +
                 "  printTable                  - Print the current regex dictionary table\n" +
                 "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
-                "  clickSaveToFile             - Save the regex dictionary to file\n" +
+                "  clickSaveToFile             - Save the regex dictionary to file and closes the regex dictionary editor to return to main loop\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: **********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123\n" +
@@ -146,7 +147,7 @@ class SanitizerPromptLoopEndToEndTest {
                 "  clickSortBySafe             - Sort rows by the safe (right) column\n" +
                 "  printTable                  - Print the current dictionary table\n" +
                 "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
-                "  clickSaveToFile             - Save the dictionary to file\n" +
+                "  clickSaveToFile             - Save the dictionary to file and closes the dictionary editor to return to main loop\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
     }
 

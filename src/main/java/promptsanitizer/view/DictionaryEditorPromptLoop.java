@@ -131,7 +131,7 @@ public class DictionaryEditorPromptLoop {
         shouldBeSystemOut.println("  clickSortBySafe             - Sort rows by the safe (right) column");
         shouldBeSystemOut.println("  printTable                  - Print the current dictionary table");
         shouldBeSystemOut.println("  editCellContents            - Edit a cell (prompts for row, column, and new value)");
-        shouldBeSystemOut.println("  clickSaveToFile             - Save the dictionary to file");
+        shouldBeSystemOut.println("  clickSaveToFile             - Save the dictionary to file and closes the dictionary editor to return to main loop");
     }
     boolean isValidThirdColumn(int column, String command) {
         return true;
