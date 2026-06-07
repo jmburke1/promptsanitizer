@@ -320,3 +320,7 @@ MIT - do whatever you want with your downloaded copy of it.
 ## Screen Captures
 
 This README.md is already long enough.  See the EXAMPLE_WITH_SCREEN_CAPTURES.md for more details.  Also, for regular expression support, see REGEX_EXAMPLE_WITH_SCREEN_CAPTURES.md.
+
+## About Being AI Assisted
+
+I used a local LLM, that I installed from openmonoagent.ai to prototype a lot of this.  I also have thoroughly tested it to the best of my ability to the point where I understand it just as well as if I had hand-coded everything.
