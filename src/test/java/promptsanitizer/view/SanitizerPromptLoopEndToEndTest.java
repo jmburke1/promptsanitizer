@@ -79,6 +79,37 @@ class SanitizerPromptLoopEndToEndTest {
                 new SanitizerModel(),
                 mockOut,
                 mockErr,
+                new ByteArrayInputStream("stareOutAWindow\nhelp\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        // The prompt should have been printed once
+        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+                "Unknown command.  Type 'help' for a list of commands.\n" +
+                "SanitizerPromptLoop ... What do you want to do: " +
+                "You are in the sanitizer prompt loop.  Choices are:\n" +
+                "  exit                        - Exit the application\n" +
+                "  printLeft                   - Print the left panel text\n" +
+                "  enterLeft: <text>           - Set the left panel text (use \\n for newlines)\n" +
+                "  printRight                  - Print the right panel text\n" +
+                "  enterRight: <text>          - Set the right panel text (use \\n for newlines)\n" +
+                "  clickMoveRight              - Sanitize left panel and write to right panel\n" +
+                "  clickMoveLeft               - Restore right panel and write to left panel\n" +
+                "  clickTildeButton            - Open the dictionary editor (~)\n" +
+                "  clickAsteriskTildeButton    - Open the regex dictionary editor (*~)\n" +
+                "SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+    }
+
+    @Test
+    void shouldUnknownCommandFollowedByHelp2() {
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
+                mockOut,
+                mockErr,
                 new ByteArrayInputStream("clickAsteriskTildeButton\nhungry\nhelp\nclickCancel\nclickTildeButton\nhungry\nhelp\nclickCancel\nexit\n".getBytes())
         );
 
