@@ -110,13 +110,13 @@ Replacements are applied sequentially - not simultaneously. So `"I saw an abcde 
 ### Quick install (Linux / macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0-tui/install.sh | bash
 ```
 
 This downloads the source, compiles it with Java 21+, and installs a `promptsanitizer` command to `/usr/local/bin`.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/localinstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0-tui/localinstall.sh | bash
 ```
 
 Similar to the first one, but the following two differences:
@@ -126,13 +126,13 @@ Similar to the first one, but the following two differences:
 Finally, the uninstallers are similarly named with
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0-tui/uninstall.sh | bash
 ```
 
 and
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/localuninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0-tui/localuninstall.sh | bash
 ```
 
 
