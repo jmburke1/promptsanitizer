@@ -174,9 +174,85 @@ java -cp build/classes/java/main:lib/json-20250107.jar promptsanitizer.MainApp
 
 ---
 
+## TUI Mode (Headless / Terminal Interface)
+
+When there is no display available (e.g., inside a Docker container or on a headless server), PromptSanitizer automatically detects the missing GUI and launches in **TUI mode** — an interactive command-line prompt that mirrors every GUI feature.
+
+Note, this mode is meant for the human operator exec'ing into the docker container to try and troubleshoot things that might be going on with the agent's personal dictionary file.  I suppose it is also for a human user that doesn't have a GUI.  But that sounds rare.  The agent, itself, is meant to use batch mode (see the next section after this).
+
+### How to Launch
+
+Just run the app as usual. No flags needed:
+
+```bash
+promptsanitizer
+```
+
+If a display is available, the normal GUI opens. If not, you'll see this prompt:
+
+```
+SanitizerPromptLoop ... What do you want to do? (Type "help" for a list of commands):
+```
+
+### Main Sanitizer Commands
+
+| Command | What it does                                                                                                                 |
+|---|------------------------------------------------------------------------------------------------------------------------------|
+| `enterLeft: <text>` | Populate text into the left panel (the **unsanitized** side). Use `\n` for newlines.                                         |
+| `printLeft` | Print the current contents of the unsanitized left panel.                                                                    |
+| `clickMoveRight` | Sanitize the left panel → writes safe text to the right panel.                                                               |
+| `printRight` | Print the current contents of the right panel (the **sanitized** side).                                                      |
+| `enterRight: <text>` | Paste text into the right panel (useful for pasting an LLM response back in).                                                |
+| `clickMoveLeft` | Reverse-sanitize the right panel → restores original sensitive text to the left, thus personalizing the LLM answer received. |
+| `clickTildeButton` | Open the **dictionary editor** (plain string replacements).                                                                  |
+| `clickAsteriskTildeButton` | Open the **regex dictionary editor**.                                                                                        |
+| `help` | Show all available commands.                                                                                                 |
+| `exit` | Quit the application.                                                                                                        |
+
+### Dictionary Editor Commands (opened via `clickTildeButton`)
+
+| Command | What it does                                                                         |
+|---|--------------------------------------------------------------------------------------|
+| `printTable` | Print the current dictionary entries.                                                |
+| `clickAdd` | Add a new empty row.                                                                 |
+| `clickRemove` | Remove a row (prompts for row number, 0-indexed).                                    |
+| `editCellContents` | Edit a cell — prompts for row, column, and new value.                                |
+| `clickSortBySensitive` | Sort rows by the sensitive (left) column.                                            |
+| `clickSortBySafe` | Sort rows by the safe (right) column.                                                |
+| `clickSaveToFile` | Save the dictionary to `~/personal_dictionary.json` and go back to main prompt loop. |
+| `clickCancel` | Close the editor and return to the main loop.                                        |
+
+### Regex Dictionary Editor Commands (opened via `clickAsteriskTildeButton`)
+
+Same as above, with sort commands renamed:
+
+| Command | What it does |
+|---|---|
+| `clickSortByRegex` | Sort rows by the regex column. |
+| `clickSortByReplacement` | Sort rows by the replacement column. |
+| `clickSaveToFile` | Save to `~/personal_regex_dictionary.json` and go back to main prompt loop. |
+
+### Example Workflow
+
+```
+SanitizerPromptLoop ... What do you want to do? enterLeft: My API key is sk-proj-abc123 and my email is john@corp.com\n
+SanitizerPromptLoop ... What do you want to do? clickMoveRight
+SanitizerPromptLoop ... What do you want to do? printRight
+My API key is [OPENAI_KEY] and my email is [REDACTED_EMAIL]
+
+# After sending to the LLM and getting a response back:
+SanitizerPromptLoop ... What do you want to do? enterRight: The key [OPENAI_KEY] was found in config.yaml. Contact [REDACTED_EMAIL] for access.
+SanitizerPromptLoop ... What do you want to do? clickMoveLeft
+SanitizerPromptLoop ... What do you want to do? printLeft
+The key sk-proj-abc123 was found in config.yaml. Contact john@corp.com for access.
+
+SanitizerPromptLoop ... What do you want to do? exit
+```
+
+---
 ## Batch Job Interface
 
-For headless or automated use — such as a local AI agent running inside a Docker container — the batch mode sanitizes files via command line with no GUI required.
+For headless or automated use — such as a local AI agent running inside a Docker container — the batch mode sanitizes files via command line with no GUI required.  Unlike TUI mode, the agent is actually meant to run this for you (although you can run it, if you prefer a batch job).  Whereas TUI mode is meant for troubleshooting the docker container that the agent is inside of.
 
 ### How to Run
 

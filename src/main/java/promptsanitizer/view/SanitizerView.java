@@ -43,9 +43,9 @@ public class SanitizerView {
     private final JTextArea rightArea;
 
     public void createUI() {
-        model.init(fileName, regexFileName);
-        controller.init(model, fileName, regexFileName);
         JFrame frame = new JFrame("Replace Sensitive Strings in Your Prompts to an LLM.  Back replace the answer from the LLM.");
+        model.init(fileName, regexFileName);
+        ViewSetupUtil.initSanitizerController(controller, model, fileName, regexFileName);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Left text area (source for >, destination for <)
@@ -84,19 +84,19 @@ public class SanitizerView {
         JButton moveLeftButton  = new JButton("<");
         moveLeftButton.setFont(font);
 
-        moveRightButton.addActionListener(e -> controller.moveText(leftArea, rightArea, false));
+        moveRightButton.addActionListener(e -> controller.moveText(leftArea::getText, rightArea::setText, leftArea::setText, false));
 
-        moveLeftButton.addActionListener(e -> controller.moveText(rightArea, leftArea, true));
+        moveLeftButton.addActionListener(e -> controller.moveText(rightArea::getText, leftArea::setText, rightArea::setText, true));
 
         topButtons.add(moveLeftButton);
         topButtons.add(moveRightButton);
 
         JButton tildeButton = new JButton("~");
         tildeButton.setFont(font);
-        tildeButton.addActionListener(e -> controller.handleTilde());
+        tildeButton.addActionListener(e -> controller.handleTilde(null, null, null));
         JButton asteriskTildeButton = new JButton("*~");
         asteriskTildeButton.setFont(font);
-        asteriskTildeButton.addActionListener(e -> controller.handleAsteriskTilde());
+        asteriskTildeButton.addActionListener(e -> controller.handleAsteriskTilde(null, null, null));
 
         buttonPanel.add(topButtons);
         buttonPanel.add(Box.createVerticalStrut(4));

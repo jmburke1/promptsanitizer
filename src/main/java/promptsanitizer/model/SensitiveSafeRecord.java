@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-class SensitiveSafeRecord implements ReplacementRecord {
+public class SensitiveSafeRecord implements ReplacementRecord {
     private String sensitive;
     private String safe;
 

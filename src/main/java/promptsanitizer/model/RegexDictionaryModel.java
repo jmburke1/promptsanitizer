@@ -6,7 +6,7 @@ package promptsanitizer.model;
 
 /** Lightweight model backed by a Map<Integer, String>. */
 public class RegexDictionaryModel extends AbstractDictionaryModel {
-    ReplacementRecord createReplacementRecord() {
+    protected ReplacementRecord createReplacementRecord() {
         return new RegexReplaceRecord("", "", ">");
     }
     @Override public int getColumnCount()           { return 3; }

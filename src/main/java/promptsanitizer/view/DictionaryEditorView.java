@@ -11,7 +11,6 @@ import promptsanitizer.controller.TableMouseAdapter;
 import promptsanitizer.model.RegexDictionaryModel;
 import promptsanitizer.model.AbstractDictionaryModel;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.JOptionPane;
 
 import javax.swing.*;
 import javax.swing.table.TableColumnModel;

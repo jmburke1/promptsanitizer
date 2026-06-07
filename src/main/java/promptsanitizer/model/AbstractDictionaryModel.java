@@ -74,7 +74,7 @@ public abstract class AbstractDictionaryModel {
         return result;
     }
 
-    abstract ReplacementRecord createReplacementRecord();
+    abstract protected ReplacementRecord createReplacementRecord();
     abstract public int getColumnCount();
     abstract public String getColumnName(int c);
 
@@ -87,6 +87,16 @@ public abstract class AbstractDictionaryModel {
         deletedBehavior = delBeh;
         changedBehavior = chgBeh;
         cellChangeBehavior = cellChgBeh;
+    }
+
+    public boolean isOutOfRange(int row, int column) {
+        if((row < 0) || (getRowCount() <= row)) {
+            return true;
+        }
+        if((column < 0) || (getColumnCount() <= column)) {
+            return true;
+        }
+        return false;
     }
 }
 

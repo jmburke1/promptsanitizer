@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-class RegexReplaceRecord implements ReplacementRecord {
+public class RegexReplaceRecord implements ReplacementRecord {
     private String regex;
     private String replacement;
     private String direction;
