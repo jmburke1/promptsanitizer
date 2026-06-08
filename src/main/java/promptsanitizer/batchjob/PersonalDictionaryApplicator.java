@@ -3,6 +3,7 @@ package promptsanitizer.batchjob;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,8 +32,7 @@ public class PersonalDictionaryApplicator {
     public void executeUpdate() throws IOException {
         File sourceFile = new File(sourceFileLocation);
         if(!sourceFile.exists()) {
-            System.out.println("No work piece to sanitize.  Returning.");
-            return;
+            throw new FileNotFoundException(String.format("There is no %s to read data from and process into its counterpart.", sourceFileLocation));
         }
         File personalDictionaryFile = new File(personalDictionaryFileLocation);
         File regexPersonalDictionaryFile = new File(regexPersonalDictionaryFileLocation);

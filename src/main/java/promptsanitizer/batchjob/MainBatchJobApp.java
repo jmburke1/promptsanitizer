@@ -6,6 +6,9 @@ public class MainBatchJobApp {
     public static void main(String[] args) throws IOException {
         boolean reverseDirection;
         boolean upsertOnly;
+        if(args.length < 1) {
+            throw new IllegalArgumentException("The batch job takes one argument where you specify forward, reverse or upsertonly");
+        }
         if("forward".equals(args[0])) {
             reverseDirection = false;
             upsertOnly = false;
@@ -27,7 +30,7 @@ public class MainBatchJobApp {
         String regexPersonalDictionaryFileLocation =
                 personalDictionaryFileLocationPrefix +
                         "personal_regex_dictionary.json";
-        (new MergeIntoPersonalDictionaryTool(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "upserts.json")).updatePersonalDictionary();
+        (new MergeIntoPersonalDictionaryTool(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "upserts.json", upsertOnly)).updatePersonalDictionary();
         if(!upsertOnly) {
             if (reverseDirection) {
                 (new PersonalDictionaryApplicator(personalDictionaryFileLocation, regexPersonalDictionaryFileLocation, "sanitized_content.txt", "unsanitized_content.txt", true)).executeUpdate();

@@ -3,6 +3,7 @@ package promptsanitizer.batchjob;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,14 +12,19 @@ public class MergeIntoPersonalDictionaryTool {
     private final String personalDictionaryFileLocation;
     private final String regexPersonalDictionaryFileLocation;
     private final String updateFileLocation;
-    public MergeIntoPersonalDictionaryTool(String personalDictionaryFileLocation, String regexPersonalDictionaryFileLocation, String updateFileLocation) {
+    private boolean throwExceptionOnUpsertsFileNotExist;
+    public MergeIntoPersonalDictionaryTool(String personalDictionaryFileLocation, String regexPersonalDictionaryFileLocation, String updateFileLocation, boolean throwExceptionOnUpsertsFileNotExist) {
         this.personalDictionaryFileLocation = personalDictionaryFileLocation;
         this.regexPersonalDictionaryFileLocation = regexPersonalDictionaryFileLocation;
         this.updateFileLocation = updateFileLocation;
+        this.throwExceptionOnUpsertsFileNotExist = throwExceptionOnUpsertsFileNotExist;
     }
     public void updatePersonalDictionary() throws IOException {
         File checkExists = new File(updateFileLocation);
         if(!checkExists.exists()) {
+            if(throwExceptionOnUpsertsFileNotExist) {
+                throw new FileNotFoundException(String.format("There is no upsert file %s to merge into the personal dictionary.", updateFileLocation));
+            }
             return;
         }
         checkExists = new File(personalDictionaryFileLocation);

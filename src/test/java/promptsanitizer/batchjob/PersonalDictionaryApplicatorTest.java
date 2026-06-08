@@ -2,10 +2,12 @@ package promptsanitizer.batchjob;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PersonalDictionaryApplicatorTest {
     @Test
@@ -98,6 +100,7 @@ public class PersonalDictionaryApplicatorTest {
         Path tmpRegexPersonalDict = Files.createTempFile("regexPersonalDict", ".json");
         Path tmpContentToSanitize = Files.createTempFile("contentToSanitize", ".txt");
         Files.delete(tmpContentToSanitize);
+        boolean caught = false;
         try {
             Files.writeString(
                     tmpPersonalDict,
@@ -119,10 +122,16 @@ public class PersonalDictionaryApplicatorTest {
             PersonalDictionaryApplicator personalDictionaryApplicator = new PersonalDictionaryApplicator(tmpPersonalDict.toString(), tmpRegexPersonalDict.toString(), tmpContentToSanitize.toString(), null, false);
 
             personalDictionaryApplicator.executeUpdate();
+        } catch(FileNotFoundException fnfe) {
+            String excpMsg = fnfe.getMessage();
+            assertTrue(excpMsg.startsWith("There is no "));
+            assertTrue(excpMsg.endsWith(" to read data from and process into its counterpart."));
+            caught = true;
         } finally {
             Files.delete(tmpPersonalDict);
             Files.delete(tmpRegexPersonalDict);
         }
+        assertTrue(caught);
     }
 
     @Test

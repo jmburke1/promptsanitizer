@@ -19,10 +19,11 @@ class MainBatchJobAppTest {
                 MockedConstruction<MergeIntoPersonalDictionaryTool> mgIntoPDectToolMC = Mockito.mockConstruction(
                         MergeIntoPersonalDictionaryTool.class,
                         (mock, context) -> {
-                            assertEquals(3, context.arguments().size());
+                            assertEquals(4, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
                             assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
                             assertEquals("upserts.json", context.arguments().get(2));
+                            assertFalse((boolean)context.arguments().get(3));
                         }
                 );
                 MockedConstruction<PersonalDictionaryApplicator> personalDictApplMC = Mockito.mockConstruction(
@@ -50,10 +51,11 @@ class MainBatchJobAppTest {
                 MockedConstruction<MergeIntoPersonalDictionaryTool> mgIntoPDectToolMC = Mockito.mockConstruction(
                         MergeIntoPersonalDictionaryTool.class,
                         (mock, context) -> {
-                            assertEquals(3, context.arguments().size());
+                            assertEquals(4, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
                             assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
                             assertEquals("upserts.json", context.arguments().get(2));
+                            assertFalse((boolean)context.arguments().get(3));
                         }
                 );
                 MockedConstruction<PersonalDictionaryApplicator> personalDictApplMC = Mockito.mockConstruction(
@@ -92,10 +94,11 @@ class MainBatchJobAppTest {
                 MockedConstruction<MergeIntoPersonalDictionaryTool> mgIntoPDectToolMC = Mockito.mockConstruction(
                         MergeIntoPersonalDictionaryTool.class,
                         (mock, context) -> {
-                            assertEquals(3, context.arguments().size());
+                            assertEquals(4, context.arguments().size());
                             assertTrue(((String)context.arguments().get(0)).contains("personal_dictionary.json"));
                             assertTrue(((String)context.arguments().get(1)).contains("personal_regex_dictionary.json"));
                             assertEquals("upserts.json", context.arguments().get(2));
+                            assertTrue((boolean)context.arguments().get(3));
                         }
                 );
                 MockedConstruction<PersonalDictionaryApplicator> personalDictApplMC = Mockito.mockConstruction(
@@ -107,6 +110,18 @@ class MainBatchJobAppTest {
             Mockito.verify(mgIntoPDectToolMC.constructed().getFirst()).updatePersonalDictionary();
             assertEquals(0, personalDictApplMC.constructed().size());
         }
+    }
+    @Test
+    void testMainForNoArgsProvided() throws IOException {
+        boolean caught = false;
+        String[] testArgs = {};
+        try {
+            MainBatchJobApp.main(testArgs);
+        } catch(IllegalArgumentException iae) {
+            assertEquals("The batch job takes one argument where you specify forward, reverse or upsertonly", iae.getMessage());
+            caught = true;
+        }
+        assertTrue(caught);
     }
 
 }

@@ -4,10 +4,12 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
+import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MergeIntoPersonalDictionaryToolTest {
@@ -35,7 +37,7 @@ public class MergeIntoPersonalDictionaryToolTest {
                             "    \"shouldBeUnchangedBecauseExactEqual\": \"value6\"" +
                             "}"
             );
-            MergeIntoPersonalDictionaryTool mergeIntoPersonalDictionaryTool = new MergeIntoPersonalDictionaryTool(tmpPersonalDict.toString(), tmpRegexPersonalDict.toString(), tmpUpsertDict.toString());
+            MergeIntoPersonalDictionaryTool mergeIntoPersonalDictionaryTool = new MergeIntoPersonalDictionaryTool(tmpPersonalDict.toString(), tmpRegexPersonalDict.toString(), tmpUpsertDict.toString(), false);
 
             mergeIntoPersonalDictionaryTool.updatePersonalDictionary();
 
@@ -65,7 +67,7 @@ public class MergeIntoPersonalDictionaryToolTest {
                             "    \"key4\": \"value5\"" +
                             "}"
             );
-            MergeIntoPersonalDictionaryTool mergeIntoPersonalDictionaryTool = new MergeIntoPersonalDictionaryTool(tmpPersonalDict.toString(), tmpRegexPersonalDict.toString(), tmpUpsertDict.toString());
+            MergeIntoPersonalDictionaryTool mergeIntoPersonalDictionaryTool = new MergeIntoPersonalDictionaryTool(tmpPersonalDict.toString(), tmpRegexPersonalDict.toString(), tmpUpsertDict.toString(), false);
 
             mergeIntoPersonalDictionaryTool.updatePersonalDictionary();
 
@@ -117,7 +119,7 @@ public class MergeIntoPersonalDictionaryToolTest {
                             "    \"shouldBeUnchangedBecauseExactlySameInUpserts(.*)\": {\"repl\": \"fourtyTwoIsMagicNumber$1\", \"dir\": \"<\"}" +
                             "}"
             );
-            MergeIntoPersonalDictionaryTool mergeIntoPersonalDictionaryTool = new MergeIntoPersonalDictionaryTool(tmpPersonalDict.toString(), tmpRegexPersonalDict.toString(), tmpUpsertDict.toString());
+            MergeIntoPersonalDictionaryTool mergeIntoPersonalDictionaryTool = new MergeIntoPersonalDictionaryTool(tmpPersonalDict.toString(), tmpRegexPersonalDict.toString(), tmpUpsertDict.toString(), false);
 
             mergeIntoPersonalDictionaryTool.updatePersonalDictionary();
 
@@ -147,5 +149,36 @@ public class MergeIntoPersonalDictionaryToolTest {
             Files.delete(tmpRegexPersonalDict);
             Files.delete(tmpUpsertDict);
         }
+    }
+
+    @Test
+    void upsertShouldReturnEarlyWhenUpsertsNotExistAndNotUpsertOnlyFlow() throws Exception {
+        Path tmpUpsertDict = Files.createTempFile("upsert", ".json");
+        Files.delete(tmpUpsertDict);
+        boolean caught = false;
+        try {
+            MergeIntoPersonalDictionaryTool mergeIntoPersonalDictionaryTool = new MergeIntoPersonalDictionaryTool("/path/to/file.txt", "/path/to/other_file.txt", tmpUpsertDict.toString(), false);
+            mergeIntoPersonalDictionaryTool.updatePersonalDictionary();
+        } catch(FileNotFoundException fnfe) {
+            caught = true;
+        }
+        assertFalse(caught);
+    }
+
+    @Test
+    void upsertShouldThrowFNFEWhenUpsertsNotExistAndActuallyIsUpsertOnlyFlow() throws Exception {
+        Path tmpUpsertDict = Files.createTempFile("upsert", ".json");
+        Files.delete(tmpUpsertDict);
+        boolean caught = false;
+        try {
+            MergeIntoPersonalDictionaryTool mergeIntoPersonalDictionaryTool = new MergeIntoPersonalDictionaryTool("/path/to/file.txt", "/path/to/other_file.txt", tmpUpsertDict.toString(), true);
+            mergeIntoPersonalDictionaryTool.updatePersonalDictionary();
+        } catch(FileNotFoundException fnfe) {
+            String excpMsg = fnfe.getMessage();
+            assertTrue(excpMsg.startsWith("There is no upsert file "));
+            assertTrue(excpMsg.endsWith(" to merge into the personal dictionary."));
+            caught = true;
+        }
+        assertTrue(caught);
     }
 }
