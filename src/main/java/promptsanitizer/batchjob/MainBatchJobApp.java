@@ -1,5 +1,7 @@
 package promptsanitizer.batchjob;
 
+import promptsanitizer.namespaces.NameSpaceResolver;
+
 import java.io.IOException;
 
 public class MainBatchJobApp {
@@ -21,8 +23,9 @@ public class MainBatchJobApp {
         } else {
             throw new IllegalArgumentException("Must specify forward, reverse or upsertonly");
         }
-        String personalDictionaryFileLocationPrefix =
-                System.getProperty("user.home") +
+        NameSpaceResolver nameSpaceResolver = new NameSpaceResolver(System.getProperty("user.home"));
+        String personalDictionaryFileLocationPrefix = nameSpaceResolver
+                .resolveNameSpace(System.getenv("CURRENT_PROMPTSANITIZER_NAMESPACE")) +
                 System.getProperty("file.separator");
         String personalDictionaryFileLocation =
                 personalDictionaryFileLocationPrefix +
