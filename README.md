@@ -110,13 +110,13 @@ Replacements are applied sequentially - not simultaneously. So `"I saw an abcde 
 ### Quick install (Linux / macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0-tui/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.5/install.sh | bash
 ```
 
 This downloads the source, compiles it with Java 21+, and installs a `promptsanitizer` command to `/usr/local/bin`.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0-tui/localinstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.5/localinstall.sh | bash
 ```
 
 Similar to the first one, but the following two differences:
@@ -126,13 +126,13 @@ Similar to the first one, but the following two differences:
 Finally, the uninstallers are similarly named with
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0-tui/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.5/uninstall.sh | bash
 ```
 
 and
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.0-tui/localuninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.5/localuninstall.sh | bash
 ```
 
 
@@ -308,6 +308,19 @@ The batch mode is designed under the assumption of a click-ops workflow: your Do
 5. Run `promptsanitizer reverse` - restored original values appear in `unsanitized_content.txt`.
 
 The advantage: you're leveraging a local AI to surface sensitive information you might have missed, while nothing ever leaves your machine unredacted.
+
+## Namespace Support
+
+So far, the entire documentation has been assuming that you don't have an environment variable, called `CURRENT_PROMPTSANITIZER_NAMESPACE` set.  However, if you do, and if it adheres to certain regex patterns, then, instead of trying to find the personal dictionary files based only on your home directory, the application will try to find them based on your home directory, plus the path that comes from correctly interpreting this environment variable.
+
+The rules for the `CURRENT_PROMPTSANITIZER_NAMESPACE` environment variable are
+  - It must be separable into parts each part of which is a lowercase alphanumeric string with underscores allowed.
+  - The separator character for the parts is a dot `.`
+  - When the dots are replaced by the path separator character of your operating system (`/` for Linux and `\` for Windows) and appended to the path of your home directory, it represents a directory that actually exists.
+
+So, for a Linux example, if you execute `export CURRENT_PROMPTSANITIZER_NAMESPACE=bozo.the.clown` and, your username and home directory are something like `bob` and `/home/bob`, and if you have a `bozo/the/clown` directory path actually existing in your `/home/bob` directory, then the application will create and use personal dictionaries in that location instead of just your home directory.  This is true of both the GUI based application (or TUI if it falls back on headless mode) and of the batch job.
+
+This should be helpful for if you have different contexts in which you want to perform different substitutions depending on which AI web interface you want to have a conversation with.
 
 ## License
 
