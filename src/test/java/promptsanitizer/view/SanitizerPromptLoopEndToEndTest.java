@@ -8,7 +8,9 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import promptsanitizer.controller.DictionaryEditorController;
 import promptsanitizer.controller.SanitizerController;
+import promptsanitizer.model.DictionaryModel;
 import promptsanitizer.model.SanitizerModel;
 
 import java.io.ByteArrayInputStream;
@@ -17,11 +19,12 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.Scanner;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class SanitizerPromptLoopEndToEndTest {
 
@@ -194,6 +197,95 @@ class SanitizerPromptLoopEndToEndTest {
         String err = capturedError.toString();
         assertEquals("invalid.  Expected format is \"enterLeft: <text you want to enter with just type \\n for newlines>\n", err);
     }
+
+    @Test
+    void uninitializedDictionaries() {
+        Path tmpPersonalDictNotExist = Path.of(tmpPersonalDict.toString().replace("personalDict", "personalDictNotExist"));
+        Path tmpRegexPersonalDictNotExist = Path.of(tmpRegexPersonalDict.toString().replace("regexPersonalDict", "regexPersonalDictNotExist"));
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDictNotExist.toString(),
+                tmpRegexPersonalDictNotExist.toString(),
+                new SanitizerController(),
+                new SanitizerModel(),
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("enterLeft\nenterLeft: Lorem \\nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nclickMoveRight\nprintRight\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        // The prompt should have been printed once
+        assertTrue(capturedOutput.toString().contains("[No Dictionary Configured] You either haven't configured a personal dictionary yet or it has no data in it.\n" +
+                "Click the ~ button to set one up."));
+    }
+
+    @Test
+    void correctErrorMessageWhenSaveError() throws IOException {
+        Path tmpPersonalDictNotExist = Path.of(tmpPersonalDict.toString().replace("personalDict", "directoryNotExist" + System.getProperty("file.separator") + "personalDict"));
+        SanitizerModel model = new SanitizerModel();
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController() {
+                    public void handleTilde(
+                            PrintStream shouldBeSystemOut,
+                            PrintStream shouldBeSystemErr,
+                            Scanner shouldBeSystemInScanner
+                    ) {
+                        model.invalidateDictionary();
+                        assertNotNull(shouldBeSystemOut);
+                        new DictionaryEditorPromptLoop(tmpPersonalDictNotExist.toString(), new DictionaryEditorController(), new DictionaryModel(), shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemInScanner).promptForWhatToDo();
+                    }
+
+                },
+                model,
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("clickTildeButton\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        String err = capturedError.toString();
+        assertTrue(err.contains("[Save Error] Could not save to "));
+    }
+
+
+    @Test
+    void correctErrorMessageWhenLoadError() throws IOException {
+        SanitizerModel model = new SanitizerModel();
+        SanitizerPromptLoop loop = new SanitizerPromptLoop(
+                tmpPersonalDict.toString(),
+                tmpRegexPersonalDict.toString(),
+                new SanitizerController() {
+                    public void handleTilde(
+                            PrintStream shouldBeSystemOut,
+                            PrintStream shouldBeSystemErr,
+                            Scanner shouldBeSystemInScanner
+                    ) {
+                        boolean caught = false;
+                        try {
+                            Files.writeString(tmpPersonalDict, "{{ a bunch of random junk not really JSON format");
+                        } catch(IOException ioex) {
+                            caught = true;
+                        }
+                        assertFalse(caught);
+                        super.handleTilde(shouldBeSystemOut, shouldBeSystemErr, shouldBeSystemInScanner);
+                    }
+
+                },
+                model,
+                mockOut,
+                mockErr,
+                new ByteArrayInputStream("clickTildeButton\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n".getBytes())
+        );
+
+        loop.promptForWhatToDo();
+
+        String err = capturedError.toString();
+        assertTrue(err.contains("[Load Error] Could not read "));
+    }
+
 
     @Test
     void shouldBeAbleToPersonalizeResponse() {
