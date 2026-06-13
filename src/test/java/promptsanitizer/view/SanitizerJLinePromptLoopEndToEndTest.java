@@ -104,7 +104,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "  clickMoveLeft               - Personalize right panel and write to left panel\n" +
                 "  clickTildeButton            - Open the dictionary editor (~)\n" +
                 "  clickAsteriskTildeButton    - Open the regex dictionary editor (*~)\n" +
-                "SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
     }
 
     @Test
@@ -155,7 +155,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "  printTable                  - Print the current dictionary table\n" +
                 "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
                 "  clickSaveToFile             - Save the dictionary to file and closes the dictionary editor to return to main loop\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+                "DictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
     }
 
     @Test
@@ -181,7 +181,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "([0-9]*)bdf\t\t\tace$1\t<\n" +
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
     }
 
     @Test
@@ -201,7 +201,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: invalid.  Expected format is \"enterLeft: <text you want to enter with just type \\n for newlines>\nSanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem \nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nSanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+        assertEquals("SanitizerPromptLoop ... What do you want to do: invalid.  Expected format is \"enterLeft: <text you want to enter with just type \\n for newlines>\nSanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem \nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nSanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
     }
 
     @Test
@@ -316,7 +316,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: invalid.  Expected format is \"enterRight: <text you want to enter with just type \\n for newlines>\nSanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem \nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nSanitizerPromptLoop ... What do you want to do: ", capturedOutput.toString());
+        assertEquals("SanitizerPromptLoop ... What do you want to do: invalid.  Expected format is \"enterRight: <text you want to enter with just type \\n for newlines>\nSanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem \nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nSanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
     }
 
     @Test
@@ -359,7 +359,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", output);
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
         JSONObject jo = new JSONObject(Files.readString(tmpPersonalDict));
         assertEquals("0z123", jo.getString("TTVVV"));
         assertEquals("fghij", jo.getString("abcde"));
@@ -403,7 +403,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", output);
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
     }
 
     @Test
@@ -468,7 +468,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", output);
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
     }
 
 
@@ -540,7 +540,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "bbbbb\t\t\tqqqqq\n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", output);
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
         /*String err = capturedError.toString();
         assertEquals("invalid, row is out of range\n" +
                 "invalid, row is out of range\n" +
@@ -583,7 +583,15 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "uvwxy			z0123\n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", output);
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
+    }
+    private String cleanup(String t) {
+        return t
+                .replace("\r\n", "\n")
+                .replace("\r", "\n")
+                .replaceAll("\\u001B\\[[;?0-9]*[ -/]*[@-~]", "")
+                .replaceAll("\\u001B[=>]", "");
+
     }
 }
 
