@@ -5,10 +5,13 @@ set -euo pipefail
 APP_NAME="promptsanitizer"
 INSTALL_DIR="/opt/${APP_NAME}"
 LIB_DIR="${INSTALL_DIR}/lib"
-REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/main.zip"
+REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/feature/jlinesupport.zip"
 #REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/tags/v1.2.5.zip"
 JSON_VERSION="20250107"
 JSON_COORD="org.json:json:${JSON_VERSION}"
+JLINE_VERSION="3.30.13"
+JLINE_READER_COORD="org.jline:jline-reader:${JLINE_VERSION}"
+JLINE_TERMINAL_COORD="org.jline:jline-terminal:${JLINE_VERSION}"
 JAVA_MIN=21
 
 # -- Helpers -----------------------------------------------------------
@@ -56,28 +59,44 @@ sudo unzip downloaded.zip
 sudo rm downloaded.zip
 
 # -- Step 3: Download org.json jar -------------------------------------
-JAR_URL="https://repo1.maven.org/maven2/org/json/json/${JSON_VERSION}/json-${JSON_VERSION}.jar"
-JAR_PATH="${LIB_DIR}/json-${JSON_VERSION}.jar"
+JSON_JAR_URL="https://repo1.maven.org/maven2/org/json/json/${JSON_VERSION}/json-${JSON_VERSION}.jar"
+JSON_JAR_PATH="${LIB_DIR}/json-${JSON_VERSION}.jar"
 
-if [ ! -f "$JAR_PATH" ]; then
+if [ ! -f "$JSON_JAR_PATH" ]; then
     info "Downloading ${JSON_COORD} ..."
-    sudo curl -fsSL -o "$JAR_PATH" "$JAR_URL" || die "Failed to download ${JAR_URL}"
+    sudo curl -fsSL -o "$JSON_JAR_PATH" "$JSON_JAR_URL" || die "Failed to download ${JSON_JAR_URL}"
+fi
+
+JLINE_READER_JAR_URL="https://repo1.maven.org/maven2/org/jline/jline-reader/${JLINE_VERSION}/jline-reader-${JLINE_VERSION}.jar"
+JLINE_READER_JAR_PATH="${LIB_DIR}/jline-reader-${JLINE_VERSION}.jar"
+
+if [ ! -f "$JLINE_READER_JAR_PATH" ]; then
+    info "Downloading ${JLINE_READER_COORD} ..."
+    sudo curl -fsSL -o "$JLINE_READER_JAR_PATH" "$JLINE_READER_JAR_URL" || die "Failed to download ${JLINE_READER_JAR_URL}"
+fi
+
+JLINE_TERMINAL_JAR_URL="https://repo1.maven.org/maven2/org/jline/jline-terminal/${JLINE_VERSION}/jline-terminal-${JLINE_VERSION}.jar"
+JLINE_TERMINAL_JAR_PATH="${LIB_DIR}/jline-terminal-${JLINE_VERSION}.jar"
+
+if [ ! -f "$JLINE_TERMINAL_JAR_PATH" ]; then
+    info "Downloading ${JLINE_TERMINAL_COORD} ..."
+    sudo curl -fsSL -o "$JLINE_TERMINAL_JAR_PATH" "$JLINE_TERMINAL_JAR_URL" || die "Failed to download ${JLINE_TERMINAL_JAR_URL}"
 fi
 
 # -- Step 4: Compile MainApp and all main classes ---------------------
 info "Compiling Java sources ..."
-pushd promptsanitizer-main
+pushd promptsanitizer-feature-jlinesupport
 #pushd promptsanitizer-1.2.5
 sudo mv * ../
 sudo mv .gitignore ../
 sudo mv .gitattributes ../
 popd
-sudo rmdir promptsanitizer-main
+sudo rmdir promptsanitizer-feature-jlinesupport
 #sudo rmdir promptsanitizer-1.2.5
 
 # Collect all .java files under src/main/java
 sudo javac -d build -sourcepath src/main/java \
-    -cp "${INSTALL_DIR}/lib/json-${JSON_VERSION}.jar" \
+    -cp "${JSON_JAR_PATH}:${JLINE_READER_JAR_PATH}:${JLINE_TERMINAL_JAR_PATH}" \
     src/main/java/promptsanitizer/MainApp.java \
     src/main/java/promptsanitizer/batchjob/MainBatchJobApp.java \
     || die "Compilation failed."
