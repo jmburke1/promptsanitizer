@@ -154,7 +154,7 @@ class SanitizerControllerTest {
                 DictionaryEditorView.class, (mock, context) -> {
                     assertInstanceOf(DictionaryModel.class, context.arguments().get(2));
                 })) {
-            controller.handleTilde(null, null, null);
+            controller.handleTilde(null);
 
             Mockito.verify(model).invalidateDictionary();
             List<DictionaryEditorView> editorViews = viewMockedConstruction.constructed();
@@ -177,7 +177,7 @@ class SanitizerControllerTest {
                 DictionaryEditorView.class, (mock, context) -> {
                     assertInstanceOf(RegexDictionaryModel.class, context.arguments().get(2));
                 })) {
-            controller.handleAsteriskTilde(null, null, null);
+            controller.handleAsteriskTilde(null);
 
             Mockito.verify(model).invalidateDictionary();
             List<DictionaryEditorView> editorViews = viewMockedConstruction.constructed();
