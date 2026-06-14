@@ -124,7 +124,7 @@ sudo rmdir promptsanitizer-feature-jlinesupport
 
 # Collect all .java files under src/main/java
 sudo javac -d build -sourcepath src/main/java \
-    -cp "${JSON_JAR_PATH}:${JLINE_BUILTINS_JAR_URL}:${JLINE_READER_JAR_PATH}:${JLINE_TERMINALJANSI_JAR_URL}:${JLINE_CONSOLE_JAR_URL}:${JLINE_TERMINAL_JAR_PATH}" \
+    -cp "${JSON_JAR_PATH}:${JLINE_BUILTINS_JAR_PATH}:${JLINE_READER_JAR_PATH}:${JLINE_TERMINALJANSI_JAR_PATH}:${JLINE_CONSOLE_JAR_PATH}:${JLINE_TERMINAL_JAR_PATH}" \
     src/main/java/promptsanitizer/MainApp.java \
     src/main/java/promptsanitizer/batchjob/MainBatchJobApp.java \
     || die "Compilation failed."
