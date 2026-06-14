@@ -5,7 +5,7 @@ set -euo pipefail
 APP_NAME="promptsanitizer"
 INSTALL_DIR="/opt/${APP_NAME}"
 LIB_DIR="${INSTALL_DIR}/lib"
-REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/feature/jlinesupport.zip"
+REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/heads/main.zip"
 #REPO_URL="https://github.com/jmburke1/promptsanitizer/archive/refs/tags/v1.2.5.zip"
 JSON_VERSION="20250107"
 JSON_COORD="org.json:json:${JSON_VERSION}"
@@ -113,13 +113,13 @@ fi
 
 # -- Step 4: Compile MainApp and all main classes ---------------------
 info "Compiling Java sources ..."
-pushd promptsanitizer-feature-jlinesupport
+pushd promptsanitizer-main
 #pushd promptsanitizer-1.2.5
 sudo mv * ../
 sudo mv .gitignore ../
 sudo mv .gitattributes ../
 popd
-sudo rmdir promptsanitizer-feature-jlinesupport
+sudo rmdir promptsanitizer-main
 #sudo rmdir promptsanitizer-1.2.5
 
 # Collect all .java files under src/main/java
