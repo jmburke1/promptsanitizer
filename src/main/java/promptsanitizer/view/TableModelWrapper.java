@@ -35,7 +35,7 @@ public class TableModelWrapper extends AbstractTableModel {
         return model.getValueAt(i, i1);
     }
     @Override public void setValueAt(Object v, int r, int c) {
-        model.setValueAt(v, r, c);
+        model.setValueAt((String)v, r, c);
     }
     @Override public boolean isCellEditable(int r, int c) { return true; }
     @Override public String getColumnName(int c) {return model.getColumnName(c);}

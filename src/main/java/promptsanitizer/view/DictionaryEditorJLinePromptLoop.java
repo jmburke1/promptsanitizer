@@ -1,5 +1,7 @@
 package promptsanitizer.view;
 
+import org.jline.console.Printer;
+import org.jline.console.impl.DefaultPrinter;
 import org.jline.reader.*;
 import org.jline.reader.impl.DefaultParser;
 import org.jline.reader.impl.completer.StringsCompleter;
@@ -7,12 +9,11 @@ import org.jline.terminal.Terminal;
 import promptsanitizer.controller.DictionaryEditorController;
 import promptsanitizer.model.AbstractDictionaryModel;
 
-import java.io.PrintStream;
-import java.util.Scanner;
+import java.util.*;
 
 public class DictionaryEditorJLinePromptLoop {
     private boolean keepGoing;
-    private DictionaryEditorController controller;
+    private final DictionaryEditorController controller;
     protected AbstractDictionaryModel model;
     private int selectedRow;
     private final Terminal terminal;
@@ -157,18 +158,69 @@ public class DictionaryEditorJLinePromptLoop {
         return true;
     }
     private void printTable(int index) {
+        Printer printer = new TerminalPrinter(terminal);
+        List<Map<String, String>> rows = new ArrayList<>();
+
         int rowCount = model.getRowCount();
         terminal.writer().println("**********************");
         for(int i=0; i<rowCount; i++) {
-            terminal.writer().println(model.getValueAt(i,0) + "\t\t\t" + model.getValueAt(i,1) + getThirdValue(i) + (i == index ? "<<<<<" : ""));
+            rows.add(row(model.getValueAt(i,0), model.getValueAt(i,1), getThirdValue(i), (i == index ? "<<<<<" : "")));
         }
+        Map<String, Object> options = new HashMap<>();
+        options.put(Printer.COLUMNS, columnPrintOrder());
+        printer.println(options, rows);
         terminal.writer().println("**********************" + (rowCount == index ? "<<<<<" : ""));
     }
+    private Map<String, String> row(
+            String zerothColumn,
+            String firstColumn,
+            String secondColumnIfApplicable,
+            String thirdOrFourthColumn
+    ) {
+        Map<String, String> row = new HashMap<>();
+        row.put(model.getColumnName(0), zerothColumn);
+        row.put(model.getColumnName(1), firstColumn);
+        if(!secondColumnIfApplicable.isEmpty()) {
+            row.put(model.getColumnName(2), secondColumnIfApplicable);
+        }
+        row.put("", thirdOrFourthColumn);
+        return row;
+    }
+
+    private List<String> columnPrintOrder() {
+        List<String> options = new ArrayList<>();
+        options.add(model.getColumnName(0));
+        options.add(model.getColumnName(1));
+        if(model.getColumnCount() > 2) {
+            options.add(model.getColumnName(2));
+        }
+        options.add("");
+        return options;
+    }
+
     private int getSelectedRow() {
         return selectedRow;
     }
     private void setSelectedRow(int value) {
         selectedRow = value;
+    }
+    /**
+     * DefaultPrinter expects to know what Terminal it is printing to.
+     * JLine's own example does this by subclassing DefaultPrinter
+     * and overriding terminal().
+     */
+    private static class TerminalPrinter extends DefaultPrinter {
+        private final Terminal terminal;
+
+        TerminalPrinter(Terminal terminal) {
+            super(null);
+            this.terminal = terminal;
+        }
+
+        @Override
+        protected Terminal terminal() {
+            return terminal;
+        }
     }
 }
 

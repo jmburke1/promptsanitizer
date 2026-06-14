@@ -29,7 +29,7 @@ public class RegexDictionaryEditorJLinePromptLoop extends DictionaryEditorJLineP
         return "clickSortByReplacement";
     }
     String getThirdValue(int i) {
-        return "\t" + model.getValueAt(i, 2);
+        return model.getValueAt(i, 2);
     }
     void printHelp() {
         terminal.writer().println("You are in the regex dictionary editor prompt loop.  Choices are:");

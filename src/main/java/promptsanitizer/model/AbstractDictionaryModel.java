@@ -21,11 +21,11 @@ public abstract class AbstractDictionaryModel {
 
     public int getRowCount()              {  return replacementValues.size(); }
 
-    public Object getValueAt(int r, int c) {
+    public String getValueAt(int r, int c) {
         return replacementValues.get(r).getColumnValue(c);
     }
 
-    public void setValueAt(Object v, int r, int c) {
+    public void setValueAt(String v, int r, int c) {
         String s = (v == null) ? "" : v.toString();
         replacementValues.set(r, replacementValues.get(r).createOther(s, c));
         cellChangeBehavior.accept(r, c);

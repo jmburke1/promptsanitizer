@@ -123,10 +123,11 @@ class SanitizerJLinePromptLoopEndToEndTest {
 
         // The prompt should have been printed once
         assertEquals("SanitizerPromptLoop ... What do you want to do: clickAsteriskTildeButton\n**********************\n" +
-                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
-                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
-                "([0-9]*)bdf\t\t\tace$1\t<\n" +
-                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "Regex        Replacement Direction  \n" +
+                "ace([0-9]*)  $1bdf       >          \n" +
+                "welp([a-z]*) $1zepp      >          \n" +
+                "([0-9]*)bdf  ace$1       <          \n" +
+                "([a-z]*)zepp welp$1      <          \n" +
                 "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: hungry\nUnknown command.  Type 'help' for a list of commands.\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: help\nYou are in the regex dictionary editor prompt loop.  Choices are:\n" +
@@ -139,9 +140,10 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
                 "  clickSaveToFile             - Save the regex dictionary to file and closes the regex dictionary editor to return to main loop\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: clickCancel\nSanitizerPromptLoop ... What do you want to do: clickTildeButton\n**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "vuwxy\t\t\t0z123\n" +
-                "uvwxy\t\t\tz0123\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "vuwxy     0z123  \n" +
+                "uvwxy     z0123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: hungry\nUnknown command.  Type 'help' for a list of commands.\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: help\nYou are in the dictionary editor prompt loop.  Choices are:\n" +
@@ -174,10 +176,11 @@ class SanitizerJLinePromptLoopEndToEndTest {
 
         // The prompt should have been printed once
         assertEquals("SanitizerPromptLoop ... What do you want to do: clickAsteriskTildeButton\n**********************\n" +
-                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
-                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
-                "([0-9]*)bdf\t\t\tace$1\t<\n" +
-                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "Regex        Replacement Direction  \n" +
+                "ace([0-9]*)  $1bdf       >          \n" +
+                "welp([a-z]*) $1zepp      >          \n" +
+                "([0-9]*)bdf  ace$1       <          \n" +
+                "([a-z]*)zepp welp$1      <          \n" +
                 "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: \nSanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString(), feedInAsInput));
     }
@@ -337,9 +340,10 @@ class SanitizerJLinePromptLoopEndToEndTest {
         String output = capturedOutput.toString();
         assertEquals("SanitizerPromptLoop ... What do you want to do: clickTildeButton\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "vuwxy\t\t\t0z123\n" +
-                "uvwxy\t\t\tz0123\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "vuwxy     0z123  \n" +
+                "uvwxy     z0123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
                 "Enter row number (counting from zero'th row):\n-1\n" +
@@ -353,9 +357,10 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "Cell contents changed to: TTVVV\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "TTVVV\t\t\t0z123\n" +
-                "uvwxy\t\t\tz0123\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "TTVVV     0z123  \n" +
+                "uvwxy     z0123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickSaveToFile\n" +
                 "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
@@ -384,9 +389,10 @@ class SanitizerJLinePromptLoopEndToEndTest {
         String output = capturedOutput.toString();
         assertEquals("SanitizerPromptLoop ... What do you want to do: clickTildeButton\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "vuwxy\t\t\t0z123\n" +
-                "uvwxy\t\t\tz0123\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "vuwxy     0z123  \n" +
+                "uvwxy     z0123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
                 "Enter row number (counting from zero'th row):\nq\n" +
@@ -397,9 +403,10 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "invalid, column doesn't parse as integer\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "vuwxy\t\t\t0z123\n" +
-                "uvwxy\t\t\tz0123\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "vuwxy     0z123  \n" +
+                "uvwxy     z0123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickCancel\n" +
                 "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
@@ -424,10 +431,11 @@ class SanitizerJLinePromptLoopEndToEndTest {
         String output = capturedOutput.toString();
         assertEquals("SanitizerPromptLoop ... What do you want to do: clickAsteriskTildeButton\n" +
                 "**********************\n" +
-                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
-                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
-                "([0-9]*)bdf\t\t\tace$1\t<\n" +
-                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "Regex        Replacement Direction  \n" +
+                "ace([0-9]*)  $1bdf       >          \n" +
+                "welp([a-z]*) $1zepp      >          \n" +
+                "([0-9]*)bdf  ace$1       <          \n" +
+                "([a-z]*)zepp welp$1      <          \n" +
                 "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
                 "Enter row number (counting from zero'th row):\n2\n" +
@@ -441,30 +449,33 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "Cell contents changed to: >\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
-                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
-                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
-                "([0-9]*)bdf\t\t\tace$1\t>\n" +
-                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "Regex        Replacement Direction  \n" +
+                "ace([0-9]*)  $1bdf       >          \n" +
+                "welp([a-z]*) $1zepp      >          \n" +
+                "([0-9]*)bdf  ace$1       >          \n" +
+                "([a-z]*)zepp welp$1      <          \n" +
                 "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: editCellContents\nEnter row number (counting from zero'th row):\n2\n" +
                 "Enter column number (counting from zero'th column):\n2\n" +
                 "Enter new value:\n<\n" +
                 "Cell contents changed to: <\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: printTable\n**********************\n" +
-                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
-                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
-                "([0-9]*)bdf\t\t\tace$1\t<\n" +
-                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "Regex        Replacement Direction  \n" +
+                "ace([0-9]*)  $1bdf       >          \n" +
+                "welp([a-z]*) $1zepp      >          \n" +
+                "([0-9]*)bdf  ace$1       <          \n" +
+                "([a-z]*)zepp welp$1      <          \n" +
                 "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: editCellContents\nEnter row number (counting from zero'th row):\n2\n" +
                 "Enter column number (counting from zero'th column):\n1\n" +
                 "Enter new value:\nabe$1\n" +
                 "Cell contents changed to: abe$1\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: printTable\n**********************\n" +
-                "ace([0-9]*)\t\t\t$1bdf\t>\n" +
-                "welp([a-z]*)\t\t\t$1zepp\t>\n" +
-                "([0-9]*)bdf\t\t\tabe$1\t<\n" +
-                "([a-z]*)zepp\t\t\twelp$1\t<\n" +
+                "Regex        Replacement Direction  \n" +
+                "ace([0-9]*)  $1bdf       >          \n" +
+                "welp([a-z]*) $1zepp      >          \n" +
+                "([0-9]*)bdf  abe$1       <          \n" +
+                "([a-z]*)zepp welp$1      <          \n" +
                 "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: clickCancel\n" +
                 "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
@@ -490,16 +501,18 @@ class SanitizerJLinePromptLoopEndToEndTest {
         String output = capturedOutput.toString();
         assertEquals("SanitizerPromptLoop ... What do you want to do: clickTildeButton\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "vuwxy\t\t\t0z123\n" +
-                "uvwxy\t\t\tz0123\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "vuwxy     0z123  \n" +
+                "uvwxy     z0123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickAdd\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "vuwxy\t\t\t0z123\n" +
-                "uvwxy\t\t\tz0123\n" +
-                "\t\t\t<<<<<\n" +
+                "Sensitive Safe        \n" +
+                "abcde     fghij       \n" +
+                "vuwxy     0z123       \n" +
+                "uvwxy     z0123       \n" +
+                "                <<<<< \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
                 "Enter row number (counting from zero'th row):\n3\n" +
@@ -513,18 +526,20 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "Cell contents changed to: qqqqq\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "vuwxy\t\t\t0z123\n" +
-                "uvwxy\t\t\tz0123\n" +
-                "bbbbb\t\t\tqqqqq\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "vuwxy     0z123  \n" +
+                "uvwxy     z0123  \n" +
+                "bbbbb     qqqqq  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickRemove\n" +
                 "Enter row number (counting from zero'th row):\n1\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "vuwxy\t\t\t0z123<<<<<\n" +
-                "uvwxy\t\t\tz0123\n" +
-                "bbbbb\t\t\tqqqqq\n" +
+                "Sensitive Safe        \n" +
+                "abcde     fghij       \n" +
+                "vuwxy     0z123 <<<<< \n" +
+                "uvwxy     z0123       \n" +
+                "bbbbb     qqqqq       \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickRemove\n" +
                 "Enter row number (counting from zero'th row):\n-1\n" +
@@ -537,9 +552,10 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "invalid, row doesn't parse as integer\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
-                "abcde\t\t\tfghij\n" +
-                "uvwxy\t\t\tz0123\n" +
-                "bbbbb\t\t\tqqqqq\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "uvwxy     z0123  \n" +
+                "bbbbb     qqqqq  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickCancel\n" +
                 "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
@@ -564,21 +580,24 @@ class SanitizerJLinePromptLoopEndToEndTest {
         String output = capturedOutput.toString();
         assertEquals("SanitizerPromptLoop ... What do you want to do: clickTildeButton\n" +
                 "**********************\n" +
-                "abcde			fghij\n" +
-                "vuwxy			0z123\n" +
-                "uvwxy			z0123\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "vuwxy     0z123  \n" +
+                "uvwxy     z0123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickSortBySensitive\n" +
                 "**********************\n" +
-                "abcde			fghij\n" +
-                "uvwxy			z0123\n" +
-                "vuwxy			0z123\n" +
+                "Sensitive Safe   \n" +
+                "abcde     fghij  \n" +
+                "uvwxy     z0123  \n" +
+                "vuwxy     0z123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickSortBySafe\n" +
                 "**********************\n" +
-                "vuwxy			0z123\n" +
-                "abcde			fghij\n" +
-                "uvwxy			z0123\n" +
+                "Sensitive Safe   \n" +
+                "vuwxy     0z123  \n" +
+                "abcde     fghij  \n" +
+                "uvwxy     z0123  \n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: clickCancel\n" +
                 "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
