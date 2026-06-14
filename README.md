@@ -188,7 +188,7 @@ Just run the app as usual. No flags needed:
 promptsanitizer
 ```
 
-If a display is available, the normal GUI opens. If not, you'll see this prompt:
+If a display is available, the normal GUI opens. If not, you'll see a JLine powered version of this prompt:
 
 ```
 SanitizerPromptLoop ... What do you want to do? (Type "help" for a list of commands):

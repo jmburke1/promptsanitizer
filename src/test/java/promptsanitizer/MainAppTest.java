@@ -11,11 +11,13 @@ import promptsanitizer.controller.SanitizerController;
 import promptsanitizer.model.SanitizerModel;
 import promptsanitizer.view.SanitizerView;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainAppTest {
     @Test
-    void testMain() {
+    void testMain() throws IOException {
         try(
                 MockedConstruction<SanitizerView> sanitizerMC = Mockito.mockConstruction(
                         SanitizerView.class,

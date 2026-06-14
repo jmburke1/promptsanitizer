@@ -93,10 +93,10 @@ public class SanitizerView {
 
         JButton tildeButton = new JButton("~");
         tildeButton.setFont(font);
-        tildeButton.addActionListener(e -> controller.handleTilde(null, null, null));
+        tildeButton.addActionListener(e -> controller.handleTilde(null));
         JButton asteriskTildeButton = new JButton("*~");
         asteriskTildeButton.setFont(font);
-        asteriskTildeButton.addActionListener(e -> controller.handleAsteriskTilde(null, null, null));
+        asteriskTildeButton.addActionListener(e -> controller.handleAsteriskTilde(null));
 
         buttonPanel.add(topButtons);
         buttonPanel.add(Box.createVerticalStrut(4));

@@ -13,6 +13,12 @@ UNZIP_URL="https://raw.githubusercontent.com/jmburke1/promptsanitizer/main/Unzip
 #UNZIP_URL="https://raw.githubusercontent.com/jmburke1/promptsanitizer/v1.2.5/Unzip.java"
 JSON_VERSION="20250107"
 JSON_COORD="org.json:json:${JSON_VERSION}"
+JLINE_VERSION="3.30.13"
+JLINE_READER_COORD="org.jline:jline-reader:${JLINE_VERSION}"
+JLINE_TERMINAL_COORD="org.jline:jline-terminal:${JLINE_VERSION}"
+JLINE_CONSOLE_COORD="org.jline:jline-console:${JLINE_VERSION}"
+JLINE_TERMINALJANSI_COORD="org.jline:jline-terminal-jansi:${JLINE_VERSION}"
+JLINE_BUILTINS_COORD="org.jline:jline-builtins:${JLINE_VERSION}"
 
 # -- Helpers -----------------------------------------------------------
 die() { echo "[ERROR] $*" >&2; exit 1; }
@@ -56,10 +62,36 @@ ${JAV_DIR}/${JDK_FOLDER}/bin/java Unzip
 rm downloaded.zip
 
 # -- Step 3: Download org.json jar -------------------------------------
-JAR_URL="https://repo1.maven.org/maven2/org/json/json/${JSON_VERSION}/json-${JSON_VERSION}.jar"
-JAR_PATH="${LIB_DIR}/json-${JSON_VERSION}.jar"
+JSON_JAR_URL="https://repo1.maven.org/maven2/org/json/json/${JSON_VERSION}/json-${JSON_VERSION}.jar"
+JSON_JAR_PATH="${LIB_DIR}/json-${JSON_VERSION}.jar"
 info "Downloading ${JSON_COORD} ..."
-curl -fsSL -o "$JAR_PATH" "$JAR_URL" || die "Failed to download ${JAR_URL}"
+curl -fsSL -o "$JSON_JAR_PATH" "$JSON_JAR_URL" || die "Failed to download ${JSON_JAR_URL}"
+
+JLINE_READER_JAR_URL="https://repo1.maven.org/maven2/org/jline/jline-reader/${JLINE_VERSION}/jline-reader-${JLINE_VERSION}.jar"
+JLINE_READER_JAR_PATH="${LIB_DIR}/jline-reader-${JLINE_VERSION}.jar"
+info "Downloading ${JLINE_READER_COORD} ..."
+curl -fsSL -o "$JLINE_READER_JAR_PATH" "$JLINE_READER_JAR_URL" || die "Failed to download ${JLINE_READER_JAR_URL}"
+
+JLINE_TERMINAL_JAR_URL="https://repo1.maven.org/maven2/org/jline/jline-terminal/${JLINE_VERSION}/jline-terminal-${JLINE_VERSION}.jar"
+JLINE_TERMINAL_JAR_PATH="${LIB_DIR}/jline-terminal-${JLINE_VERSION}.jar"
+
+info "Downloading ${JLINE_TERMINAL_COORD} ..."
+curl -fsSL -o "$JLINE_TERMINAL_JAR_PATH" "$JLINE_TERMINAL_JAR_URL" || die "Failed to download ${JLINE_TERMINAL_JAR_URL}"
+
+JLINE_CONSOLE_JAR_URL="https://repo1.maven.org/maven2/org/jline/jline-console/${JLINE_VERSION}/jline-console-${JLINE_VERSION}.jar"
+JLINE_CONSOLE_JAR_PATH="${LIB_DIR}/jline-console-${JLINE_VERSION}.jar"
+info "Downloading ${JLINE_CONSOLE_COORD} ..."
+curl -fsSL -o "$JLINE_CONSOLE_JAR_PATH" "$JLINE_CONSOLE_JAR_URL" || die "Failed to download ${JLINE_CONSOLE_JAR_URL}"
+
+JLINE_TERMINALJANSI_JAR_URL="https://repo1.maven.org/maven2/org/jline/jline-terminal-jansi/${JLINE_VERSION}/jline-terminal-jansi-${JLINE_VERSION}.jar"
+JLINE_TERMINALJANSI_JAR_PATH="${LIB_DIR}/jline-terminal-jansi-${JLINE_VERSION}.jar"
+info "Downloading ${JLINE_TERMINALJANSI_COORD} ..."
+curl -fsSL -o "$JLINE_TERMINALJANSI_JAR_PATH" "$JLINE_TERMINALJANSI_JAR_URL" || die "Failed to download ${JLINE_TERMINALJANSI_JAR_URL}"
+
+JLINE_BUILTINS_JAR_URL="https://repo1.maven.org/maven2/org/jline/jline-builtins/${JLINE_VERSION}/jline-builtins-${JLINE_VERSION}.jar"
+JLINE_BUILTINS_JAR_PATH="${LIB_DIR}/jline-builtins-${JLINE_VERSION}.jar"
+info "Downloading ${JLINE_BUILTINS_COORD} ..."
+curl -fsSL -o "$JLINE_BUILTINS_JAR_PATH" "$JLINE_BUILTINS_JAR_URL" || die "Failed to download ${JLINE_BUILTINS_JAR_URL}"
 
 # -- Step 4: Compile MainApp and all main classes ---------------------
 EXTRACTED_FOLDER=$(ls -d promptsanitizer-*/ | head -1 | tr -d '\n')
@@ -71,7 +103,7 @@ rmdir ${EXTRACTED_FOLDER}
 # Compile
 info "Compiling Java sources ..."
 ${JAV_DIR}/${JDK_FOLDER}/bin/javac -d build -sourcepath src/main/java \
-    -cp "${INSTALL_DIR}/lib/json-${JSON_VERSION}.jar" \
+    -cp "${JSON_JAR_PATH}:${JLINE_BUILTINS_JAR_PATH}:${JLINE_READER_JAR_PATH}:${JLINE_TERMINALJANSI_JAR_PATH}:${JLINE_CONSOLE_JAR_PATH}:${JLINE_TERMINAL_JAR_PATH}" \
     src/main/java/promptsanitizer/MainApp.java \
     src/main/java/promptsanitizer/batchjob/MainBatchJobApp.java \
     || die "Compilation failed."

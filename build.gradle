@@ -15,6 +15,11 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.jline:jline-reader:3.30.13'
+    implementation 'org.jline:jline-terminal:3.30.13'
+    implementation 'org.jline:jline-console:3.30.13'
+    implementation 'org.jline:jline-terminal-jansi:3.30.13'
+    implementation 'org.jline:jline-builtins:3.30.13'
     implementation 'org.json:json:20250107'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.+'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
