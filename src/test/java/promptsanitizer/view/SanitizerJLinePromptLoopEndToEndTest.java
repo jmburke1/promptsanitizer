@@ -90,9 +90,9 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+        assertEquals("SanitizerPromptLoop ... What do you want to do: stareOutAWindow\n" +
                 "Unknown command.  Type 'help' for a list of commands.\n" +
-                "SanitizerPromptLoop ... What do you want to do: " +
+                "SanitizerPromptLoop ... What do you want to do: help\n" +
                 "You are in the sanitizer prompt loop.  Choices are:\n" +
                 "  exit                        - Exit the application\n" +
                 "  help                        - Show this menu of available commands\n" +
@@ -104,7 +104,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "  clickMoveLeft               - Personalize right panel and write to left panel\n" +
                 "  clickTildeButton            - Open the dictionary editor (~)\n" +
                 "  clickAsteriskTildeButton    - Open the regex dictionary editor (*~)\n" +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString(), feedInAsInput));
+                "SanitizerPromptLoop ... What do you want to do: exit", cleanup(capturedOutput.toString(), feedInAsInput));
     }
 
     @Test
@@ -124,14 +124,14 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: **********************\n" +
+        assertEquals("SanitizerPromptLoop ... What do you want to do: clickAsteriskTildeButton\n**********************\n" +
                 "ace([0-9]*)\t\t\t$1bdf\t>\n" +
                 "welp([a-z]*)\t\t\t$1zepp\t>\n" +
                 "([0-9]*)bdf\t\t\tace$1\t<\n" +
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: Unknown command.  Type 'help' for a list of commands.\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: You are in the regex dictionary editor prompt loop.  Choices are:\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: hungry\nUnknown command.  Type 'help' for a list of commands.\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: help\nYou are in the regex dictionary editor prompt loop.  Choices are:\n" +
                 "  clickCancel               - Close the regex dictionary editor and return to main loop\n" +
                 "  clickAdd                    - Add a new empty row to the regex dictionary\n" +
                 "  clickRemove                 - Remove the selected row (prompts for row number)\n" +
@@ -140,13 +140,13 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "  printTable                  - Print the current regex dictionary table\n" +
                 "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
                 "  clickSaveToFile             - Save the regex dictionary to file and closes the regex dictionary editor to return to main loop\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: **********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: clickCancel\nSanitizerPromptLoop ... What do you want to do: clickTildeButton\n**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: Unknown command.  Type 'help' for a list of commands.\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: You are in the dictionary editor prompt loop.  Choices are:\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: hungry\nUnknown command.  Type 'help' for a list of commands.\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: help\nYou are in the dictionary editor prompt loop.  Choices are:\n" +
                 "  clickCancel               - Close the dictionary editor and return to main loop\n" +
                 "  clickAdd                    - Add a new empty row to the dictionary\n" +
                 "  clickRemove                 - Remove the selected row (prompts for row number)\n" +
@@ -155,7 +155,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "  printTable                  - Print the current dictionary table\n" +
                 "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
                 "  clickSaveToFile             - Save the dictionary to file and closes the dictionary editor to return to main loop\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString(), feedInAsInput));
+                "DictionaryEditorPromptLoop ... What do you want to do: clickCancel\nSanitizerPromptLoop ... What do you want to do: exit", cleanup(capturedOutput.toString(), feedInAsInput));
     }
 
     @Test
@@ -337,30 +337,30 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         String output = capturedOutput.toString();
-        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+        assertEquals("SanitizerPromptLoop ... What do you want to do: clickTildeButton\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
-                "Enter new value:\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
+                "Enter row number (counting from zero'th row):\n-1\n" +
+                "Enter column number (counting from zero'th column):\n40\n" +
+                "Enter new value:\nqqqqq\n" +
                 "invalid, either row or column are out of range\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
-                "Enter new value:\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
+                "Enter row number (counting from zero'th row):\n1\n" +
+                "Enter column number (counting from zero'th column):\n0\n" +
+                "Enter new value:\nTTVVV\n" +
                 "Cell contents changed to: TTVVV\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "DictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "TTVVV\t\t\t0z123\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output, feedInAsInput));
+                "DictionaryEditorPromptLoop ... What do you want to do: clickSaveToFile\n" +
+                "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
         JSONObject jo = new JSONObject(Files.readString(tmpPersonalDict));
         assertEquals("0z123", jo.getString("TTVVV"));
         assertEquals("fghij", jo.getString("abcde"));
@@ -424,52 +424,52 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         String output = capturedOutput.toString();
-        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+        assertEquals("SanitizerPromptLoop ... What do you want to do: clickAsteriskTildeButton\n" +
                 "**********************\n" +
                 "ace([0-9]*)\t\t\t$1bdf\t>\n" +
                 "welp([a-z]*)\t\t\t$1zepp\t>\n" +
                 "([0-9]*)bdf\t\t\tace$1\t<\n" +
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
-                "Enter new value:\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
+                "Enter row number (counting from zero'th row):\n2\n" +
+                "Enter column number (counting from zero'th column):\n2\n" +
+                "Enter new value:\n%\n" +
                 "invalid, direction column must be either < or >\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
-                "Enter new value:\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
+                "Enter row number (counting from zero'th row):\n2\n" +
+                "Enter column number (counting from zero'th column):\n2\n" +
+                "Enter new value:\n>\n" +
                 "Cell contents changed to: >\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
                 "ace([0-9]*)\t\t\t$1bdf\t>\n" +
                 "welp([a-z]*)\t\t\t$1zepp\t>\n" +
                 "([0-9]*)bdf\t\t\tace$1\t>\n" +
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
-                "Enter new value:\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: editCellContents\nEnter row number (counting from zero'th row):\n2\n" +
+                "Enter column number (counting from zero'th column):\n2\n" +
+                "Enter new value:\n<\n" +
                 "Cell contents changed to: <\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: **********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: printTable\n**********************\n" +
                 "ace([0-9]*)\t\t\t$1bdf\t>\n" +
                 "welp([a-z]*)\t\t\t$1zepp\t>\n" +
                 "([0-9]*)bdf\t\t\tace$1\t<\n" +
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
-                "Enter new value:\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: editCellContents\nEnter row number (counting from zero'th row):\n2\n" +
+                "Enter column number (counting from zero'th column):\n1\n" +
+                "Enter new value:\nabe$1\n" +
                 "Cell contents changed to: abe$1\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: **********************\n" +
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: printTable\n**********************\n" +
                 "ace([0-9]*)\t\t\t$1bdf\t>\n" +
                 "welp([a-z]*)\t\t\t$1zepp\t>\n" +
                 "([0-9]*)bdf\t\t\tabe$1\t<\n" +
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output, feedInAsInput));
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: clickCancel\n" +
+                "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
     }
 
 
