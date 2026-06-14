@@ -10,7 +10,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 import promptsanitizer.controller.DictionaryEditorController;
 import promptsanitizer.controller.SanitizerController;
 import promptsanitizer.model.DictionaryModel;
@@ -28,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@Disabled
 class SanitizerJLinePromptLoopEndToEndTest {
 
     private ByteArrayOutputStream capturedOutput;
@@ -384,27 +382,27 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         String output = capturedOutput.toString();
-        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+        assertEquals("SanitizerPromptLoop ... What do you want to do: clickTildeButton\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
+                "Enter row number (counting from zero'th row):\nq\n" +
                 "invalid, row doesn't parse as integer\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
+                "Enter row number (counting from zero'th row):\n1\n" +
+                "Enter column number (counting from zero'th column):\nv\n" +
                 "invalid, column doesn't parse as integer\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "DictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output, feedInAsInput));
+                "DictionaryEditorPromptLoop ... What do you want to do: clickCancel\n" +
+                "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
     }
 
     @Test
