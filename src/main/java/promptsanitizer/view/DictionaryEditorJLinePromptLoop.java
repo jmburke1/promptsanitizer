@@ -168,6 +168,7 @@ public class DictionaryEditorJLinePromptLoop {
         }
         Map<String, Object> options = new HashMap<>();
         options.put(Printer.COLUMNS, columnPrintOrder());
+        options.put(Printer.ONE_ROW_TABLE, true);
         printer.println(options, rows);
         terminal.writer().println("**********************" + (rowCount == index ? "<<<<<" : ""));
     }
