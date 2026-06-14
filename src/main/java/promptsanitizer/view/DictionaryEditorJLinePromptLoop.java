@@ -51,9 +51,11 @@ public class DictionaryEditorJLinePromptLoop {
                 "clickSaveToFile"
         );
 
+        DefaultParser parser = new DefaultParser();
+        parser.setEscapeChars(new char[]{});
         LineReader reader = LineReaderBuilder.builder()
                 .terminal(terminal)
-                .parser(new DefaultParser())
+                .parser(parser)
                 .completer(commandCompleter)
                 .build();
 

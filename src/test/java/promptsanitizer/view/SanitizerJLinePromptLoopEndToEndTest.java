@@ -75,11 +75,11 @@ class SanitizerJLinePromptLoopEndToEndTest {
 
     @Test
     void shouldUnknownCommandFollowedByHelp() throws IOException {
+        String feedInAsInput = "stareOutAWindow\nhelp\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("stareOutAWindow\nhelp\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -104,16 +104,16 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "  clickMoveLeft               - Personalize right panel and write to left panel\n" +
                 "  clickTildeButton            - Open the dictionary editor (~)\n" +
                 "  clickAsteriskTildeButton    - Open the regex dictionary editor (*~)\n" +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString(), feedInAsInput));
     }
 
     @Test
     void shouldUnknownCommandFollowedByHelp2() throws IOException {
+        String feedInAsInput = "clickAsteriskTildeButton\nhungry\nhelp\nclickCancel\nclickTildeButton\nhungry\nhelp\nclickCancel\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickAsteriskTildeButton\nhungry\nhelp\nclickCancel\nclickTildeButton\nhungry\nhelp\nclickCancel\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -155,16 +155,16 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "  printTable                  - Print the current dictionary table\n" +
                 "  editCellContents            - Edit a cell (prompts for row, column, and new value)\n" +
                 "  clickSaveToFile             - Save the dictionary to file and closes the dictionary editor to return to main loop\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
+                "DictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString(), feedInAsInput));
     }
 
     @Test
     void implicitExit_shouldTerminateLoop() throws IOException {
+        String feedInAsInput = "clickAsteriskTildeButton\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickAsteriskTildeButton\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -175,22 +175,22 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: **********************\n" +
+        assertEquals("SanitizerPromptLoop ... What do you want to do: clickAsteriskTildeButton\n**********************\n" +
                 "ace([0-9]*)\t\t\t$1bdf\t>\n" +
                 "welp([a-z]*)\t\t\t$1zepp\t>\n" +
                 "([0-9]*)bdf\t\t\tace$1\t<\n" +
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
-                "RegexDictionaryEditorPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
+                "RegexDictionaryEditorPromptLoop ... What do you want to do: \nSanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString(), feedInAsInput));
     }
 
     @Test
     void shouldBeAbleToSanitizePrompt() throws IOException {
+        String feedInAsInput = "enterLeft\nenterLeft: Lorem \\nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nclickMoveRight\nprintRight\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("enterLeft\nenterLeft: Lorem \\nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nclickMoveRight\nprintRight\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -201,16 +201,16 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: invalid.  Expected format is \"enterLeft: <text you want to enter with just type \\n for newlines>\nSanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem \nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nSanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
+        assertEquals("SanitizerPromptLoop ... What do you want to do: enterLeft\ninvalid.  Expected format is \"enterLeft: <text you want to enter with just type \\n for newlines>\nSanitizerPromptLoop ... What do you want to do: enterLeft: Lorem \\nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nSanitizerPromptLoop ... What do you want to do: clickMoveRight\nSanitizerPromptLoop ... What do you want to do: printRight\nLorem \nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nSanitizerPromptLoop ... What do you want to do: exit", cleanup(capturedOutput.toString(), feedInAsInput));
     }
 
     @Test
     void uninitializedDictionaries() throws IOException {
+        String feedInAsInput = "enterLeft\nenterLeft: Lorem \\nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nclickMoveRight\nprintRight\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("enterLeft\nenterLeft: Lorem \\nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nclickMoveRight\nprintRight\nexit\n".getBytes()), mockOut)
-                .build();
-        Path tmpPersonalDictNotExist = Path.of(tmpPersonalDict.toString().replace("personalDict", "personalDictNotExist"));
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        Path tmpPersonalDictNotExist = Path.of(tmpPersonalDict.toString().replace("personalDict", "personalDictNotExist"));
         Path tmpRegexPersonalDictNotExist = Path.of(tmpRegexPersonalDict.toString().replace("regexPersonalDict", "regexPersonalDictNotExist"));
         SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDictNotExist.toString(),
@@ -231,11 +231,11 @@ class SanitizerJLinePromptLoopEndToEndTest {
 
     @Test
     void correctErrorMessageWhenSaveError() throws IOException {
+        String feedInAsInput = "clickTildeButton\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickTildeButton\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n".getBytes()), mockOut)
-                .build();
-        Path tmpPersonalDictNotExist = Path.of(tmpPersonalDict.toString().replace("personalDict", "directoryNotExist" + System.getProperty("file.separator") + "personalDict"));
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        Path tmpPersonalDictNotExist = Path.of(tmpPersonalDict.toString().replace("personalDict", "directoryNotExist" + System.getProperty("file.separator") + "personalDict"));
         SanitizerModel model = new SanitizerModel();
         SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
@@ -264,11 +264,11 @@ class SanitizerJLinePromptLoopEndToEndTest {
 
     @Test
     void correctErrorMessageWhenLoadError() throws IOException {
+        String feedInAsInput = "clickTildeButton\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickTildeButton\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerModel model = new SanitizerModel();
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerModel model = new SanitizerModel();
         SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
@@ -301,9 +301,10 @@ class SanitizerJLinePromptLoopEndToEndTest {
 
     @Test
     void shouldBeAbleToPersonalizeResponse() throws IOException {
+        String feedInAsInput = "enterRight\nenterRight: Lorem \\nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nclickMoveLeft\nprintLeft\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("enterRight\nenterRight: Lorem \\nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nclickMoveLeft\nprintLeft\nexit\n".getBytes()), mockOut)
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
                 .build();
         SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
@@ -316,16 +317,16 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         // The prompt should have been printed once
-        assertEquals("SanitizerPromptLoop ... What do you want to do: invalid.  Expected format is \"enterRight: <text you want to enter with just type \\n for newlines>\nSanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: SanitizerPromptLoop ... What do you want to do: Lorem \nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nSanitizerPromptLoop ... What do you want to do: ", cleanup(capturedOutput.toString()));
+        assertEquals("SanitizerPromptLoop ... What do you want to do: enterRight\ninvalid.  Expected format is \"enterRight: <text you want to enter with just type \\n for newlines>\nSanitizerPromptLoop ... What do you want to do: enterRight: Lorem \\nipsum fghij ficum 47bdf acaazepp 0z123 landum z0123\nSanitizerPromptLoop ... What do you want to do: clickMoveLeft\nSanitizerPromptLoop ... What do you want to do: printLeft\nLorem \nipsum abcde ficum ace47 welpacaa vuwxy landum uvwxy\nSanitizerPromptLoop ... What do you want to do: exit", cleanup(capturedOutput.toString(), feedInAsInput));
     }
 
     @Test
     void shouldBeAbleToEditDictionary() throws IOException {
+        String feedInAsInput = "clickTildeButton\neditCellContents\n-1\n40\nqqqqq\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickTildeButton\neditCellContents\n-1\n40\nqqqqq\neditCellContents\n1\n0\nTTVVV\nprintTable\nclickSaveToFile\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -359,7 +360,7 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output, feedInAsInput));
         JSONObject jo = new JSONObject(Files.readString(tmpPersonalDict));
         assertEquals("0z123", jo.getString("TTVVV"));
         assertEquals("fghij", jo.getString("abcde"));
@@ -368,11 +369,11 @@ class SanitizerJLinePromptLoopEndToEndTest {
 
     @Test
     void shouldCatchRowNotParseAsIntegerAndColumnNotParseAsIntegerEditDictionary() throws IOException {
+        String feedInAsInput = "clickTildeButton\neditCellContents\nq\neditCellContents\n1\nv\nprintTable\nclickCancel\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickTildeButton\neditCellContents\nq\neditCellContents\n1\nv\nprintTable\nclickCancel\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -403,16 +404,16 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
                 "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output, feedInAsInput));
     }
 
     @Test
     void shouldBeAbleToEditThirdColumnWithLessThanOrGreaterThanOnly() throws IOException {
+        String feedInAsInput = "clickAsteriskTildeButton\neditCellContents\n2\n2\n%\neditCellContents\n2\n2\n>\nprintTable\neditCellContents\n2\n2\n<\nprintTable\neditCellContents\n2\n1\nabe$1\nprintTable\nclickCancel\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickAsteriskTildeButton\neditCellContents\n2\n2\n%\neditCellContents\n2\n2\n>\nprintTable\neditCellContents\n2\n2\n<\nprintTable\neditCellContents\n2\n1\nabe$1\nprintTable\nclickCancel\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -468,17 +469,17 @@ class SanitizerJLinePromptLoopEndToEndTest {
                 "([a-z]*)zepp\t\t\twelp$1\t<\n" +
                 "**********************\n" +
                 "RegexDictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
+                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output, feedInAsInput));
     }
 
 
     @Test
     void shouldBeAbleToAddAndRemoveRows() throws IOException {
+        String feedInAsInput = "clickTildeButton\nclickAdd\neditCellContents\n3\n0\nbbbbb\neditCellContents\n3\n1\nqqqqq\nprintTable\nclickRemove\n1\nclickRemove\n-1\nclickRemove\n99\nclickRemove\nx\nprintTable\nclickCancel\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickTildeButton\nclickAdd\neditCellContents\n3\n0\nbbbbb\neditCellContents\n3\n1\nqqqqq\nprintTable\nclickRemove\n1\nclickRemove\n-1\nclickRemove\n99\nclickRemove\nx\nprintTable\nclickCancel\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -489,71 +490,70 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         String output = capturedOutput.toString();
-        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+        assertEquals("SanitizerPromptLoop ... What do you want to do: clickTildeButton\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "DictionaryEditorPromptLoop ... What do you want to do: clickAdd\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "\t\t\t<<<<<\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
-                "Enter new value:\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
+                "Enter row number (counting from zero'th row):\n3\n" +
+                "Enter column number (counting from zero'th column):\n0\n" +
+                "Enter new value:\nbbbbb\n" +
                 "Cell contents changed to: bbbbb\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "Enter column number (counting from zero'th column):\n" +
-                "Enter new value:\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: editCellContents\n" +
+                "Enter row number (counting from zero'th row):\n3\n" +
+                "Enter column number (counting from zero'th column):\n1\n" +
+                "Enter new value:\nqqqqq\n" +
                 "Cell contents changed to: qqqqq\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "DictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "bbbbb\t\t\tqqqqq\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: clickRemove\n" +
+                "Enter row number (counting from zero'th row):\n1\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "vuwxy\t\t\t0z123<<<<<\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "bbbbb\t\t\tqqqqq\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "Enter row number (counting from zero'th row):\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "DictionaryEditorPromptLoop ... What do you want to do: clickRemove\n" +
+                "Enter row number (counting from zero'th row):\n-1\n" +
+                "invalid, row is out of range\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: clickRemove\n" +
+                "Enter row number (counting from zero'th row):\n99\n" +
+                "invalid, row is out of range\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: clickRemove\n" +
+                "Enter row number (counting from zero'th row):\nx\n" +
+                "invalid, row doesn't parse as integer\n" +
+                "DictionaryEditorPromptLoop ... What do you want to do: printTable\n" +
                 "**********************\n" +
                 "abcde\t\t\tfghij\n" +
                 "uvwxy\t\t\tz0123\n" +
                 "bbbbb\t\t\tqqqqq\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
-        /*String err = capturedError.toString();
-        assertEquals("invalid, row is out of range\n" +
-                "invalid, row is out of range\n" +
-                "invalid, row doesn't parse as integer\n", err);*/
+                "DictionaryEditorPromptLoop ... What do you want to do: clickCancel\n" +
+                "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
     }
 
     @Test
     void shouldBeAbleToSortRows() throws IOException {
+        String feedInAsInput = "clickTildeButton\nclickSortBySensitive\nclickSortBySafe\nclickCancel\nexit\n";
         Terminal terminal = TerminalBuilder.builder()
                 .system(false)
-                .streams(new ByteArrayInputStream("clickTildeButton\nclickSortBySensitive\nclickSortBySafe\nclickCancel\nexit\n".getBytes()), mockOut)
-                .build();
-        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
+                .streams(new ByteArrayInputStream(feedInAsInput.getBytes()), mockOut)
+                .build();        SanitizerJLinePromptLoop loop = new SanitizerJLinePromptLoop(
                 tmpPersonalDict.toString(),
                 tmpRegexPersonalDict.toString(),
                 new SanitizerController(),
@@ -564,34 +564,42 @@ class SanitizerJLinePromptLoopEndToEndTest {
         loop.promptForWhatToDo();
 
         String output = capturedOutput.toString();
-        assertEquals("SanitizerPromptLoop ... What do you want to do: " +
+        assertEquals("SanitizerPromptLoop ... What do you want to do: clickTildeButton\n" +
                 "**********************\n" +
                 "abcde			fghij\n" +
                 "vuwxy			0z123\n" +
                 "uvwxy			z0123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "DictionaryEditorPromptLoop ... What do you want to do: clickSortBySensitive\n" +
                 "**********************\n" +
                 "abcde			fghij\n" +
                 "uvwxy			z0123\n" +
                 "vuwxy			0z123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
+                "DictionaryEditorPromptLoop ... What do you want to do: clickSortBySafe\n" +
                 "**********************\n" +
                 "vuwxy			0z123\n" +
                 "abcde			fghij\n" +
                 "uvwxy			z0123\n" +
                 "**********************\n" +
-                "DictionaryEditorPromptLoop ... What do you want to do: " +
-                "SanitizerPromptLoop ... What do you want to do: ", cleanup(output));
+                "DictionaryEditorPromptLoop ... What do you want to do: clickCancel\n" +
+                "SanitizerPromptLoop ... What do you want to do: exit", cleanup(output, feedInAsInput));
     }
-    private String cleanup(String t) {
-        return t
+    private String cleanup(String t, String feedInAsInput) {
+        t = t
                 .replace("\r\n", "\n")
                 .replace("\r", "\n")
                 .replaceAll("\\u001B\\[[;?0-9]*[ -/]*[@-~]", "")
                 .replaceAll("\\u001B[=>]", "");
-
+        assertTrue(t.startsWith(feedInAsInput));
+        t = t.substring(feedInAsInput.length());
+        while(t.contains("\n\n")) {
+            t = t.replace("\n\n", "\n");
+        }
+        if(t.endsWith("\n")) {
+            t = t.substring(0, t.length() - 1);
+        }
+        return t;
     }
 }
 
